@@ -1,0 +1,435 @@
+file,source_family,column,inferred_type,non_empty_count,blank_count,blank_pct,unique_count,unique_count_capped,examples
+AffectedPersons__20260418_072029_UTC.csv,CBPF,Year,integer,16,0,0.0,1,False,2026
+AffectedPersons__20260418_072029_UTC.csv,CBPF,CBPF Name,string,16,0,0.0,16,False,Afghanistan | Bangladesh (AP-RHPF) | Chad (RhPF-WCA) | DRC | Ethiopia
+AffectedPersons__20260418_072029_UTC.csv,CBPF,Boys (Reached),integer,16,0,0.0,2,False,0 | 14513
+AffectedPersons__20260418_072029_UTC.csv,CBPF,Boys (Targeted),integer,16,0,0.0,16,False,103914 | 1066888 | 314362 | 877795 | 1920814
+AffectedPersons__20260418_072029_UTC.csv,CBPF,Girls (Reached),integer,16,0,0.0,2,False,0 | 15077
+AffectedPersons__20260418_072029_UTC.csv,CBPF,Girls (Targeted),integer,16,0,0.0,16,False,108075 | 1010971 | 356770 | 922402 | 1979338
+AffectedPersons__20260418_072029_UTC.csv,CBPF,Men (Reached),integer,16,0,0.0,2,False,0 | 632
+AffectedPersons__20260418_072029_UTC.csv,CBPF,Men (Targeted),integer,16,0,0.0,16,False,71420 | 861995 | 172216 | 230399 | 1006940
+AffectedPersons__20260418_072029_UTC.csv,CBPF,Women (Reached),integer,16,0,0.0,2,False,0 | 1668
+AffectedPersons__20260418_072029_UTC.csv,CBPF,Women (Targeted),integer,16,0,0.0,16,False,90362 | 979172 | 235719 | 287310 | 1291303
+AffectedPersons__20260418_072029_UTC.csv,CBPF,Total (Reached),integer,16,0,0.0,2,False,0 | 31890
+AffectedPersons__20260418_072029_UTC.csv,CBPF,Total (Targeted),integer,16,0,0.0,16,False,373771 | 3919026 | 1079067 | 2317906 | 6198395
+AllocationFlow__20260418_071755_UTC.csv,CBPF,Year,integer,198,0,0.0,1,False,2026
+AllocationFlow__20260418_071755_UTC.csv,CBPF,Fund,string,198,0,0.0,33,False,Sudan | CAR | South Sudan | Somalia | Afghanistan
+AllocationFlow__20260418_071755_UTC.csv,CBPF,Partner type,string,198,0,0.0,6,False,UN Agency | International NGO | National NGO | Red Cross/Red Crescent Society | Others / Government
+AllocationFlow__20260418_071755_UTC.csv,CBPF,Direct funding,decimal,198,0,0.0,39,False,114000000.02 | 92500000.01 | 0 | 68219744.08 | 22949646.79
+AllocationFlow__20260418_071755_UTC.csv,CBPF,Net funding,decimal,198,0,0.0,49,False,114000000.02 | 90353000.01 | 2147000 | 0 | 59024182.08
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Year,integer,18,0,0.0,1,False,2026
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,CBPF Name,string,18,0,0.0,18,False,Afghanistan | Bangladesh (AP-RHPF) | Chad (RhPF-WCA) | DRC | Ethiopia
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Total Allocation,decimal,18,0,0.0,17,False,8487068.4 | 145896619.05 | 72622999.44 | 71024958.48 | 96999986.87
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Allocation (INGO),decimal,18,0,0.0,17,False,4507794.83 | 9699947.87 | 8461054.01 | 20641427.9 | 24086275
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Allocation (NNGO),decimal,18,0,0.0,15,False,3979273.57 | 13937203 | 5852012 | 4827200.55 | 13362719.84
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Allocation (Red Cross),decimal,18,0,0.0,7,False,0 | 226171 | 529600 | 350000 | 1716761
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Allocation (UN),decimal,18,0,0.0,14,False,0 | 122033297.18 | 57780333.43 | 45206330.03 | 59550992.03
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Reserve Allocation (INGO),decimal,18,0,0.0,17,False,4507794.83 | 9699947.87 | 8461054.01 | 20641427.9 | 24086275
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Reserve Allocation (NNGO),decimal,18,0,0.0,15,False,3979273.57 | 13937203 | 5852012 | 4827200.55 | 13362719.84
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Reserve Allocation (Red Cross),integer,18,0,0.0,6,False,0 | 226171 | 529600 | 350000 | 1716761
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Reserve Allocation (UN),decimal,18,0,0.0,14,False,0 | 122033297.18 | 57780333.43 | 45206330.03 | 59550992.03
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Standard Allocation (INGO),decimal,18,0,0.0,2,False,0 | 4491372.87
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Standard Allocation (NNGO),integer,18,0,0.0,2,False,0 | 1943622
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Standard Allocation (Red Cross),decimal,18,0,0.0,2,False,0 | 199080.99
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Standard Allocation (UN),integer,18,0,0.0,1,False,0
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Total Reserve Allocation,decimal,18,0,0.0,17,False,8487068.4 | 145896619.05 | 72622999.44 | 71024958.48 | 96999986.87
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Total Standard Allocation,decimal,18,0,0.0,2,False,0 | 6634075.86
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Total Under Approval Allocation,decimal,18,0,0.0,15,False,700000 | 0 | 24649707.39 | 78899999.98 | 5499207.8
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Under Approval Allocation (INGO),decimal,18,0,0.0,13,False,700000 | 0 | 23808585.39 | 50273474.01 | 18993055
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Under Approval Allocation (NNGO),decimal,18,0,0.0,14,False,0 | 420561 | 3653076 | 5499207.8 | 7676470
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Under Approval Allocation (Red),integer,18,0,0.0,1,False,0
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Under Approval Allocation (UN),decimal,18,0,0.0,8,False,0 | 24973449.97 | 82469889.18 | 13611544 | 62162360.43
+AllocationsTimeline__20260418_071808_UTC.csv,CBPF,AllocationSource,string,49,0,0.0,2,False,Reserve | Standard
+AllocationsTimeline__20260418_071808_UTC.csv,CBPF,AllocationHCLastProjectApprovalDate,date,49,0,0.0,35,False,3/19/2026 12:00:00 AM | 4/29/2026 12:00:00 AM | 3/2/2026 12:00:00 AM | 3/20/2026 12:00:00 AM | 1/23/2026 12:00:00 AM
+AllocationsTimeline__20260418_071808_UTC.csv,CBPF,TotalProjectsunderApproval,integer,49,0,0.0,14,False,1 | 0 | 8 | 14 | 6
+AllocationsTimeline__20260418_071808_UTC.csv,CBPF,TotalUnderApprovalBudget,decimal,49,0,0.0,24,False,700000 | 0 | 300000 | 169369 | 78900000
+AllocationsTimeline__20260418_071808_UTC.csv,CBPF,TotalProjectsApproved,integer,49,0,0.0,20,False,12 | 0 | 1 | 14 | 5
+AllocationsTimeline__20260418_071808_UTC.csv,CBPF,TotalApprovedBudget,decimal,49,0,0.0,36,False,8487068 | 0 | 350000 | 145896600 | 3000000
+AllocationsTimeline__20260418_071808_UTC.csv,CBPF,AllocationTypeId,integer,49,0,0.0,49,False,70 | 71 | 1548 | 1596 | 1562
+AllocationsTimeline__20260418_071808_UTC.csv,CBPF,AllocationSourceId,integer,49,0,0.0,2,False,1 | 2
+AllocationsTimeline__20260418_071808_UTC.csv,CBPF,FundTypeId,integer,49,0,0.0,1,False,1
+AllocationsTimeline__20260418_071808_UTC.csv,CBPF,CBPF,string,49,0,0.0,25,False,Afghanistan | Fiji (AP-Rhpf) | Vanuatu (AP-Rhpf) | Bangladesh (AP-RHPF) | CAR
+AllocationsTimeline__20260418_071808_UTC.csv,CBPF,Allocation Title,string,49,0,0.0,48,False,1st Reserve Allocation - Anticipatory Action | 2026 RA2 Reserve Allocation - Mine Action | 1st Reserve Allocation: Anticipatory Action – Tropical Cyclones (Fiji) | Anticipatory Action for Cyclones in Vanuatu | Fast-tracked support to JRP priortized response
+AllocationsTimeline__20260418_071808_UTC.csv,CBPF,Allocation Summary,string,49,0,0.0,49,False,"AHF launches a $10 million allocation under the joint $22 million CERF–AHF Anticipatory Action framework for drought in 2026 (CERF: $12M; AHF: $10M).  The allocation aims to:  •	Mitigate drought impacts before crisis thresholds are reached through trigger-based early financing.  •	Protect lives, livelihoods and dignity in the most climate-exposed, severity 4+ districts.  •	Deliver integrated, household-level support, centered on multipurpose cash and early warning, complemented by agriculture, WASH, nutrition, health and protection measures.  •	Enhance speed, predictability and coherence of pooled fund responses under a unified AA framework aligned with the 2026 HNRP.  Lessons applied from 2025: simplified trigger activation, tighter geographic targeting, and streamlined response packages—making anticipatory action (AA) more operational, scalable and fit-for-purpose in Afghanistan’s climate-risk context. | The escalation of the Afghanistan-Pakistan conflict has compounded an already critical humanitarian situation in Afghanistan, particularly in border and displacement-affected areas where insecurity, population movements, and access constraints intersect with widespread explosive ordnance contamination. In this context, the AHF is launching a US$ 1.5 million Reserve Allocation to reduce the immediate humanitarian impact of explosive ordnance on conflict-affected and displacement-affected populations through targeted mine action interventions in high-risk and underserved locations.  The allocation aims to:  •	Reduce death, injury, and psychological harm among civilians, especially children, through targeted EO risk education and community-based risk communication in high-risk areas.  •	Improve safe access to humanitarian assistance, essential services, and population movement routes through explosive ordnance survey, spot tasks, quick response, and priority clearance.  •	Restore safer access to critical civilian infrastructure and livelihood assets, including schools, health facilities, housing/public spaces, agricultural land, grazing areas, and water/irrigation access points.  •	Improved local readiness to respond to newly emerging contamination threats by empowering and funding priority to local/national NGOs.    The allocation will be delivered through multiple partners, with a strong emphasis on empowering local NGOs and reinforcing localized response capacity. 2 national NGOs and 1 international NGOs are pre-identified for this allocation for an expedited allocation process. | This Reserve Allocation supports timely, pre-agreed anticipatory actions triggered by forecasts under the Fiji Anticipatory Action Framework (2025–2027). It prioritizes NGO-led, community-level early actions, including early warning, cash, and WASH/NFI support, complementing CERF and other risk financing mechanisms, with flexibility to pivot to other shocks or early response as needed. | This Reserve Allocation enables the timely delivery of pre agreed, life saving early actions ahead of tropical cyclone impacts in Vanuatu, ensuring partners can act within the narrow window between reliable forecast and landfall. The allocation strengthens localization by prioritizing NGO implemented, community level anticipatory actions that complement nationally coordinated and UN-led interventions under the Vanuatu Anticipatory Action Framework for Tropical Cyclones.     Building on a series of national engagement – including the first national Anticipatory Action consultation convened by the National Disaster Management Office (NDMO) and OCHA on 10 December 2025—the allocation scales last mile delivery of early actions aligned with the framework’s pre agreed triggers, agreed geographic prioritization, and national coordination arrangements.     The allocation aims to strengthen operational reach across Vanuatu’s multi island geography, where remoteness and logistics constraints often delay response after impact. The allocation forms part of a layered anticipatory financing architecture for Vanuatu, complementing CERF pre arranged funding and planned contributions from bilateral donors and regional instruments. This integrated approach enables more predictable, coordinated, and cost effective humanitarian action ahead of severe cyclone impacts. | The Regional Humanitarian Pooled Fund for Asia and the Pacific (RHPF-AP) – Bangladesh envelope seeks US$150 million to support life-saving humanitarian assistance under the 2025–2026 Joint Response Plan (JRP) for the Rohingya Humanitarian Crisis and address emerging needs from natural disasters.    Bangladesh hosts over one million Rohingya refugees alongside vulnerable host communities in Cox’s Bazar, one of the country’s poorest and most disaster-prone districts. Continued displacement from Myanmar, including 130,000 new arrivals in 2025 and 35,000 expected in 2026, has intensified humanitarian needs. The 2026 JRP targets 1.56 million people, with financial requirements of US$698.4 million, including US$495.3 million in Priority 1 life-saving interventions. Funding shortfalls have heightened food insecurity, malnutrition, protection risks, and exposure to climate-related hazards.    Bangladesh also faces recurrent climate shocks—cyclones, floods, landslides, and disease outbreaks—affecting millions annually. Between 2015 and 2024, disasters affected an average of 9.7 million people per year. In 2024 alone, Cyclone Remal and widespread flooding affected 18 million people, compounding vulnerabilities in refugee-hosting areas.    Managed by OCHA’s Regional Office for Asia and the Pacific (ROAP) under the Resident Coordinator (RC), the RHPF-AP Bangladesh envelope provides flexible, timely financing to priority sectors identified through coordinated humanitarian processes. Allocations are determined through a transparent, consultative mechanism involving an Advisory Board of local and international NGOs, UN agencies, cluster coordinators, donors, and government counterparts. Contributions are unearmarked and allocated based on agreed priorities.    The Fund operates through two windows: (i) Standard Allocations aligned with JRP priorities, and (ii) Reserve Allocations for rapid response to unforeseen emergencies. In 2026, the Fund will focus on acute food insecurity, malnutrition, inadequate WASH services, shelter and NFI gaps, health needs, protection risks including GBV and child protection, and preparedness for climate hazards. Key priorities include:    General food assistance and fresh food vouchers, with LPG support for safe cooking;    Prevention and treatment of acute malnutrition among children under five and pregnant and breastfeeding women;    Emergency WASH, health services, and support to field hospitals;    Emergency shelter and NFI assistance;    Protection services for individuals at heightened risk.    The RHPF-AP emphasizes localization, prioritizing national and local partners and promoting humanitarian action that is “as local as possible, as international as necessary.” Consolidated regional management ensures cost-efficiency and compliance with OCHA’s Global Guidelines for CBPFs.    Monitoring and accountability are central. A risk-based approach prioritizes high-risk projects, with field visits, third-party monitoring where required, and remote monitoring in access-constrained areas. Robust due diligence, financial oversight, reporting, audits, and UN oversight ensure transparency. The Fund upholds strong Accountability to Affected Populations (AAP) standards, including feedback mechanisms and strict compliance with the UN’s zero-tolerance policy on Sexual Exploitation and Abuse (SEA).    Through predictable, flexible, and principled pooled financing, the RHPF-AP Bangladesh envelope strengthens coordinated humanitarian leadership, addresses funding gaps, empowers local actors, and enables timely, life-saving assistance to the most vulnerable refugees and host communities."
+AllocationsTimeline__20260418_071808_UTC.csv,CBPF,Total,integer,49,0,0.0,34,False,10000000 | 1483200 | 350000 | 1300000 | 145900000
+AllocationsTimeline__20260418_071808_UTC.csv,CBPF,Start Date,string,49,0,0.0,40,False,2026-02-28T23:00:00.000Z | 2026-04-18T22:00:00.000Z | 2026-02-10T23:00:00.000Z | 2026-04-06T22:00:00.000Z | 2026-03-05T23:00:00.000Z
+AllocationsTimeline__20260418_071808_UTC.csv,CBPF,End Date,string,49,0,0.0,35,False,2026-03-18T23:00:00.000Z | 2026-04-28T22:00:00.000Z | 2026-03-01T23:00:00.000Z | 2026-03-19T23:00:00.000Z | 2026-01-22T23:00:00.000Z
+Allocations__20260418_071733_UTC.csv,CBPF,Year,integer,33,0,0.0,1,False,2026
+Allocations__20260418_071733_UTC.csv,CBPF,PooledFund,string,33,0,0.0,23,False,Afghanistan | Fiji (AP-Rhpf) | Pakistan (AP-RHPF) | Bangladesh (AP-RHPF) | CAR
+Allocations__20260418_071733_UTC.csv,CBPF,AllocationType,string,33,0,0.0,2,False,reserve | standard
+Allocations__20260418_071733_UTC.csv,CBPF,Budget,integer,33,0,0.0,26,False,10000000 | 1483200 | 350000 | 1300000 | 145900000
+CBPFcontributions__20260418_071813_UTC.csv,CBPF,IsTransfer,integer,145,0,0.0,1,False,0
+CBPFcontributions__20260418_071813_UTC.csv,CBPF,Year,integer,145,0,0.0,1,False,2026
+CBPFcontributions__20260418_071813_UTC.csv,CBPF,Donor Name,string,145,0,0.0,29,False,Australia | Belgium | Canada | Cyprus | Denmark
+CBPFcontributions__20260418_071813_UTC.csv,CBPF,CBPF Name,string,145,0,0.0,30,False,Lebanon | Sudan | Burkina Faso (RhPF-WCA) | DRC | Mali (RhPF-WCA)
+CBPFcontributions__20260418_071813_UTC.csv,CBPF,Paid Amount,decimal,145,0,0.0,68,False,2683873.13 | 9758465.54 | 0 | 115482.23 | 115000
+CBPFcontributions__20260418_071813_UTC.csv,CBPF,Pledged Amount,decimal,145,0,0.0,47,False,0 | 3521126.76 | 9976525.82 | 2347417.84 | 4694835.68
+CBPFcontributions__20260418_071813_UTC.csv,CBPF,Total Contributions,decimal,145,0,0.0,108,False,2683873.13 | 9758465.54 | 3521126.76 | 9976525.82 | 2347417.84
+CBPFcontributions__20260418_071813_UTC.csv,CBPF,Local Curency,iso3_code,145,0,0.0,11,False,AUD | EUR | CAD | DKK | USD
+CBPFcontributions__20260418_071813_UTC.csv,CBPF,Exchange Rate,decimal,145,0,0.0,22,False,1.490000 | 1.440000 | 0.000000 | 0.860000 | 0.870000
+CBPFcontributions__20260418_071813_UTC.csv,CBPF,Paid Amount (Local Currency),decimal,145,0,0.0,59,False,3998970.96 | 14003398.05 | 0 | 99199.24 | 100050
+CBPFcontributions__20260418_071813_UTC.csv,CBPF,Pledged Amount (Local Currency),integer,145,0,0.0,26,False,0 | 3000000 | 8500000 | 2000000 | 4000000
+CBPFcontributions__20260418_071813_UTC.csv,CBPF,Total Contributions (Local Currency),decimal,145,0,0.0,73,False,3998970.96 | 14003398.05 | 3000000 | 8500000 | 2000000
+ContributionTrends__20260418_071819_UTC.csv,CBPF,Year,integer,381,0,0.0,30,False,2028 | 2027 | 2026 | 2025 | 2024
+ContributionTrends__20260418_071819_UTC.csv,CBPF,Donor Name,string,381,0,0.0,1,False,All Donors
+ContributionTrends__20260418_071819_UTC.csv,CBPF,CBPF Name,string,381,0,0.0,50,False,Lebanon | CAR | South Sudan | Yemen | Afghanistan
+ContributionTrends__20260418_071819_UTC.csv,CBPF,Paid Amount,decimal,381,0,0.0,375,False,0 | 13864860.55 | 150000000 | 4510737.529999999 | 6727059.18
+ContributionTrends__20260418_071819_UTC.csv,CBPF,Pledged Amount,decimal,381,0,0.0,26,False,1111111.11 | 280748.66 | 3363518.76 | 1321650.54 | 367647.06
+ContributionTrends__20260418_071819_UTC.csv,CBPF,Total Contributions,decimal,381,0,0.0,379,False,1111111.11 | 280748.66 | 3363518.76 | 15186511.09 | 367647.06
+ContributionTrends__20260418_071819_UTC.csv,CBPF,Paid Amount (Local Currency),string,381,0,0.0,1,False,n/a
+ContributionTrends__20260418_071819_UTC.csv,CBPF,Pledged Amount (Local Currency),string,381,0,0.0,1,False,n/a
+ContributionTrends__20260418_071819_UTC.csv,CBPF,Total Contributions (Local Currency),string,381,0,0.0,1,False,n/a
+ContributionTrends__20260418_071819_UTC.csv,CBPF,Exchange Rate,string,381,0,0.0,1,False,n/a
+ContributionTrends__20260418_071819_UTC.csv,CBPF,Local Currency,string,381,0,0.0,1,False,n/a
+ContributionsFlow__20260418_071825_UTC.csv,CBPF,IsTransfer,integer,145,0,0.0,1,False,0
+ContributionsFlow__20260418_071825_UTC.csv,CBPF,Year,integer,145,0,0.0,1,False,2026
+ContributionsFlow__20260418_071825_UTC.csv,CBPF,Donor Name,string,145,0,0.0,29,False,Australia | Belgium | Canada | Cyprus | Denmark
+ContributionsFlow__20260418_071825_UTC.csv,CBPF,CBPF Name,string,145,0,0.0,30,False,Lebanon | Sudan | Burkina Faso (RhPF-WCA) | DRC | Mali (RhPF-WCA)
+ContributionsFlow__20260418_071825_UTC.csv,CBPF,Paid Amount,decimal,145,0,0.0,68,False,2683873.13 | 9758465.54 | 0 | 115482.23 | 115000
+ContributionsFlow__20260418_071825_UTC.csv,CBPF,Pledged Amount,decimal,145,0,0.0,47,False,0 | 3521126.76 | 9976525.82 | 2347417.84 | 4694835.68
+ContributionsFlow__20260418_071825_UTC.csv,CBPF,Total Contributions,decimal,145,0,0.0,108,False,2683873.13 | 9758465.54 | 3521126.76 | 9976525.82 | 2347417.84
+ContributionsFlow__20260418_071825_UTC.csv,CBPF,Local Curency,iso3_code,145,0,0.0,11,False,AUD | EUR | CAD | DKK | USD
+ContributionsFlow__20260418_071825_UTC.csv,CBPF,Exchange Rate,decimal,145,0,0.0,22,False,1.490000 | 1.440000 | 0.000000 | 0.860000 | 0.870000
+ContributionsFlow__20260418_071825_UTC.csv,CBPF,Paid Amount (Local Currency),decimal,145,0,0.0,59,False,3998970.96 | 14003398.05 | 0 | 99199.24 | 100050
+ContributionsFlow__20260418_071825_UTC.csv,CBPF,Pledged Amount (Local Currency),integer,145,0,0.0,26,False,0 | 3000000 | 8500000 | 2000000 | 4000000
+ContributionsFlow__20260418_071825_UTC.csv,CBPF,Total Contributions (Local Currency),decimal,145,0,0.0,73,False,3998970.96 | 14003398.05 | 3000000 | 8500000 | 2000000
+GenderAgeMarker__20260418_072032_UTC.csv,CBPF,PooledFundId,integer,35,0,0.0,16,False,23 | 99 | 90 | 24 | 53
+GenderAgeMarker__20260418_072032_UTC.csv,CBPF,PooledFundName,string,35,0,0.0,16,False,Afghanistan | Bangladesh (AP-RHPF) | Chad (RhPF-WCA) | DRC | Ethiopia
+GenderAgeMarker__20260418_072032_UTC.csv,CBPF,AllocationYear,integer,35,0,0.0,1,False,2026
+GenderAgeMarker__20260418_072032_UTC.csv,CBPF,GenderMarkerGroup,iso3_code,35,0,0.0,1,False,GAM
+GenderAgeMarker__20260418_072032_UTC.csv,CBPF,GenderMarkerCode,integer,35,0,0.0,5,False,2 | 3 | 4 | 1 | 0
+GenderAgeMarker__20260418_072032_UTC.csv,CBPF,TotalProjects,integer,35,0,0.0,13,False,7 | 3 | 2 | 14 | 1
+GenderAgeMarker__20260418_072032_UTC.csv,CBPF,TotalBeneficiaries,integer,35,0,0.0,35,False,217494 | 76368 | 79909 | 3919026 | 91000
+GenderAgeMarker__20260418_072032_UTC.csv,CBPF,TotalBudget,decimal,35,0,0.0,35,False,4457577.24 | 2481014.92 | 1548476.24 | 145896619.05 | 20146999.37
+SectorsOverview__20260418_071833_UTC.csv,CBPF,Year,integer,97,0,0.0,1,False,2026
+SectorsOverview__20260418_071833_UTC.csv,CBPF,CBPF Name,string,97,0,0.0,16,False,Afghanistan | Bangladesh (AP-RHPF) | Chad (RhPF-WCA) | DRC | Ethiopia
+SectorsOverview__20260418_071833_UTC.csv,CBPF,Cluster,string,97,0,0.0,12,False,"Food Security | Health | Multi-Sector | Nutrition | Water, Sanitation and Hygiene"
+SectorsOverview__20260418_071833_UTC.csv,CBPF,Total Allocations,decimal,97,0,0.0,97,False,1048437.21 | 1290583.05 | 4042261.8899999997 | 673387.87 | 1432398.38
+SectorsOverview__20260418_071833_UTC.csv,CBPF,Targeted People,integer,97,0,0.0,97,False,42471 | 92295 | 124966 | 48935 | 65100
+SectorsOverview__20260418_071833_UTC.csv,CBPF,Reached People,integer,97,0,0.0,5,False,0 | 11149 | 2745 | 11769 | 6224
+cod_population_admin0.csv,COD-PS,ISO3,iso3_code,6722,0,0.0,139,False,AFG | ALB | AGO | AIA | ATG
+cod_population_admin0.csv,COD-PS,Country,string,6722,0,0.0,139,False,Afghanistan | Albania | Angola | Anguilla | Antigua and Barbuda
+cod_population_admin0.csv,COD-PS,ADM1_PCODE,empty,0,6722,100.0,0,False,
+cod_population_admin0.csv,COD-PS,ADM1_NAME,empty,0,6722,100.0,0,False,
+cod_population_admin0.csv,COD-PS,ADM2_PCODE,empty,0,6722,100.0,0,False,
+cod_population_admin0.csv,COD-PS,ADM2_NAME,empty,0,6722,100.0,0,False,
+cod_population_admin0.csv,COD-PS,ADM3_PCODE,empty,0,6722,100.0,0,False,
+cod_population_admin0.csv,COD-PS,ADM3_NAME,empty,0,6722,100.0,0,False,
+cod_population_admin0.csv,COD-PS,ADM4_PCODE,empty,0,6722,100.0,0,False,
+cod_population_admin0.csv,COD-PS,ADM4_NAME,empty,0,6722,100.0,0,False,
+cod_population_admin0.csv,COD-PS,Population_group,string,6722,0,0.0,257,False,F_TL | M_TL | T_TL | F_00_04 | M_00_04
+cod_population_admin0.csv,COD-PS,Gender,string,6722,0,0.0,3,False,f | m | all
+cod_population_admin0.csv,COD-PS,Age_range,string,6722,0,0.0,73,False,all | 0-4 | 5-9 | 10-14 | 15-19
+cod_population_admin0.csv,COD-PS,Age_min,integer,6315,407,6.0547,40,False,0 | 5 | 10 | 15 | 20
+cod_population_admin0.csv,COD-PS,Age_max,integer,5944,778,11.5739,38,False,4 | 9 | 14 | 19 | 24
+cod_population_admin0.csv,COD-PS,Population,integer,6722,0,0.0,6529,False,19844212 | 20567657 | 40411869 | 3571135 | 3707169
+cod_population_admin0.csv,COD-PS,Reference_year,integer,6722,0,0.0,17,False,2021 | 2024 | 2022 | 2023 | 2018
+cod_population_admin0.csv,COD-PS,Source,string,6722,0,0.0,125,False,National Statistic and Information Authority (NSIA) Afghanistan | UNFPA | Institut National de la Statistique et de l'Analyse Economique (baseline);  US Census Bureau (projections) | Anguilla Statistics Department | National Statistics Office (NSO) 2011 population and housing census.
+cod_population_admin0.csv,COD-PS,Contributor,string,6722,0,0.0,14,False,OCHA Afghanistan | UNFPA | OCHA Field Information Services Section (FISS) | OCHA Latin America and the Caribbean (ROLAC) | OCHA Democratic Republic of the Congo (DRC)
+cod_population_admin1.csv,COD-PS,ISO3,iso3_code,91471,0,0.0,123,False,ALB | AGO | ARG | ARM | AZE
+cod_population_admin1.csv,COD-PS,Country,string,91471,0,0.0,123,False,Albania | Angola | Argentina | Armenia | Azerbaijan
+cod_population_admin1.csv,COD-PS,ADM1_PCODE,string,91126,345,0.3772,1861,False,AL01 | AL02 | AL03 | AL04 | AL05
+cod_population_admin1.csv,COD-PS,ADM1_NAME,string,91471,0,0.0,1804,False,Berat | Dibër | Durrës | Elbasan | Fier
+cod_population_admin1.csv,COD-PS,ADM2_PCODE,empty,0,91471,100.0,0,False,
+cod_population_admin1.csv,COD-PS,ADM2_NAME,empty,0,91471,100.0,0,False,
+cod_population_admin1.csv,COD-PS,ADM3_PCODE,empty,0,91471,100.0,0,False,
+cod_population_admin1.csv,COD-PS,ADM3_NAME,empty,0,91471,100.0,0,False,
+cod_population_admin1.csv,COD-PS,ADM4_PCODE,empty,0,91471,100.0,0,False,
+cod_population_admin1.csv,COD-PS,ADM4_NAME,empty,0,91471,100.0,0,False,
+cod_population_admin1.csv,COD-PS,Population_group,string,91471,0,0.0,253,False,F_TL | M_TL | T_TL | F_00_04 | F_05_09
+cod_population_admin1.csv,COD-PS,Gender,string,91471,0,0.0,3,False,f | m | all
+cod_population_admin1.csv,COD-PS,Age_range,string,91471,0,0.0,70,False,all | 0-4 | 5-9 | 10-14 | 15-19
+cod_population_admin1.csv,COD-PS,Age_min,integer,85961,5510,6.0238,40,False,0 | 5 | 10 | 15 | 20
+cod_population_admin1.csv,COD-PS,Age_max,integer,81054,10417,11.3883,38,False,4 | 9 | 14 | 19 | 24
+cod_population_admin1.csv,COD-PS,Population,integer,91471,0,0.0,55860,False,62842 | 61786 | 124628 | 3125 | 3342
+cod_population_admin1.csv,COD-PS,Reference_year,integer,91471,0,0.0,18,False,2021 | 2024 | 2018 | 2022 | 2010
+cod_population_admin1.csv,COD-PS,Source,string,91471,0,0.0,110,False,UNFPA | Institut National de la Statistique et de l'Analyse Economique (baseline);  US Census Bureau (projections) | Projected by UNFPA from El Instituto Nacional de Estadística y Censos de la República Argentina (INDEC) data | National Statistical Service of the Republic of Armenia | State Statistical Committee of the Republic of Azerbaijan
+cod_population_admin1.csv,COD-PS,Contributor,string,91471,0,0.0,14,False,UNFPA | OCHA Field Information Services Section (FISS) | OCHA Latin America and the Caribbean (ROLAC) | OCHA Central African Republic | OCHA Democratic Republic of the Congo (DRC)
+cod_population_admin2.csv,COD-PS,ISO3,iso3_code,1001583,0,0.0,77,False,AGO | AZE | BGD | BLZ | BEN
+cod_population_admin2.csv,COD-PS,Country,string,1001583,0,0.0,77,False,Angola | Azerbaijan | Bangladesh | Belize | Benin
+cod_population_admin2.csv,COD-PS,ADM1_PCODE,string,1001583,0,0.0,1118,False,AO01 | AO02 | AO03 | AO04 | AO05
+cod_population_admin2.csv,COD-PS,ADM1_NAME,string,1001583,0,0.0,1083,False,Bengo | Benguela | Bié | Cabinda | Cuando Cubango
+cod_population_admin2.csv,COD-PS,ADM2_PCODE,string,1000017,1566,0.1564,18949,False,AO01001 | AO01002 | AO01005 | AO01040 | AO01043
+cod_population_admin2.csv,COD-PS,ADM2_NAME,string,1001475,108,0.0108,17890,False,Ambriz | Dande | Nambuangongo | Bula-Atumba | Dembos-Quibaxe
+cod_population_admin2.csv,COD-PS,ADM3_PCODE,empty,0,1001583,100.0,0,False,
+cod_population_admin2.csv,COD-PS,ADM3_NAME,empty,0,1001583,100.0,0,False,
+cod_population_admin2.csv,COD-PS,ADM4_PCODE,empty,0,1001583,100.0,0,False,
+cod_population_admin2.csv,COD-PS,ADM4_NAME,empty,0,1001583,100.0,0,False,
+cod_population_admin2.csv,COD-PS,Population_group,string,1001583,0,0.0,178,False,F_TL | M_TL | T_TL | F_00_04 | F_05_09
+cod_population_admin2.csv,COD-PS,Gender,string,1001583,0,0.0,3,False,f | m | all
+cod_population_admin2.csv,COD-PS,Age_range,string,1001583,0,0.0,61,False,all | 0-4 | 5-9 | 10-14 | 15-19
+cod_population_admin2.csv,COD-PS,Age_min,integer,945164,56419,5.633,39,False,0 | 5 | 10 | 15 | 20
+cod_population_admin2.csv,COD-PS,Age_max,integer,894836,106747,10.6578,38,False,4 | 9 | 14 | 19 | 24
+cod_population_admin2.csv,COD-PS,Population,integer,1001583,0,0.0,67181,False,15102 | 17667 | 32769 | 2877 | 2337
+cod_population_admin2.csv,COD-PS,Reference_year,integer,1001583,0,0.0,17,False,2024 | 2018 | 2022 | 2010 | 2023
+cod_population_admin2.csv,COD-PS,Source,string,1001583,0,0.0,72,False,Institut National de la Statistique et de l'Analyse Economique (baseline);  US Census Bureau (projections) | State Statistical Committee of the Republic of Azerbaijan | UNFPA and US Census Bureau (USCB) | Statistical Institute of Belize | Institut de la statistique du Bénin
+cod_population_admin2.csv,COD-PS,Contributor,string,1001583,0,0.0,14,False,UNFPA | OCHA Field Information Services Section (FISS) | OCHA Latin America and the Caribbean (ROLAC) | OCHA Central African Republic | OCHA Democratic Republic of the Congo (DRC)
+cod_population_admin3.csv,COD-PS,ISO3,iso3_code,241962,0,0.0,19,False,BGD | BWA | CAF | CHL | CRI
+cod_population_admin3.csv,COD-PS,Country,string,241962,0,0.0,19,False,Bangladesh | Botswana | Central African Republic | Chile | Costa Rica
+cod_population_admin3.csv,COD-PS,ADM1_PCODE,string,241962,0,0.0,223,False,BD10 | BD20 | BD30 | BD40 | BD45
+cod_population_admin3.csv,COD-PS,ADM1_NAME,string,241962,0,0.0,217,False,Barisal | Chittagong | Dhaka | Khulna | Mymensingh
+cod_population_admin3.csv,COD-PS,ADM2_PCODE,string,241962,0,0.0,1150,False,BD1004 | BD1006 | BD1009 | BD1042 | BD1078
+cod_population_admin3.csv,COD-PS,ADM2_NAME,string,241962,0,0.0,1154,False,Barguna | Barisal | Bhola | Jhalokati | Patuakhali
+cod_population_admin3.csv,COD-PS,ADM3_PCODE,string,241962,0,0.0,8259,False,BD100409 | BD100419 | BD100428 | BD100447 | BD100485
+cod_population_admin3.csv,COD-PS,ADM3_NAME,string,241962,0,0.0,7843,False,Amtali | Bamna | Barguna Sadar | Betagi | Patharghata
+cod_population_admin3.csv,COD-PS,ADM4_PCODE,empty,0,241962,100.0,0,False,
+cod_population_admin3.csv,COD-PS,ADM4_NAME,empty,0,241962,100.0,0,False,
+cod_population_admin3.csv,COD-PS,Population_group,string,241962,0,0.0,78,False,F_TL | M_TL | T_TL | F_00_04 | F_05_09
+cod_population_admin3.csv,COD-PS,Gender,string,241962,0,0.0,3,False,f | m | all
+cod_population_admin3.csv,COD-PS,Age_range,string,241962,0,0.0,26,False,all | 0-4 | 5-9 | 10-14 | 15-19
+cod_population_admin3.csv,COD-PS,Age_min,integer,221185,20777,8.5869,21,False,0 | 5 | 10 | 15 | 20
+cod_population_admin3.csv,COD-PS,Age_max,integer,207944,34018,14.0592,20,False,4 | 9 | 14 | 19 | 24
+cod_population_admin3.csv,COD-PS,Population,integer,241962,0,0.0,30782,False,142076 | 126963 | 269039 | 11119 | 11814
+cod_population_admin3.csv,COD-PS,Reference_year,integer,241962,0,0.0,10,False,2022 | 2023 | 2015 | 2021 | 2019
+cod_population_admin3.csv,COD-PS,Source,string,241962,0,0.0,19,False,"UNFPA and US Census Bureau (USCB) | UNFPA | General Census of Population and Housing, Census Office Central African Republic | UNFPA and Instituto Nacional de Estadísticas de Chile (INE) | Costa Rica National Statistics Office (NSO)"
+cod_population_admin3.csv,COD-PS,Contributor,string,241962,0,0.0,8,False,UNFPA | OCHA Central African Republic | OCHA West and Central Africa (ROWCA) | OCHA Ethiopia | OCHA Regional Office for Asia and the Pacific (ROAP)
+cod_population_admin4.csv,COD-PS,ISO3,iso3_code,17465,0,0.0,1,False,MDG
+cod_population_admin4.csv,COD-PS,Country,string,17465,0,0.0,1,False,Madagascar
+cod_population_admin4.csv,COD-PS,ADM1_PCODE,string,17465,0,0.0,22,False,MG11 | MG12 | MG13 | MG14 | MG21
+cod_population_admin4.csv,COD-PS,ADM1_NAME,string,17465,0,0.0,22,False,Analamanga | Vakinankaratra | Itasy | Bongolava | Haute Matsiatra
+cod_population_admin4.csv,COD-PS,ADM2_PCODE,string,17465,0,0.0,119,False,MG11101001A | MG11101002A | MG11101003A | MG11101004A | MG11101005A
+cod_population_admin4.csv,COD-PS,ADM2_NAME,string,17465,0,0.0,119,False,1er Arrondissement | 2e Arrondissement | 3e Arrondissement | 4e Arrondissement | 5e Arrondissement
+cod_population_admin4.csv,COD-PS,ADM3_PCODE,string,17465,0,0.0,1579,False,MG11101001 | MG11101002 | MG11101003 | MG11101004 | MG11101005
+cod_population_admin4.csv,COD-PS,ADM3_NAME,string,17465,0,0.0,1429,False,1er Arrondissement | 2e Arrondissement | 3e Arrondissement | 4e Arrondissement | 5e Arrondissement
+cod_population_admin4.csv,COD-PS,ADM4_PCODE,string,17465,0,0.0,17465,False,MG11101001001 | MG11101001002 | MG11101001003 | MG11101001004 | MG11101001005
+cod_population_admin4.csv,COD-PS,ADM4_NAME,string,17465,0,0.0,10977,False,Antanimalalaka Analakely | Ambalavao Isotry | Ambatonakanga Ambohitsorohitra | Ambatovinaky | Soarano Ambondrona Ambodifilao
+cod_population_admin4.csv,COD-PS,Population_group,string,17465,0,0.0,1,False,T_TL
+cod_population_admin4.csv,COD-PS,Gender,string,17465,0,0.0,1,False,all
+cod_population_admin4.csv,COD-PS,Age_range,string,17465,0,0.0,1,False,all
+cod_population_admin4.csv,COD-PS,Age_min,empty,0,17465,100.0,0,False,
+cod_population_admin4.csv,COD-PS,Age_max,empty,0,17465,100.0,0,False,
+cod_population_admin4.csv,COD-PS,Population,integer,17465,0,0.0,3298,False,1347 | 6436 | 2151 | 3804 | 8518
+cod_population_admin4.csv,COD-PS,Reference_year,integer,17465,0,0.0,1,False,2018
+cod_population_admin4.csv,COD-PS,Source,string,17465,0,0.0,1,False,INSTAT / Madagascar BNGRC (National Disaster Management Agency ) 2009 population data
+cod_population_admin4.csv,COD-PS,Contributor,string,17465,0,0.0,1,False,OCHA Regional Office for Southern and Eastern Africa (ROSEA)
+fts_incoming_funding_global.csv,FTS,date,date,7990,0,0.0,442,False,2026-02-04 | 2024-08-02 | 2026-04-17 | 2026-04-15 | 2026-04-14
+fts_incoming_funding_global.csv,FTS,budgetYear,integer,7346,644,8.0601,14,False,2026 | 2025 | 2023 | 2022 | 2024
+fts_incoming_funding_global.csv,FTS,description,string,7990,0,0.0,3474,False,"Providing humanitarian aid to vulnerable people affected by disasters induced by natural hazards, human-induced crises or exceptional situations or circumstances comparable to these, which have entailed or are likely to continue entailing major loss of life, physical and psychological or social suffering or material damage | IOM	Regional/OSE	2024-26 | Afghanistan Humanitarian Needs and Response Plan 2026 | Total private sector contributions | World Food Programme 	Afghanistan, Haiti, Lebanon, Palestine, Yemen, Pakistan, Angola, Burkina Faso, Burundi, Cameroon, CAR, DRC, Djibouti, Kenya, Madagascar, Mali, Nigeria, Rwanda, Somalia, South Sudan, Sudan, Tanzania, Uganda, Zimbabwe, Myanmar, Thailand, Ukraine"
+fts_incoming_funding_global.csv,FTS,amountUSD,integer,7990,0,0.0,5960,False,31335988 | 1046639 | 1609 | 1105651 | 36502
+fts_incoming_funding_global.csv,FTS,srcOrganization,string,7988,2,0.025,197,False,European Commission's Humanitarian Aid and Civil Protection Department | Swedish International Development Cooperation Agency (SIDA) | Switzerland for UNHCR | United Nations High Commissioner for Refugees | USA for UNHCR
+fts_incoming_funding_global.csv,FTS,srcOrganizationTypes,string,7988,2,0.025,7,False,Multilateral Organizations | Governments | Private Organizations | NGOs | Pooled Funds
+fts_incoming_funding_global.csv,FTS,srcLocations,iso3_code,4421,3569,44.6683,63,False,SWE | JPN | IRL | QAT | MCO
+fts_incoming_funding_global.csv,FTS,srcUsageYearStart,integer,7990,0,0.0,7,False,2026 | 2024 | 2025 | 2023 | 2022
+fts_incoming_funding_global.csv,FTS,srcUsageYearEnd,integer,7990,0,0.0,9,False,2026 | 2024 | 2025 | 2023 | 2022
+fts_incoming_funding_global.csv,FTS,destPlan,string,5018,2972,37.1965,34,False,Venezuela Regional Refugee and Migrant Response Plan (RMRP) 2026 | Afghanistan Humanitarian Needs and Response Plan 2026 | Burkina Faso Besoins Humanitaires et Plan de Réponse 2026 | Rohingya Humanitarian Crisis Joint Response Plan 2026 | République Centrafricaine Besoins Humanitaires et Plan de Réponse 2026
+fts_incoming_funding_global.csv,FTS,destPlanCode,string,5018,2972,37.1965,34,False,RREG26b | HAFG26 | HBFA26 | RBGD26 | HCAF26
+fts_incoming_funding_global.csv,FTS,destPlanId,integer,5018,2972,37.1965,34,False,1525 | 1502 | 1499 | 1524 | 1507
+fts_incoming_funding_global.csv,FTS,destOrganization,string,7925,65,0.8135,476,False,International Organization for Migration | United Nations High Commissioner for Refugees | World Food Programme | United Nations Office on Drugs and Crime | United Nations Development Programme
+fts_incoming_funding_global.csv,FTS,destOrganizationTypes,string,7925,65,0.8135,9,False,Multilateral Organizations | Pooled Funds | NGOs | Governments | Red Cross/Red Crescent Organizations
+fts_incoming_funding_global.csv,FTS,destGlobalClusters,string,6910,1080,13.5169,126,False,"Emergency Shelter and NFI,Protection,Water Sanitation Hygiene | Food Security,Logistics,Nutrition | Protection | Early Recovery,Protection | Food Security"
+fts_incoming_funding_global.csv,FTS,destLocations,string,7990,0,0.0,197,False,"ABW,ARG,BOL,BRA,CHL,COL,CRI,CUW,DOM,ECU,GUY,MEX,PAN,PER,PRY,TTO,URY | AFG | AFG,AGO,BDI,BFA,CAF,CMR,COD,DJI,HTI,KEN,LBN,MDG,MLI,MMR,NGA,PAK,PSE,RWA,SDN,SOM,SSD,THA,TZA,UGA,UKR,YEM,ZWE | AFG,AGO,DJI,DZA,ERI,ETH,GHA,GMB,LBN,LBY,LKA,LSO,MLI,MMR,NGA,NPL,PSE,SDN,SLE,SWZ,TGO,TZA,UKR | AFG,COG,COM,ETH,GIN,IRQ,KEN,KHM,LBR,MAR,MDA,MMR,MOZ,NGA,PSE,SDN,SOM,SSD,YEM"
+fts_incoming_funding_global.csv,FTS,destProject,string,120,7870,98.4981,80,False,Bolivia: United Nations Children's Fund (Protection - Child Protection response) | Bolivia: United Nations Children's Fund (Health response) | Bolivia: United Nations Children's Fund (Protection response) | Brazil: United Nations Children's Fund (Education response) | Brazil: United Nations Children's Fund (Protection - Child Protection response)
+fts_incoming_funding_global.csv,FTS,destProjectCode,string,120,7870,98.4981,80,False,RREG26b-PRO-233076-2 | RREG26b-HEA-233056-2 | RREG26b-PRO-233093-2 | RREG26b-EDU-233037-1 | RREG26b-PRO|PRO-CPN|PRO-GBV|PRO-HTS-233072-1
+fts_incoming_funding_global.csv,FTS,destEmergency,string,498,7492,93.7672,12,False,VENEZUELA Outflow - Regional Refugees and Migrants | Tropical Cyclone Beryl 2024 | Syrian Arab Republic - Civil Unrest (from 2012) | Coronavirus disease Outbreak - COVID -19 | Afghanistan Complex Emergency August 2021
+fts_incoming_funding_global.csv,FTS,destUsageYearStart,integer,7990,0,0.0,6,False,2026 | 2025 | 2024 | 2023 | 2022
+fts_incoming_funding_global.csv,FTS,destUsageYearEnd,integer,7990,0,0.0,5,False,2026 | 2027 | 2030 | 2028 | 2029
+fts_incoming_funding_global.csv,FTS,contributionType,string,7990,0,0.0,2,False,financial | in kind
+fts_incoming_funding_global.csv,FTS,flowType,string,7990,0,0.0,4,False,Standard | Pass through | Parked | Carryover
+fts_incoming_funding_global.csv,FTS,method,string,7990,0,0.0,2,False,Traditional aid | Cash transfer programming (CTP)
+fts_incoming_funding_global.csv,FTS,boundary,string,7990,0,0.0,1,False,incoming
+fts_incoming_funding_global.csv,FTS,onBoundary,string,7990,0,0.0,2,False,shared | single
+fts_incoming_funding_global.csv,FTS,status,string,7990,0,0.0,3,False,pledge | paid | commitment
+fts_incoming_funding_global.csv,FTS,firstReportedDate,date,7990,0,0.0,398,False,2026-02-04 | 2024-08-02 | 2026-03-31 | 2026-04-14 | 2025-07-02
+fts_incoming_funding_global.csv,FTS,decisionDate,date,7575,415,5.194,716,False,2026-02-28 | 2026-02-19 | 2026-02-24 | 2026-02-17 | 2025-05-23
+fts_incoming_funding_global.csv,FTS,keywords,string,1360,6630,82.9787,44,False,"Multiyear | Food Assistance | Earthquake | Multiyear,FCDO | Mine action,Multiyear"
+fts_incoming_funding_global.csv,FTS,originalAmount,integer,6641,1349,16.8836,4390,False,11139588 | 900000 | 10096408650 | 30999900 | 7023585300
+fts_incoming_funding_global.csv,FTS,originalCurrency,iso3_code,6641,1349,16.8836,22,False,SEK | CHF | JPY | EUR | QAR
+fts_incoming_funding_global.csv,FTS,exchangeRate,decimal,6641,1349,16.8836,766,False,10.6432 | 0.814 | 150 | 0.897 | 0.867
+fts_incoming_funding_global.csv,FTS,id,integer,7990,0,0.0,7550,False,376064 | 317615 | 385855 | 385856 | 385857
+fts_incoming_funding_global.csv,FTS,refCode,string,7545,445,5.5695,3896,False,"ECHO/-AM/BUD/2026/91000 | CD.0101	Sweden- SIDA	15798 | 26-NAP-CH-006/2026-02-28 | 24-GOV-CH-023/2025-04-25  7F-10323.03, 7F-10333.03, 81084548, 81084550-51 | 26-NAP-US-002/2026-02-28"
+fts_incoming_funding_global.csv,FTS,createdAt,date,7990,0,0.0,411,False,2026-02-04 | 2025-05-22 | 2026-04-17 | 2026-04-15 | 2026-04-14
+fts_incoming_funding_global.csv,FTS,updatedAt,date,7990,0,0.0,247,False,2026-04-14 | 2026-02-27 | 2026-04-17 | 2026-04-15 | 2026-04-16
+fts_internal_funding_global.csv,FTS,date,date,675,0,0.0,39,False,2026-04-15 | 2026-04-14 | 2026-04-13 | 2026-04-09 | 2026-03-05
+fts_internal_funding_global.csv,FTS,budgetYear,integer,661,14,2.0741,3,False,2026 | 2024 | 2025
+fts_internal_funding_global.csv,FTS,description,string,675,0,0.0,200,False,"Allocation Type: Reserve - 1st Reserve Allocation - Anticipatory Action
+Emergency Water, Sanitation, and Hygiene (WASH) Response for Communities at Risk of Drought in Sar-e-Pul Province.
+Project Start Date: 2026-04-01 - Project End Date: 2026-11-30
+Project Code: CBPF-AFG-26-R-NGO-39230
+Emergency Type: Climate / natural disaster - Drought | Allocation Type: Reserve - 1st Reserve Allocation - Anticipatory Action
+Multi-Purpose Cash assistance (MPCA) to vulnerable households in northern province
+Project Start Date: 2026-04-01 - Project End Date: 2026-09-30
+Project Code: CBPF-AFG-26-R-INGO-39226
+Emergency Type: Climate / natural disaster - Drought | Allocation Type: Reserve - 1st Reserve Allocation - Anticipatory Action
+Multi-Purpose Cash Assistance and Emergency Agricultural Support for Vulnerable Communities Exposed to Drought in Jawzjan and Balkh Provinces – 2026 Anticipatory Action Response
+Project Start Date: 2026-04-01 - Project End Date: 2026-12-31
+Project Code: CBPF-AFG-26-R-INGO-39229
+Emergency Type: Climate / natural disaster - Drought | Allocation Type: Reserve - 1st Reserve Allocation - Anticipatory Action
+Water Sanitation &amp; Hygiene (100%) for Vulnerable Households in Jawzjan and Sare Pul Province
+Project Start Date: 2026-04-01 - Project End Date: 2026-09-30
+Project Code: CBPF-AFG-26-R-INGO-39281
+Emergency Type: Climate / natural disaster - Drought | Allocation Type: Reserve - 1st Reserve Allocation - Anticipatory Action
+Emergency Livestock Support for Communities at Risk of Drought in the Faryab Province.
+Project Start Date: 2026-04-01 - Project End Date: 2026-09-30
+Project Code: CBPF-AFG-26-R-NGO-39231
+Emergency Type: Climate / natural disaster - Drought"
+fts_internal_funding_global.csv,FTS,amountUSD,integer,675,0,0.0,500,False,0 | 609778 | 996645 | 799713 | 199928
+fts_internal_funding_global.csv,FTS,srcOrganization,string,675,0,0.0,27,False,"Afghanistan Humanitarian Fund | International Organization for Migration | United Nations Children's Fund | Première Urgence Internationale | Bangladesh (Asia, Pacific HF)"
+fts_internal_funding_global.csv,FTS,srcOrganizationTypes,string,675,0,0.0,4,False,Pooled Funds | Multilateral Organizations | NGOs | Red Cross/Red Crescent Organizations
+fts_internal_funding_global.csv,FTS,srcLocations,iso3_code,675,0,0.0,21,False,AFG | BFA | BGD | COD | COL
+fts_internal_funding_global.csv,FTS,srcUsageYearStart,integer,675,0,0.0,1,False,2026
+fts_internal_funding_global.csv,FTS,srcUsageYearEnd,integer,675,0,0.0,1,False,2026
+fts_internal_funding_global.csv,FTS,destPlan,string,665,10,1.4815,20,False,Afghanistan Humanitarian Needs and Response Plan 2026 | Burkina Faso Besoins Humanitaires et Plan de Réponse 2026 | Rohingya Humanitarian Crisis Joint Response Plan 2026 | République Démocratique du Congo Besoins Humanitaires et Plan de Réponse 2026 | Venezuela Regional Refugee and Migrant Response Plan (RMRP) 2026
+fts_internal_funding_global.csv,FTS,destPlanCode,string,665,10,1.4815,20,False,HAFG26 | HBFA26 | RBGD26 | HCOD26 | RREG26b
+fts_internal_funding_global.csv,FTS,destPlanId,integer,665,10,1.4815,20,False,1502 | 1499 | 1524 | 1509 | 1525
+fts_internal_funding_global.csv,FTS,destOrganization,string,675,0,0.0,100,False,Organization for Coordination of Humanitarian Relief | ActionAid International | Deutsche Welthungerhilfe e.V. (German Agro Action) | Organization for Human Welfare | International Rescue Committee
+fts_internal_funding_global.csv,FTS,destOrganizationTypes,string,675,0,0.0,3,False,NGOs | Multilateral Organizations | Red Cross/Red Crescent Organizations
+fts_internal_funding_global.csv,FTS,destGlobalClusters,string,533,142,21.037,17,False,Water Sanitation Hygiene | Multi-sector | Food Security | Nutrition | Health
+fts_internal_funding_global.csv,FTS,destLocations,iso3_code,675,0,0.0,21,False,AFG | BFA | BGD | COD | COL
+fts_internal_funding_global.csv,FTS,destProject,empty,0,675,100.0,0,False,
+fts_internal_funding_global.csv,FTS,destProjectCode,empty,0,675,100.0,0,False,
+fts_internal_funding_global.csv,FTS,destEmergency,string,39,636,94.2222,2,False,Mozambique: Floods 2026 | Syrian Arab Republic - Civil Unrest (from 2012)
+fts_internal_funding_global.csv,FTS,destUsageYearStart,integer,675,0,0.0,1,False,2026
+fts_internal_funding_global.csv,FTS,destUsageYearEnd,integer,675,0,0.0,1,False,2026
+fts_internal_funding_global.csv,FTS,contributionType,string,675,0,0.0,1,False,financial
+fts_internal_funding_global.csv,FTS,flowType,string,675,0,0.0,3,False,Parked | Standard | Pass through
+fts_internal_funding_global.csv,FTS,method,string,675,0,0.0,2,False,Traditional aid | Cash transfer programming (CTP)
+fts_internal_funding_global.csv,FTS,boundary,string,675,0,0.0,1,False,internal
+fts_internal_funding_global.csv,FTS,onBoundary,string,675,0,0.0,1,False,single
+fts_internal_funding_global.csv,FTS,status,string,675,0,0.0,3,False,paid | commitment | pledge
+fts_internal_funding_global.csv,FTS,firstReportedDate,date,675,0,0.0,52,False,2026-04-05 | 2026-03-31 | 2026-04-02 | 2026-04-06 | 2026-03-05
+fts_internal_funding_global.csv,FTS,decisionDate,date,675,0,0.0,66,False,2026-04-07 | 2026-04-09 | 2026-04-10 | 2024-09-01 | 2025-06-10
+fts_internal_funding_global.csv,FTS,keywords,empty,0,675,100.0,0,False,
+fts_internal_funding_global.csv,FTS,originalAmount,integer,27,648,96.0,26,False,878967 | 431378 | 190994 | 156670000 | 10533928
+fts_internal_funding_global.csv,FTS,originalCurrency,iso3_code,27,648,96.0,6,False,EUR | BDT | GBP | COP | MDL
+fts_internal_funding_global.csv,FTS,exchangeRate,decimal,27,648,96.0,19,False,0.8506 | 0.8621 | 0.897 | 119.5 | 121.5
+fts_internal_funding_global.csv,FTS,id,integer,675,0,0.0,675,False,384280 | 384281 | 384273 | 384274 | 384275
+fts_internal_funding_global.csv,FTS,refCode,string,675,0,0.0,192,False,CBPF-AFG-26-R-NGO-39230 | CBPF-AFG-26-R-INGO-39226 | CBPF-AFG-26-R-INGO-39229 | CBPF-AFG-26-R-INGO-39281 | CBPF-AFG-26-R-NGO-39231
+fts_internal_funding_global.csv,FTS,createdAt,date,675,0,0.0,36,False,2026-04-16 | 2026-04-11 | 2026-04-09 | 2026-03-05 | 2025-09-11
+fts_internal_funding_global.csv,FTS,updatedAt,date,675,0,0.0,30,False,2026-04-16 | 2026-04-13 | 2026-04-09 | 2026-03-23 | 2026-03-08
+fts_outgoing_funding_global.csv,FTS,date,date,3199,0,0.0,162,False,2026-02-20 | 2026-04-10 | 2026-04-06 | 2026-02-18 | 2026-01-20
+fts_outgoing_funding_global.csv,FTS,budgetYear,integer,2995,204,6.377,11,False,2026 | 2025 | 2024 | 2023 | 2022
+fts_outgoing_funding_global.csv,FTS,description,string,3199,0,0.0,1917,False,United Arab Emirates Contribution to Sudan Humanitarian Fund (SUHF) 2026 | Food Security & Livelihoods | Australia support to WFP | Education | Food Security - Food Assistance
+fts_outgoing_funding_global.csv,FTS,amountUSD,integer,3199,0,0.0,2209,False,5000000 | 19608 | 0 | 1116892 | 9000000
+fts_outgoing_funding_global.csv,FTS,srcOrganization,string,3199,0,0.0,63,False,"United Arab Emirates, Government of | Australia, Government of | Austria, Government of | Belgium, Government of | Canada, Government of"
+fts_outgoing_funding_global.csv,FTS,srcOrganizationTypes,string,3199,0,0.0,4,False,Governments | Private Organizations | NGOs | Multilateral Organizations
+fts_outgoing_funding_global.csv,FTS,srcLocations,iso3_code,3199,0,0.0,48,False,ARE | AUS | AUT | BEL | CAN
+fts_outgoing_funding_global.csv,FTS,srcUsageYearStart,integer,3199,0,0.0,6,False,2026 | 2024 | 2025 | 2023 | 2021
+fts_outgoing_funding_global.csv,FTS,srcUsageYearEnd,integer,3199,0,0.0,4,False,2026 | 2027 | 2030 | 2028
+fts_outgoing_funding_global.csv,FTS,destPlan,string,1771,1428,44.6389,42,False,Sudan Humanitarian Needs and Response Plan 2026 | Cuba Plan of Action 2026 – Response to Hurricane Melissa | Rohingya Humanitarian Crisis Joint Response Plan 2026 | Lebanon Flash Appeal 2026 | Myanmar Humanitarian Needs and Response Plan 2026
+fts_outgoing_funding_global.csv,FTS,destPlanCode,string,1771,1428,44.6389,42,False,HSDN26 | OCUB26 | RBGD26 | FLBN26 | HMMR26
+fts_outgoing_funding_global.csv,FTS,destPlanId,integer,1771,1428,44.6389,42,False,1514 | 1601 | 1524 | 1568 | 1505
+fts_outgoing_funding_global.csv,FTS,destOrganization,string,3179,20,0.6252,329,False,Sudan Humanitarian Fund | World Food Programme | United Nations High Commissioner for Refugees | Access to Health Fund | International Committee of the Red Cross
+fts_outgoing_funding_global.csv,FTS,destOrganizationTypes,string,3179,20,0.6252,8,False,Pooled Funds | Multilateral Organizations | Red Cross/Red Crescent Organizations | NGOs | Private Organizations
+fts_outgoing_funding_global.csv,FTS,destGlobalClusters,string,2654,545,17.0366,77,False,Food Security | Education | Nutrition | Protection | Health
+fts_outgoing_funding_global.csv,FTS,destLocations,iso3_code,2690,509,15.9112,149,False,SDN | CUB | BGD | LBN | MMR
+fts_outgoing_funding_global.csv,FTS,destProject,string,17,3182,99.4686,9,False,Peru: United Nations High Commissioner for Refugees (Protection response) | Peru: World Food Programme (Food Security response) | Uganda: United Nations High Commissioner for Refugees (Protection response) | Colombia: United Nations High Commissioner for Refugees (Shelter response) | Colombia: United Nations High Commissioner for Refugees (Protection response)
+fts_outgoing_funding_global.csv,FTS,destProjectCode,string,17,3182,99.4686,10,False,RREG26b-PRO|PRO-CPN|PRO-GBV|PRO-HTS-233202-1 | RREG26b-FSC-233268-1 | RETHKENUGA25-PRO-229753-1 | RREG26b-SHL-233214-1 | RREG26b-PRO|PRO-CPN|PRO-GBV|PRO-HTS-233197-1
+fts_outgoing_funding_global.csv,FTS,destEmergency,string,99,3100,96.9053,10,False,Sudan Complex Emergency 2023 | Mozambique: Floods 2026 | Syrian Arab Republic - Civil Unrest (from 2012) | oPt Complex Emergency 2023-24 | VENEZUELA Outflow - Regional Refugees and Migrants
+fts_outgoing_funding_global.csv,FTS,destUsageYearStart,integer,3199,0,0.0,7,False,2026 | 2024 | 2025 | 2023 | 2021
+fts_outgoing_funding_global.csv,FTS,destUsageYearEnd,integer,3199,0,0.0,6,False,2026 | 2027 | 2025 | 2030 | 2028
+fts_outgoing_funding_global.csv,FTS,contributionType,string,3199,0,0.0,2,False,financial | in kind
+fts_outgoing_funding_global.csv,FTS,flowType,string,3199,0,0.0,4,False,Standard | Parked | Pass through | Carryover
+fts_outgoing_funding_global.csv,FTS,method,string,3199,0,0.0,2,False,Traditional aid | Cash transfer programming (CTP)
+fts_outgoing_funding_global.csv,FTS,boundary,string,3199,0,0.0,1,False,outgoing
+fts_outgoing_funding_global.csv,FTS,onBoundary,string,3199,0,0.0,2,False,single | shared
+fts_outgoing_funding_global.csv,FTS,status,string,3199,0,0.0,3,False,paid | commitment | pledge
+fts_outgoing_funding_global.csv,FTS,firstReportedDate,date,3199,0,0.0,158,False,2026-01-20 | 2026-04-10 | 2026-04-03 | 2026-02-18 | 2026-01-13
+fts_outgoing_funding_global.csv,FTS,decisionDate,date,2982,217,6.7834,379,False,2026-01-15 | 2026-02-06 | 2026-02-27 | 2026-03-23 | 2025-06-10
+fts_outgoing_funding_global.csv,FTS,keywords,string,304,2895,90.497,20,False,"Multiyear | Earthquake | SDC | Refugee | Mine action,Multiyear"
+fts_outgoing_funding_global.csv,FTS,originalAmount,integer,2890,309,9.6593,1533,False,27000 | 3000000 | 75000 | 3648296 | 14000000
+fts_outgoing_funding_global.csv,FTS,originalCurrency,iso3_code,2890,309,9.6593,17,False,AUD | EUR | CAD | CHF | CZK
+fts_outgoing_funding_global.csv,FTS,exchangeRate,decimal,2889,310,9.6905,549,False,1.377 | 1.408 | 1.548 | 1.493 | 0.85
+fts_outgoing_funding_global.csv,FTS,id,integer,3199,0,0.0,3199,False,374223 | 384437 | 384468 | 384469 | 384470
+fts_outgoing_funding_global.csv,FTS,refCode,string,3003,196,6.1269,2372,False,OCT/ARE/2026/77941/OCHA(CBPF-OCHA)/SDN/85108 - | 10052509	 No 	 EOL 77225/28 	 AUL-C-00372-01 	 CU03.01.011.URT1 | 10052630	 No 	 77335-29 	 AUL-C-00373-01 	 BD02.01.011.URT1 | 10052690	 No 	 77335-18 	 AUL-C-00361-02 	 LB02 | 25-GOV-AU-007-01
+fts_outgoing_funding_global.csv,FTS,createdAt,date,3199,0,0.0,174,False,2026-02-24 | 2026-04-10 | 2026-04-06 | 2026-02-18 | 2026-01-28
+fts_outgoing_funding_global.csv,FTS,updatedAt,date,3199,0,0.0,141,False,2026-02-24 | 2026-04-10 | 2026-04-06 | 2026-02-18 | 2026-01-28
+fts_requirements_funding_cluster_global.csv,FTS,countryCode,iso3_code,8030,0,0.0,84,False,AFG | AGO | BDI | BEN | BFA
+fts_requirements_funding_cluster_global.csv,FTS,id,integer,8030,0,0.0,815,False,1502 | 1263 | 1185 | 1117 | 1100
+fts_requirements_funding_cluster_global.csv,FTS,name,string,8030,0,0.0,815,False,Afghanistan Humanitarian Needs and Response Plan 2026 | Afghanistan Humanitarian Needs and Response Plan 2025 | Afghanistan Humanitarian Needs and Response Plan 2024 | Afghanistan Humanitarian Response Plan 2023 | Afghanistan Humanitarian Response Plan 2022
+fts_requirements_funding_cluster_global.csv,FTS,code,string,8030,0,0.0,815,False,HAFG26 | HAFG25 | HAFG24 | HAFG23 | HAFG22
+fts_requirements_funding_cluster_global.csv,FTS,startDate,date,8030,0,0.0,203,False,2026-01-01 | 2025-01-01 | 2024-01-01 | 2023-01-01 | 2022-01-01
+fts_requirements_funding_cluster_global.csv,FTS,endDate,date,8030,0,0.0,143,False,2026-12-31 | 2025-12-31 | 2024-12-31 | 2023-12-31 | 2022-12-31
+fts_requirements_funding_cluster_global.csv,FTS,year,integer,8030,0,0.0,27,False,2026 | 2025 | 2024 | 2023 | 2022
+fts_requirements_funding_cluster_global.csv,FTS,clusterCode,integer,6400,1630,20.2989,6394,False,8837 | 8838 | 8603 | 8831 | 8832
+fts_requirements_funding_cluster_global.csv,FTS,cluster,string,8030,0,0.0,927,False,"Aviation | Coordination, Thematics and System Support | Education | Emergency Shelter and NFI | Food Security and Agriculture"
+fts_requirements_funding_cluster_global.csv,FTS,requirements,integer,6301,1729,21.5318,5627,False,14700000 | 24700000 | 60040000 | 160285975 | 651101609
+fts_requirements_funding_cluster_global.csv,FTS,funding,integer,7454,576,7.1731,6775,False,1219832 | 1805186 | 18138612 | 5814964 | 50221603
+fts_requirements_funding_cluster_global.csv,FTS,percentFunded,integer,5773,2257,28.1071,266,False,8 | 7 | 30 | 4 | 16
+fts_requirements_funding_covid_global.csv,FTS,countryCode,iso3_code,152,0,0.0,66,False,AFG | AGO | ARG | BDI | BEN
+fts_requirements_funding_covid_global.csv,FTS,id,integer,152,0,0.0,115,False,1100 | 1031 | 929 | 1006 | 946
+fts_requirements_funding_covid_global.csv,FTS,name,string,152,0,0.0,115,False,Afghanistan Humanitarian Response Plan 2022 | Afghanistan Humanitarian Response Plan 2021 | Afghanistan Humanitarian Response Plan 2020 | GHRP (COVID) Famine Prevention 2020 | Democratic Republic of the Congo Regional Refugee Response Plan 2020
+fts_requirements_funding_covid_global.csv,FTS,code,string,152,0,0.0,115,False,HAFG22 | HAFG21 | HAFG20 | OGLBL20b | RDRCRRP20
+fts_requirements_funding_covid_global.csv,FTS,typeId,integer,152,0,0.0,4,False,4 | 6 | 111 | 5
+fts_requirements_funding_covid_global.csv,FTS,typeName,string,152,0,0.0,4,False,Humanitarian response plan | Other | Regional response plan | Flash appeal
+fts_requirements_funding_covid_global.csv,FTS,startDate,date,152,0,0.0,14,False,2022-01-01 | 2021-01-01 | 2020-01-01 | 2020-05-01 | 2020-01-02
+fts_requirements_funding_covid_global.csv,FTS,endDate,date,152,0,0.0,10,False,2022-12-31 | 2021-12-31 | 2020-12-31 | 2021-01-01 | 2022-02-15
+fts_requirements_funding_covid_global.csv,FTS,year,integer,152,0,0.0,3,False,2022 | 2021 | 2020
+fts_requirements_funding_covid_global.csv,FTS,requirements,integer,137,15,9.8684,127,False,4442200000 | 868666483 | 1131050820 | 18938063 | 182414025
+fts_requirements_funding_covid_global.csv,FTS,funding,integer,152,0,0.0,151,False,3269032938 | 833236959 | 600940338 | 15000000 | 9604566
+fts_requirements_funding_covid_global.csv,FTS,covidFunding,integer,152,0,0.0,150,False,12744301 | 21031388 | 187852973 | 15000000 | 1038000
+fts_requirements_funding_covid_global.csv,FTS,covidPercentageOfFunding,integer,152,0,0.0,48,False,0 | 3 | 31 | 100 | 11
+fts_requirements_funding_global.csv,FTS,countryCode,iso3_code,3805,0,0.0,110,False,AFG | AGO | AIA | ARG | ABW
+fts_requirements_funding_global.csv,FTS,id,integer,1251,2554,67.1222,888,False,1502 | 1263 | 1185 | 1117 | 1100
+fts_requirements_funding_global.csv,FTS,name,string,3805,0,0.0,889,False,Not specified | Afghanistan Humanitarian Needs and Response Plan 2026 | Afghanistan Humanitarian Needs and Response Plan 2025 | Afghanistan Humanitarian Needs and Response Plan 2024 | Afghanistan Humanitarian Response Plan 2023
+fts_requirements_funding_global.csv,FTS,code,string,1246,2559,67.2536,887,False,HAFG26 | HAFG25 | HAFG24 | HAFG23 | HAFG22
+fts_requirements_funding_global.csv,FTS,typeId,integer,1251,2554,67.1222,8,False,2070 | 4 | 5 | 6 | 2071
+fts_requirements_funding_global.csv,FTS,typeName,string,1251,2554,67.1222,8,False,Humanitarian needs and response plan | Humanitarian response plan | Flash appeal | Other | Strategic response plan
+fts_requirements_funding_global.csv,FTS,startDate,date,1251,2554,67.1222,206,False,2026-01-01 | 2025-01-01 | 2024-01-01 | 2023-01-01 | 2022-01-01
+fts_requirements_funding_global.csv,FTS,endDate,date,1251,2554,67.1222,147,False,2026-12-31 | 2025-12-31 | 2024-12-31 | 2023-12-31 | 2022-12-31
+fts_requirements_funding_global.csv,FTS,year,integer,3805,0,0.0,33,False,2029 | 2028 | 2027 | 2026 | 2025
+fts_requirements_funding_global.csv,FTS,requirements,integer,1198,2607,68.5151,1183,False,1714181496 | 2416811546 | 3059587797 | 3227372908 | 4442200000
+fts_requirements_funding_global.csv,FTS,funding,integer,3781,24,0.6307,3743,False,31418 | 18781357 | 68639119 | 214214587 | 29192310
+fts_requirements_funding_global.csv,FTS,percentFunded,integer,1182,2623,68.9356,139,False,13 | 42 | 52 | 74 | 96
+fts_requirements_funding_globalcluster_global.csv,FTS,countryCode,iso3_code,10630,0,0.0,84,False,AFG | AGO | BDI | BEN | BFA
+fts_requirements_funding_globalcluster_global.csv,FTS,id,integer,10630,0,0.0,815,False,1502 | 1263 | 1185 | 1117 | 1100
+fts_requirements_funding_globalcluster_global.csv,FTS,name,string,10630,0,0.0,815,False,Afghanistan Humanitarian Needs and Response Plan 2026 | Afghanistan Humanitarian Needs and Response Plan 2025 | Afghanistan Humanitarian Needs and Response Plan 2024 | Afghanistan Humanitarian Response Plan 2023 | Afghanistan Humanitarian Response Plan 2022
+fts_requirements_funding_globalcluster_global.csv,FTS,code,string,10630,0,0.0,815,False,HAFG26 | HAFG25 | HAFG24 | HAFG23 | HAFG22
+fts_requirements_funding_globalcluster_global.csv,FTS,startDate,date,10630,0,0.0,203,False,2026-01-01 | 2025-01-01 | 2024-01-01 | 2023-01-01 | 2022-01-01
+fts_requirements_funding_globalcluster_global.csv,FTS,endDate,date,10630,0,0.0,143,False,2026-12-31 | 2025-12-31 | 2024-12-31 | 2023-12-31 | 2022-12-31
+fts_requirements_funding_globalcluster_global.csv,FTS,year,integer,10630,0,0.0,27,False,2026 | 2025 | 2024 | 2023 | 2022
+fts_requirements_funding_globalcluster_global.csv,FTS,clusterCode,integer,9000,1630,15.334,22,False,26480 | 3 | 4 | 6 | 7
+fts_requirements_funding_globalcluster_global.csv,FTS,cluster,string,10630,0,0.0,24,False,Coordination and support services | Education | Emergency Shelter and NFI | Food Security | Health
+fts_requirements_funding_globalcluster_global.csv,FTS,requirements,integer,8192,2438,22.9351,7295,False,24700000 | 60040000 | 160285975 | 651101609 | 190768456
+fts_requirements_funding_globalcluster_global.csv,FTS,funding,integer,9626,1004,9.445,8700,False,1805186 | 18138612 | 5814964 | 50221603 | 30587554
+fts_requirements_funding_globalcluster_global.csv,FTS,percentFunded,integer,7347,3283,30.8843,290,False,7 | 30 | 4 | 8 | 16
+hpc_hno_2024.csv,HNO,Country ISO3,iso3_code,387819,0,0.0,24,False,AFG | BFA | CAF | CMR | COD
+hpc_hno_2024.csv,HNO,Admin 1 PCode,string,16520,371299,95.7403,131,False,AF01 | AF02 | AF03 | AF04 | AF05
+hpc_hno_2024.csv,HNO,Admin 1 Name,string,16520,371299,95.7403,131,False,Kabul | Kapisa | Parwan | Maidan Wardak | Logar
+hpc_hno_2024.csv,HNO,Admin 2 PCode,string,221442,166377,42.9007,2561,False,AF0101 | AF0102 | AF0103 | AF0104 | AF0105
+hpc_hno_2024.csv,HNO,Admin 2 Name,string,221442,166377,42.9007,2508,False,Kabul | Paghman | Chahar Asyab | Bagrami | Deh Sabz
+hpc_hno_2024.csv,HNO,Admin 3 PCode,string,147305,240514,62.0171,2553,False,BF130001 | BF130002 | BF130003 | BF130004 | BF130005
+hpc_hno_2024.csv,HNO,Admin 3 Name,string,147305,240514,62.0171,2540,False,Komki-Ipala | Komsilga | Koubri | Ouagadougou | Pabré
+hpc_hno_2024.csv,HNO,Description,string,387818,1,0.0003,126,False,Final HNRP Caseload | Education | Food Security | Health | Border Consortium Appeal
+hpc_hno_2024.csv,HNO,Cluster,string,386966,853,0.2199,18,False,ALL | EDU | FSC | HEA | MS
+hpc_hno_2024.csv,HNO,Category,string,387459,360,0.0928,160,False,Adult | Adult - Female | Adult - Female - Border / EC | Adult - Female - IDP | Adult - Female - Iran (District of Return)
+hpc_hno_2024.csv,HNO,Population,decimal,10890,376929,97.192,9349,False,44532600 | 23268117 | 5538282 | 4729699 | 6109479
+hpc_hno_2024.csv,HNO,In Need,decimal,381314,6505,1.6773,115002,False,23666389 | 10876422 | 5857561 | 184946 | 34726
+hpc_hno_2024.csv,HNO,Targeted,decimal,318244,69575,17.9401,92363,False,17327995 | 7982696 | 4090179 | 164215 | 26347
+hpc_hno_2024.csv,HNO,Affected,decimal,3996,383823,98.9696,3751,False,6148956.39 | 56755 | 9801 | 62071 | 58504
+hpc_hno_2024.csv,HNO,Reached,integer,511,387308,99.8682,489,False,18400000 | 1600000 | 1500000 | 1850000 | 7100000
+hpc_hno_2024.csv,HNO,Info,string,1025,386794,99.7357,23,False,No cluster for entity 7309 | Unknown location 25811256 | Unknown location 25811207 | No cluster for entity 7272 | Unknown location 25870104
+hpc_hno_2025.csv,HNO,Country ISO3,iso3_code,318259,0,0.0,22,False,AFG | BFA | CAF | CMR | COD
+hpc_hno_2025.csv,HNO,Admin 1 PCode,string,15792,302467,95.038,144,False,AF01 | AF02 | AF03 | AF04 | AF05
+hpc_hno_2025.csv,HNO,Admin 1 Name,string,15792,302467,95.038,144,False,Kabul | Kapisa | Parwan | Maidan Wardak | Logar
+hpc_hno_2025.csv,HNO,Admin 2 PCode,string,228156,90103,28.3112,2480,False,AF0101 | AF0102 | AF0103 | AF0104 | AF0105
+hpc_hno_2025.csv,HNO,Admin 2 Name,string,228156,90103,28.3112,2454,False,Kabul | Paghman | Chahar Asyab | Bagrami | Deh Sabz
+hpc_hno_2025.csv,HNO,Admin 3 PCode,string,71817,246442,77.4344,1200,False,BF130001 | BF130002 | BF130003 | BF130004 | BF130005
+hpc_hno_2025.csv,HNO,Admin 3 Name,string,71817,246442,77.4344,1191,False,Komki-Ipala | Komsilga | Koubri | Ouagadougou | Pabré
+hpc_hno_2025.csv,HNO,Description,string,318259,0,0.0,144,False,Final HRP caseload | Coordination and Common Services | Food Security and Agriculture | Aviation | Multi-purpose Cash
+hpc_hno_2025.csv,HNO,Cluster,string,312689,5570,1.7501,19,False,ALL | CSS | EDU | FSC | HEA
+hpc_hno_2025.csv,HNO,Category,string,317922,337,0.1059,130,False,Adults | Boys | Children | Elderly | Female-Headed Households
+hpc_hno_2025.csv,HNO,Population,decimal,30898,287361,90.2916,20165,False,46024352 | 20999996 | 12241703 | 24035916 | 988441
+hpc_hno_2025.csv,HNO,In Need,decimal,310199,8060,2.5325,53047,False,22887726 | 10241973 | 5927993 | 12188191 | 457563
+hpc_hno_2025.csv,HNO,Targeted,decimal,269281,48978,15.3894,36128,False,16790412 | 7737415 | 4431106 | 8707494 | 345502
+hpc_hno_2025.csv,HNO,Affected,decimal,3232,315027,98.9845,3028,False,29033649 | 40253714 | 1665024 | 35946880 | 35005507
+hpc_hno_2025.csv,HNO,Reached,integer,22,318237,99.9931,20,False,18100000 | 1800000 | 720000 | 800000 | 9100000
+hpc_hno_2025.csv,HNO,Info,string,5570,312689,98.2499,13,False,No cluster for entity 31046 | No cluster for entity 30250 | No cluster for entity 33141 | No cluster for entity 31167 | No cluster for entity 31506
+hpc_hno_2026.csv,HNO,Country ISO3,iso3_code,134,0,0.0,20,False,AFG | BFA | CAF | CMR | COD
+hpc_hno_2026.csv,HNO,Description,string,134,0,0.0,65,False,Plan caseload | Education | Food Security and Agriculture | Health | Multipurpose Cash
+hpc_hno_2026.csv,HNO,Cluster,string,134,0,0.0,15,False,ALL | EDU | FSC | HEA | MPC
+hpc_hno_2026.csv,HNO,Category,empty,0,134,100.0,0,False,
+hpc_hno_2026.csv,HNO,Population,integer,20,114,85.0746,20,False,48595632 | 24100000 | 6567382 | 29900000 | 112800000
+hpc_hno_2026.csv,HNO,In Need,integer,128,6,4.4776,124,False,21889283 | 7105602 | 17412653 | 14423290 | 7464230
+hpc_hno_2026.csv,HNO,Targeted,integer,134,0,0.0,132,False,17479657 | 613774 | 11911619 | 7218662 | 688322
+hpc_hno_2026.csv,HNO,Affected,empty,0,134,100.0,0,False,
+hpc_hno_2026.csv,HNO,Reached,empty,0,134,100.0,0,False,
+hpc_hno_2026.csv,HNO,Info,empty,0,134,100.0,0,False,
+humanitarian-response-plans.csv,HRP,code,string,909,1,0.1099,899,False,HHTI26 | RREG26 | FPSE26 | HMLI26 | OPAK26
+humanitarian-response-plans.csv,HRP,internalId,integer,910,0,0.0,910,False,8278 | 8215 | 8267 | 8128 | 8313
+humanitarian-response-plans.csv,HRP,startDate,date,910,0,0.0,208,False,2026-01-01 | 2025-12-11 | 2025-10-28 | 2025-10-20 | 2025-04-01
+humanitarian-response-plans.csv,HRP,endDate,date,910,0,0.0,149,False,2026-12-31 | 2026-04-30 | 2025-12-31 | 2025-03-31 | 2025-06-01
+humanitarian-response-plans.csv,HRP,planVersion,string,910,0,0.0,910,False,Haiti Besoins Humanitaires et Plan de Réponse 2026 | Regional Migrant Response Plan for Horn of Africa to Yemen and Southern Africa 2026 | Escalation of Hostilities in the OPT Flash Appeal 2026 | Mali Besoins Humanitaires et Plan de Réponse 2026 | Pakistan Floods Support Plan 2026
+humanitarian-response-plans.csv,HRP,categories,string,910,0,0.0,64,False,Humanitarian needs and response plan | cluster | fr | sector | en | Regional response plan | cluster | en | Flash appeal | sector | en | Other | Humanitarian needs and response plan | cluster | en
+humanitarian-response-plans.csv,HRP,locations,string,887,23,2.5275,165,False,HTI | YEM | KEN | DJI | SOM | ETH | TZA | PSE | MLI | PAK
+humanitarian-response-plans.csv,HRP,years,integer,910,0,0.0,27,False,2026 | 2025 | 2024 | 2023 | 2022
+humanitarian-response-plans.csv,HRP,origRequirements,integer,910,0,0.0,857,False,880327426 | 0 | 4064305808 | 889600798 | 516399423
+humanitarian-response-plans.csv,HRP,revisedRequirements,integer,910,0,0.0,906,False,880327426 | 52990581 | 4064305808 | 551000000 | 64943909

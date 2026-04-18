@@ -1,0 +1,415 @@
+file,source_family,column,row_count,blank_count,blank_pct,non_empty_count
+AffectedPersons__20260418_072029_UTC.csv,CBPF,Year,16,0,0.0,16
+AffectedPersons__20260418_072029_UTC.csv,CBPF,CBPF Name,16,0,0.0,16
+AffectedPersons__20260418_072029_UTC.csv,CBPF,Boys (Reached),16,0,0.0,16
+AffectedPersons__20260418_072029_UTC.csv,CBPF,Boys (Targeted),16,0,0.0,16
+AffectedPersons__20260418_072029_UTC.csv,CBPF,Girls (Reached),16,0,0.0,16
+AffectedPersons__20260418_072029_UTC.csv,CBPF,Girls (Targeted),16,0,0.0,16
+AffectedPersons__20260418_072029_UTC.csv,CBPF,Men (Reached),16,0,0.0,16
+AffectedPersons__20260418_072029_UTC.csv,CBPF,Men (Targeted),16,0,0.0,16
+AffectedPersons__20260418_072029_UTC.csv,CBPF,Women (Reached),16,0,0.0,16
+AffectedPersons__20260418_072029_UTC.csv,CBPF,Women (Targeted),16,0,0.0,16
+AffectedPersons__20260418_072029_UTC.csv,CBPF,Total (Reached),16,0,0.0,16
+AffectedPersons__20260418_072029_UTC.csv,CBPF,Total (Targeted),16,0,0.0,16
+AllocationFlow__20260418_071755_UTC.csv,CBPF,Year,198,0,0.0,198
+AllocationFlow__20260418_071755_UTC.csv,CBPF,Fund,198,0,0.0,198
+AllocationFlow__20260418_071755_UTC.csv,CBPF,Partner type,198,0,0.0,198
+AllocationFlow__20260418_071755_UTC.csv,CBPF,Direct funding,198,0,0.0,198
+AllocationFlow__20260418_071755_UTC.csv,CBPF,Net funding,198,0,0.0,198
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Year,18,0,0.0,18
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,CBPF Name,18,0,0.0,18
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Total Allocation,18,0,0.0,18
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Allocation (INGO),18,0,0.0,18
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Allocation (NNGO),18,0,0.0,18
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Allocation (Red Cross),18,0,0.0,18
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Allocation (UN),18,0,0.0,18
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Reserve Allocation (INGO),18,0,0.0,18
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Reserve Allocation (NNGO),18,0,0.0,18
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Reserve Allocation (Red Cross),18,0,0.0,18
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Reserve Allocation (UN),18,0,0.0,18
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Standard Allocation (INGO),18,0,0.0,18
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Standard Allocation (NNGO),18,0,0.0,18
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Standard Allocation (Red Cross),18,0,0.0,18
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Standard Allocation (UN),18,0,0.0,18
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Total Reserve Allocation,18,0,0.0,18
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Total Standard Allocation,18,0,0.0,18
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Total Under Approval Allocation,18,0,0.0,18
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Under Approval Allocation (INGO),18,0,0.0,18
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Under Approval Allocation (NNGO),18,0,0.0,18
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Under Approval Allocation (Red),18,0,0.0,18
+AllocationsByOrgType__20260418_071803_UTC.csv,CBPF,Under Approval Allocation (UN),18,0,0.0,18
+AllocationsTimeline__20260418_071808_UTC.csv,CBPF,AllocationSource,49,0,0.0,49
+AllocationsTimeline__20260418_071808_UTC.csv,CBPF,AllocationHCLastProjectApprovalDate,49,0,0.0,49
+AllocationsTimeline__20260418_071808_UTC.csv,CBPF,TotalProjectsunderApproval,49,0,0.0,49
+AllocationsTimeline__20260418_071808_UTC.csv,CBPF,TotalUnderApprovalBudget,49,0,0.0,49
+AllocationsTimeline__20260418_071808_UTC.csv,CBPF,TotalProjectsApproved,49,0,0.0,49
+AllocationsTimeline__20260418_071808_UTC.csv,CBPF,TotalApprovedBudget,49,0,0.0,49
+AllocationsTimeline__20260418_071808_UTC.csv,CBPF,AllocationTypeId,49,0,0.0,49
+AllocationsTimeline__20260418_071808_UTC.csv,CBPF,AllocationSourceId,49,0,0.0,49
+AllocationsTimeline__20260418_071808_UTC.csv,CBPF,FundTypeId,49,0,0.0,49
+AllocationsTimeline__20260418_071808_UTC.csv,CBPF,CBPF,49,0,0.0,49
+AllocationsTimeline__20260418_071808_UTC.csv,CBPF,Allocation Title,49,0,0.0,49
+AllocationsTimeline__20260418_071808_UTC.csv,CBPF,Allocation Summary,49,0,0.0,49
+AllocationsTimeline__20260418_071808_UTC.csv,CBPF,Total,49,0,0.0,49
+AllocationsTimeline__20260418_071808_UTC.csv,CBPF,Start Date,49,0,0.0,49
+AllocationsTimeline__20260418_071808_UTC.csv,CBPF,End Date,49,0,0.0,49
+Allocations__20260418_071733_UTC.csv,CBPF,Year,33,0,0.0,33
+Allocations__20260418_071733_UTC.csv,CBPF,PooledFund,33,0,0.0,33
+Allocations__20260418_071733_UTC.csv,CBPF,AllocationType,33,0,0.0,33
+Allocations__20260418_071733_UTC.csv,CBPF,Budget,33,0,0.0,33
+CBPFcontributions__20260418_071813_UTC.csv,CBPF,IsTransfer,145,0,0.0,145
+CBPFcontributions__20260418_071813_UTC.csv,CBPF,Year,145,0,0.0,145
+CBPFcontributions__20260418_071813_UTC.csv,CBPF,Donor Name,145,0,0.0,145
+CBPFcontributions__20260418_071813_UTC.csv,CBPF,CBPF Name,145,0,0.0,145
+CBPFcontributions__20260418_071813_UTC.csv,CBPF,Paid Amount,145,0,0.0,145
+CBPFcontributions__20260418_071813_UTC.csv,CBPF,Pledged Amount,145,0,0.0,145
+CBPFcontributions__20260418_071813_UTC.csv,CBPF,Total Contributions,145,0,0.0,145
+CBPFcontributions__20260418_071813_UTC.csv,CBPF,Local Curency,145,0,0.0,145
+CBPFcontributions__20260418_071813_UTC.csv,CBPF,Exchange Rate,145,0,0.0,145
+CBPFcontributions__20260418_071813_UTC.csv,CBPF,Paid Amount (Local Currency),145,0,0.0,145
+CBPFcontributions__20260418_071813_UTC.csv,CBPF,Pledged Amount (Local Currency),145,0,0.0,145
+CBPFcontributions__20260418_071813_UTC.csv,CBPF,Total Contributions (Local Currency),145,0,0.0,145
+ContributionTrends__20260418_071819_UTC.csv,CBPF,Year,381,0,0.0,381
+ContributionTrends__20260418_071819_UTC.csv,CBPF,Donor Name,381,0,0.0,381
+ContributionTrends__20260418_071819_UTC.csv,CBPF,CBPF Name,381,0,0.0,381
+ContributionTrends__20260418_071819_UTC.csv,CBPF,Paid Amount,381,0,0.0,381
+ContributionTrends__20260418_071819_UTC.csv,CBPF,Pledged Amount,381,0,0.0,381
+ContributionTrends__20260418_071819_UTC.csv,CBPF,Total Contributions,381,0,0.0,381
+ContributionTrends__20260418_071819_UTC.csv,CBPF,Paid Amount (Local Currency),381,0,0.0,381
+ContributionTrends__20260418_071819_UTC.csv,CBPF,Pledged Amount (Local Currency),381,0,0.0,381
+ContributionTrends__20260418_071819_UTC.csv,CBPF,Total Contributions (Local Currency),381,0,0.0,381
+ContributionTrends__20260418_071819_UTC.csv,CBPF,Exchange Rate,381,0,0.0,381
+ContributionTrends__20260418_071819_UTC.csv,CBPF,Local Currency,381,0,0.0,381
+ContributionsFlow__20260418_071825_UTC.csv,CBPF,IsTransfer,145,0,0.0,145
+ContributionsFlow__20260418_071825_UTC.csv,CBPF,Year,145,0,0.0,145
+ContributionsFlow__20260418_071825_UTC.csv,CBPF,Donor Name,145,0,0.0,145
+ContributionsFlow__20260418_071825_UTC.csv,CBPF,CBPF Name,145,0,0.0,145
+ContributionsFlow__20260418_071825_UTC.csv,CBPF,Paid Amount,145,0,0.0,145
+ContributionsFlow__20260418_071825_UTC.csv,CBPF,Pledged Amount,145,0,0.0,145
+ContributionsFlow__20260418_071825_UTC.csv,CBPF,Total Contributions,145,0,0.0,145
+ContributionsFlow__20260418_071825_UTC.csv,CBPF,Local Curency,145,0,0.0,145
+ContributionsFlow__20260418_071825_UTC.csv,CBPF,Exchange Rate,145,0,0.0,145
+ContributionsFlow__20260418_071825_UTC.csv,CBPF,Paid Amount (Local Currency),145,0,0.0,145
+ContributionsFlow__20260418_071825_UTC.csv,CBPF,Pledged Amount (Local Currency),145,0,0.0,145
+ContributionsFlow__20260418_071825_UTC.csv,CBPF,Total Contributions (Local Currency),145,0,0.0,145
+GenderAgeMarker__20260418_072032_UTC.csv,CBPF,PooledFundId,35,0,0.0,35
+GenderAgeMarker__20260418_072032_UTC.csv,CBPF,PooledFundName,35,0,0.0,35
+GenderAgeMarker__20260418_072032_UTC.csv,CBPF,AllocationYear,35,0,0.0,35
+GenderAgeMarker__20260418_072032_UTC.csv,CBPF,GenderMarkerGroup,35,0,0.0,35
+GenderAgeMarker__20260418_072032_UTC.csv,CBPF,GenderMarkerCode,35,0,0.0,35
+GenderAgeMarker__20260418_072032_UTC.csv,CBPF,TotalProjects,35,0,0.0,35
+GenderAgeMarker__20260418_072032_UTC.csv,CBPF,TotalBeneficiaries,35,0,0.0,35
+GenderAgeMarker__20260418_072032_UTC.csv,CBPF,TotalBudget,35,0,0.0,35
+SectorsOverview__20260418_071833_UTC.csv,CBPF,Year,97,0,0.0,97
+SectorsOverview__20260418_071833_UTC.csv,CBPF,CBPF Name,97,0,0.0,97
+SectorsOverview__20260418_071833_UTC.csv,CBPF,Cluster,97,0,0.0,97
+SectorsOverview__20260418_071833_UTC.csv,CBPF,Total Allocations,97,0,0.0,97
+SectorsOverview__20260418_071833_UTC.csv,CBPF,Targeted People,97,0,0.0,97
+SectorsOverview__20260418_071833_UTC.csv,CBPF,Reached People,97,0,0.0,97
+cod_population_admin0.csv,COD-PS,ISO3,6722,0,0.0,6722
+cod_population_admin0.csv,COD-PS,Country,6722,0,0.0,6722
+cod_population_admin0.csv,COD-PS,ADM1_PCODE,6722,6722,100.0,0
+cod_population_admin0.csv,COD-PS,ADM1_NAME,6722,6722,100.0,0
+cod_population_admin0.csv,COD-PS,ADM2_PCODE,6722,6722,100.0,0
+cod_population_admin0.csv,COD-PS,ADM2_NAME,6722,6722,100.0,0
+cod_population_admin0.csv,COD-PS,ADM3_PCODE,6722,6722,100.0,0
+cod_population_admin0.csv,COD-PS,ADM3_NAME,6722,6722,100.0,0
+cod_population_admin0.csv,COD-PS,ADM4_PCODE,6722,6722,100.0,0
+cod_population_admin0.csv,COD-PS,ADM4_NAME,6722,6722,100.0,0
+cod_population_admin0.csv,COD-PS,Population_group,6722,0,0.0,6722
+cod_population_admin0.csv,COD-PS,Gender,6722,0,0.0,6722
+cod_population_admin0.csv,COD-PS,Age_range,6722,0,0.0,6722
+cod_population_admin0.csv,COD-PS,Age_min,6722,407,6.0547,6315
+cod_population_admin0.csv,COD-PS,Age_max,6722,778,11.5739,5944
+cod_population_admin0.csv,COD-PS,Population,6722,0,0.0,6722
+cod_population_admin0.csv,COD-PS,Reference_year,6722,0,0.0,6722
+cod_population_admin0.csv,COD-PS,Source,6722,0,0.0,6722
+cod_population_admin0.csv,COD-PS,Contributor,6722,0,0.0,6722
+cod_population_admin1.csv,COD-PS,ISO3,91471,0,0.0,91471
+cod_population_admin1.csv,COD-PS,Country,91471,0,0.0,91471
+cod_population_admin1.csv,COD-PS,ADM1_PCODE,91471,345,0.3772,91126
+cod_population_admin1.csv,COD-PS,ADM1_NAME,91471,0,0.0,91471
+cod_population_admin1.csv,COD-PS,ADM2_PCODE,91471,91471,100.0,0
+cod_population_admin1.csv,COD-PS,ADM2_NAME,91471,91471,100.0,0
+cod_population_admin1.csv,COD-PS,ADM3_PCODE,91471,91471,100.0,0
+cod_population_admin1.csv,COD-PS,ADM3_NAME,91471,91471,100.0,0
+cod_population_admin1.csv,COD-PS,ADM4_PCODE,91471,91471,100.0,0
+cod_population_admin1.csv,COD-PS,ADM4_NAME,91471,91471,100.0,0
+cod_population_admin1.csv,COD-PS,Population_group,91471,0,0.0,91471
+cod_population_admin1.csv,COD-PS,Gender,91471,0,0.0,91471
+cod_population_admin1.csv,COD-PS,Age_range,91471,0,0.0,91471
+cod_population_admin1.csv,COD-PS,Age_min,91471,5510,6.0238,85961
+cod_population_admin1.csv,COD-PS,Age_max,91471,10417,11.3883,81054
+cod_population_admin1.csv,COD-PS,Population,91471,0,0.0,91471
+cod_population_admin1.csv,COD-PS,Reference_year,91471,0,0.0,91471
+cod_population_admin1.csv,COD-PS,Source,91471,0,0.0,91471
+cod_population_admin1.csv,COD-PS,Contributor,91471,0,0.0,91471
+cod_population_admin2.csv,COD-PS,ISO3,1001583,0,0.0,1001583
+cod_population_admin2.csv,COD-PS,Country,1001583,0,0.0,1001583
+cod_population_admin2.csv,COD-PS,ADM1_PCODE,1001583,0,0.0,1001583
+cod_population_admin2.csv,COD-PS,ADM1_NAME,1001583,0,0.0,1001583
+cod_population_admin2.csv,COD-PS,ADM2_PCODE,1001583,1566,0.1564,1000017
+cod_population_admin2.csv,COD-PS,ADM2_NAME,1001583,108,0.0108,1001475
+cod_population_admin2.csv,COD-PS,ADM3_PCODE,1001583,1001583,100.0,0
+cod_population_admin2.csv,COD-PS,ADM3_NAME,1001583,1001583,100.0,0
+cod_population_admin2.csv,COD-PS,ADM4_PCODE,1001583,1001583,100.0,0
+cod_population_admin2.csv,COD-PS,ADM4_NAME,1001583,1001583,100.0,0
+cod_population_admin2.csv,COD-PS,Population_group,1001583,0,0.0,1001583
+cod_population_admin2.csv,COD-PS,Gender,1001583,0,0.0,1001583
+cod_population_admin2.csv,COD-PS,Age_range,1001583,0,0.0,1001583
+cod_population_admin2.csv,COD-PS,Age_min,1001583,56419,5.633,945164
+cod_population_admin2.csv,COD-PS,Age_max,1001583,106747,10.6578,894836
+cod_population_admin2.csv,COD-PS,Population,1001583,0,0.0,1001583
+cod_population_admin2.csv,COD-PS,Reference_year,1001583,0,0.0,1001583
+cod_population_admin2.csv,COD-PS,Source,1001583,0,0.0,1001583
+cod_population_admin2.csv,COD-PS,Contributor,1001583,0,0.0,1001583
+cod_population_admin3.csv,COD-PS,ISO3,241962,0,0.0,241962
+cod_population_admin3.csv,COD-PS,Country,241962,0,0.0,241962
+cod_population_admin3.csv,COD-PS,ADM1_PCODE,241962,0,0.0,241962
+cod_population_admin3.csv,COD-PS,ADM1_NAME,241962,0,0.0,241962
+cod_population_admin3.csv,COD-PS,ADM2_PCODE,241962,0,0.0,241962
+cod_population_admin3.csv,COD-PS,ADM2_NAME,241962,0,0.0,241962
+cod_population_admin3.csv,COD-PS,ADM3_PCODE,241962,0,0.0,241962
+cod_population_admin3.csv,COD-PS,ADM3_NAME,241962,0,0.0,241962
+cod_population_admin3.csv,COD-PS,ADM4_PCODE,241962,241962,100.0,0
+cod_population_admin3.csv,COD-PS,ADM4_NAME,241962,241962,100.0,0
+cod_population_admin3.csv,COD-PS,Population_group,241962,0,0.0,241962
+cod_population_admin3.csv,COD-PS,Gender,241962,0,0.0,241962
+cod_population_admin3.csv,COD-PS,Age_range,241962,0,0.0,241962
+cod_population_admin3.csv,COD-PS,Age_min,241962,20777,8.5869,221185
+cod_population_admin3.csv,COD-PS,Age_max,241962,34018,14.0592,207944
+cod_population_admin3.csv,COD-PS,Population,241962,0,0.0,241962
+cod_population_admin3.csv,COD-PS,Reference_year,241962,0,0.0,241962
+cod_population_admin3.csv,COD-PS,Source,241962,0,0.0,241962
+cod_population_admin3.csv,COD-PS,Contributor,241962,0,0.0,241962
+cod_population_admin4.csv,COD-PS,ISO3,17465,0,0.0,17465
+cod_population_admin4.csv,COD-PS,Country,17465,0,0.0,17465
+cod_population_admin4.csv,COD-PS,ADM1_PCODE,17465,0,0.0,17465
+cod_population_admin4.csv,COD-PS,ADM1_NAME,17465,0,0.0,17465
+cod_population_admin4.csv,COD-PS,ADM2_PCODE,17465,0,0.0,17465
+cod_population_admin4.csv,COD-PS,ADM2_NAME,17465,0,0.0,17465
+cod_population_admin4.csv,COD-PS,ADM3_PCODE,17465,0,0.0,17465
+cod_population_admin4.csv,COD-PS,ADM3_NAME,17465,0,0.0,17465
+cod_population_admin4.csv,COD-PS,ADM4_PCODE,17465,0,0.0,17465
+cod_population_admin4.csv,COD-PS,ADM4_NAME,17465,0,0.0,17465
+cod_population_admin4.csv,COD-PS,Population_group,17465,0,0.0,17465
+cod_population_admin4.csv,COD-PS,Gender,17465,0,0.0,17465
+cod_population_admin4.csv,COD-PS,Age_range,17465,0,0.0,17465
+cod_population_admin4.csv,COD-PS,Age_min,17465,17465,100.0,0
+cod_population_admin4.csv,COD-PS,Age_max,17465,17465,100.0,0
+cod_population_admin4.csv,COD-PS,Population,17465,0,0.0,17465
+cod_population_admin4.csv,COD-PS,Reference_year,17465,0,0.0,17465
+cod_population_admin4.csv,COD-PS,Source,17465,0,0.0,17465
+cod_population_admin4.csv,COD-PS,Contributor,17465,0,0.0,17465
+fts_incoming_funding_global.csv,FTS,date,7990,0,0.0,7990
+fts_incoming_funding_global.csv,FTS,budgetYear,7990,644,8.0601,7346
+fts_incoming_funding_global.csv,FTS,description,7990,0,0.0,7990
+fts_incoming_funding_global.csv,FTS,amountUSD,7990,0,0.0,7990
+fts_incoming_funding_global.csv,FTS,srcOrganization,7990,2,0.025,7988
+fts_incoming_funding_global.csv,FTS,srcOrganizationTypes,7990,2,0.025,7988
+fts_incoming_funding_global.csv,FTS,srcLocations,7990,3569,44.6683,4421
+fts_incoming_funding_global.csv,FTS,srcUsageYearStart,7990,0,0.0,7990
+fts_incoming_funding_global.csv,FTS,srcUsageYearEnd,7990,0,0.0,7990
+fts_incoming_funding_global.csv,FTS,destPlan,7990,2972,37.1965,5018
+fts_incoming_funding_global.csv,FTS,destPlanCode,7990,2972,37.1965,5018
+fts_incoming_funding_global.csv,FTS,destPlanId,7990,2972,37.1965,5018
+fts_incoming_funding_global.csv,FTS,destOrganization,7990,65,0.8135,7925
+fts_incoming_funding_global.csv,FTS,destOrganizationTypes,7990,65,0.8135,7925
+fts_incoming_funding_global.csv,FTS,destGlobalClusters,7990,1080,13.5169,6910
+fts_incoming_funding_global.csv,FTS,destLocations,7990,0,0.0,7990
+fts_incoming_funding_global.csv,FTS,destProject,7990,7870,98.4981,120
+fts_incoming_funding_global.csv,FTS,destProjectCode,7990,7870,98.4981,120
+fts_incoming_funding_global.csv,FTS,destEmergency,7990,7492,93.7672,498
+fts_incoming_funding_global.csv,FTS,destUsageYearStart,7990,0,0.0,7990
+fts_incoming_funding_global.csv,FTS,destUsageYearEnd,7990,0,0.0,7990
+fts_incoming_funding_global.csv,FTS,contributionType,7990,0,0.0,7990
+fts_incoming_funding_global.csv,FTS,flowType,7990,0,0.0,7990
+fts_incoming_funding_global.csv,FTS,method,7990,0,0.0,7990
+fts_incoming_funding_global.csv,FTS,boundary,7990,0,0.0,7990
+fts_incoming_funding_global.csv,FTS,onBoundary,7990,0,0.0,7990
+fts_incoming_funding_global.csv,FTS,status,7990,0,0.0,7990
+fts_incoming_funding_global.csv,FTS,firstReportedDate,7990,0,0.0,7990
+fts_incoming_funding_global.csv,FTS,decisionDate,7990,415,5.194,7575
+fts_incoming_funding_global.csv,FTS,keywords,7990,6630,82.9787,1360
+fts_incoming_funding_global.csv,FTS,originalAmount,7990,1349,16.8836,6641
+fts_incoming_funding_global.csv,FTS,originalCurrency,7990,1349,16.8836,6641
+fts_incoming_funding_global.csv,FTS,exchangeRate,7990,1349,16.8836,6641
+fts_incoming_funding_global.csv,FTS,id,7990,0,0.0,7990
+fts_incoming_funding_global.csv,FTS,refCode,7990,445,5.5695,7545
+fts_incoming_funding_global.csv,FTS,createdAt,7990,0,0.0,7990
+fts_incoming_funding_global.csv,FTS,updatedAt,7990,0,0.0,7990
+fts_internal_funding_global.csv,FTS,date,675,0,0.0,675
+fts_internal_funding_global.csv,FTS,budgetYear,675,14,2.0741,661
+fts_internal_funding_global.csv,FTS,description,675,0,0.0,675
+fts_internal_funding_global.csv,FTS,amountUSD,675,0,0.0,675
+fts_internal_funding_global.csv,FTS,srcOrganization,675,0,0.0,675
+fts_internal_funding_global.csv,FTS,srcOrganizationTypes,675,0,0.0,675
+fts_internal_funding_global.csv,FTS,srcLocations,675,0,0.0,675
+fts_internal_funding_global.csv,FTS,srcUsageYearStart,675,0,0.0,675
+fts_internal_funding_global.csv,FTS,srcUsageYearEnd,675,0,0.0,675
+fts_internal_funding_global.csv,FTS,destPlan,675,10,1.4815,665
+fts_internal_funding_global.csv,FTS,destPlanCode,675,10,1.4815,665
+fts_internal_funding_global.csv,FTS,destPlanId,675,10,1.4815,665
+fts_internal_funding_global.csv,FTS,destOrganization,675,0,0.0,675
+fts_internal_funding_global.csv,FTS,destOrganizationTypes,675,0,0.0,675
+fts_internal_funding_global.csv,FTS,destGlobalClusters,675,142,21.037,533
+fts_internal_funding_global.csv,FTS,destLocations,675,0,0.0,675
+fts_internal_funding_global.csv,FTS,destProject,675,675,100.0,0
+fts_internal_funding_global.csv,FTS,destProjectCode,675,675,100.0,0
+fts_internal_funding_global.csv,FTS,destEmergency,675,636,94.2222,39
+fts_internal_funding_global.csv,FTS,destUsageYearStart,675,0,0.0,675
+fts_internal_funding_global.csv,FTS,destUsageYearEnd,675,0,0.0,675
+fts_internal_funding_global.csv,FTS,contributionType,675,0,0.0,675
+fts_internal_funding_global.csv,FTS,flowType,675,0,0.0,675
+fts_internal_funding_global.csv,FTS,method,675,0,0.0,675
+fts_internal_funding_global.csv,FTS,boundary,675,0,0.0,675
+fts_internal_funding_global.csv,FTS,onBoundary,675,0,0.0,675
+fts_internal_funding_global.csv,FTS,status,675,0,0.0,675
+fts_internal_funding_global.csv,FTS,firstReportedDate,675,0,0.0,675
+fts_internal_funding_global.csv,FTS,decisionDate,675,0,0.0,675
+fts_internal_funding_global.csv,FTS,keywords,675,675,100.0,0
+fts_internal_funding_global.csv,FTS,originalAmount,675,648,96.0,27
+fts_internal_funding_global.csv,FTS,originalCurrency,675,648,96.0,27
+fts_internal_funding_global.csv,FTS,exchangeRate,675,648,96.0,27
+fts_internal_funding_global.csv,FTS,id,675,0,0.0,675
+fts_internal_funding_global.csv,FTS,refCode,675,0,0.0,675
+fts_internal_funding_global.csv,FTS,createdAt,675,0,0.0,675
+fts_internal_funding_global.csv,FTS,updatedAt,675,0,0.0,675
+fts_outgoing_funding_global.csv,FTS,date,3199,0,0.0,3199
+fts_outgoing_funding_global.csv,FTS,budgetYear,3199,204,6.377,2995
+fts_outgoing_funding_global.csv,FTS,description,3199,0,0.0,3199
+fts_outgoing_funding_global.csv,FTS,amountUSD,3199,0,0.0,3199
+fts_outgoing_funding_global.csv,FTS,srcOrganization,3199,0,0.0,3199
+fts_outgoing_funding_global.csv,FTS,srcOrganizationTypes,3199,0,0.0,3199
+fts_outgoing_funding_global.csv,FTS,srcLocations,3199,0,0.0,3199
+fts_outgoing_funding_global.csv,FTS,srcUsageYearStart,3199,0,0.0,3199
+fts_outgoing_funding_global.csv,FTS,srcUsageYearEnd,3199,0,0.0,3199
+fts_outgoing_funding_global.csv,FTS,destPlan,3199,1428,44.6389,1771
+fts_outgoing_funding_global.csv,FTS,destPlanCode,3199,1428,44.6389,1771
+fts_outgoing_funding_global.csv,FTS,destPlanId,3199,1428,44.6389,1771
+fts_outgoing_funding_global.csv,FTS,destOrganization,3199,20,0.6252,3179
+fts_outgoing_funding_global.csv,FTS,destOrganizationTypes,3199,20,0.6252,3179
+fts_outgoing_funding_global.csv,FTS,destGlobalClusters,3199,545,17.0366,2654
+fts_outgoing_funding_global.csv,FTS,destLocations,3199,509,15.9112,2690
+fts_outgoing_funding_global.csv,FTS,destProject,3199,3182,99.4686,17
+fts_outgoing_funding_global.csv,FTS,destProjectCode,3199,3182,99.4686,17
+fts_outgoing_funding_global.csv,FTS,destEmergency,3199,3100,96.9053,99
+fts_outgoing_funding_global.csv,FTS,destUsageYearStart,3199,0,0.0,3199
+fts_outgoing_funding_global.csv,FTS,destUsageYearEnd,3199,0,0.0,3199
+fts_outgoing_funding_global.csv,FTS,contributionType,3199,0,0.0,3199
+fts_outgoing_funding_global.csv,FTS,flowType,3199,0,0.0,3199
+fts_outgoing_funding_global.csv,FTS,method,3199,0,0.0,3199
+fts_outgoing_funding_global.csv,FTS,boundary,3199,0,0.0,3199
+fts_outgoing_funding_global.csv,FTS,onBoundary,3199,0,0.0,3199
+fts_outgoing_funding_global.csv,FTS,status,3199,0,0.0,3199
+fts_outgoing_funding_global.csv,FTS,firstReportedDate,3199,0,0.0,3199
+fts_outgoing_funding_global.csv,FTS,decisionDate,3199,217,6.7834,2982
+fts_outgoing_funding_global.csv,FTS,keywords,3199,2895,90.497,304
+fts_outgoing_funding_global.csv,FTS,originalAmount,3199,309,9.6593,2890
+fts_outgoing_funding_global.csv,FTS,originalCurrency,3199,309,9.6593,2890
+fts_outgoing_funding_global.csv,FTS,exchangeRate,3199,310,9.6905,2889
+fts_outgoing_funding_global.csv,FTS,id,3199,0,0.0,3199
+fts_outgoing_funding_global.csv,FTS,refCode,3199,196,6.1269,3003
+fts_outgoing_funding_global.csv,FTS,createdAt,3199,0,0.0,3199
+fts_outgoing_funding_global.csv,FTS,updatedAt,3199,0,0.0,3199
+fts_requirements_funding_cluster_global.csv,FTS,countryCode,8030,0,0.0,8030
+fts_requirements_funding_cluster_global.csv,FTS,id,8030,0,0.0,8030
+fts_requirements_funding_cluster_global.csv,FTS,name,8030,0,0.0,8030
+fts_requirements_funding_cluster_global.csv,FTS,code,8030,0,0.0,8030
+fts_requirements_funding_cluster_global.csv,FTS,startDate,8030,0,0.0,8030
+fts_requirements_funding_cluster_global.csv,FTS,endDate,8030,0,0.0,8030
+fts_requirements_funding_cluster_global.csv,FTS,year,8030,0,0.0,8030
+fts_requirements_funding_cluster_global.csv,FTS,clusterCode,8030,1630,20.2989,6400
+fts_requirements_funding_cluster_global.csv,FTS,cluster,8030,0,0.0,8030
+fts_requirements_funding_cluster_global.csv,FTS,requirements,8030,1729,21.5318,6301
+fts_requirements_funding_cluster_global.csv,FTS,funding,8030,576,7.1731,7454
+fts_requirements_funding_cluster_global.csv,FTS,percentFunded,8030,2257,28.1071,5773
+fts_requirements_funding_covid_global.csv,FTS,countryCode,152,0,0.0,152
+fts_requirements_funding_covid_global.csv,FTS,id,152,0,0.0,152
+fts_requirements_funding_covid_global.csv,FTS,name,152,0,0.0,152
+fts_requirements_funding_covid_global.csv,FTS,code,152,0,0.0,152
+fts_requirements_funding_covid_global.csv,FTS,typeId,152,0,0.0,152
+fts_requirements_funding_covid_global.csv,FTS,typeName,152,0,0.0,152
+fts_requirements_funding_covid_global.csv,FTS,startDate,152,0,0.0,152
+fts_requirements_funding_covid_global.csv,FTS,endDate,152,0,0.0,152
+fts_requirements_funding_covid_global.csv,FTS,year,152,0,0.0,152
+fts_requirements_funding_covid_global.csv,FTS,requirements,152,15,9.8684,137
+fts_requirements_funding_covid_global.csv,FTS,funding,152,0,0.0,152
+fts_requirements_funding_covid_global.csv,FTS,covidFunding,152,0,0.0,152
+fts_requirements_funding_covid_global.csv,FTS,covidPercentageOfFunding,152,0,0.0,152
+fts_requirements_funding_global.csv,FTS,countryCode,3805,0,0.0,3805
+fts_requirements_funding_global.csv,FTS,id,3805,2554,67.1222,1251
+fts_requirements_funding_global.csv,FTS,name,3805,0,0.0,3805
+fts_requirements_funding_global.csv,FTS,code,3805,2559,67.2536,1246
+fts_requirements_funding_global.csv,FTS,typeId,3805,2554,67.1222,1251
+fts_requirements_funding_global.csv,FTS,typeName,3805,2554,67.1222,1251
+fts_requirements_funding_global.csv,FTS,startDate,3805,2554,67.1222,1251
+fts_requirements_funding_global.csv,FTS,endDate,3805,2554,67.1222,1251
+fts_requirements_funding_global.csv,FTS,year,3805,0,0.0,3805
+fts_requirements_funding_global.csv,FTS,requirements,3805,2607,68.5151,1198
+fts_requirements_funding_global.csv,FTS,funding,3805,24,0.6307,3781
+fts_requirements_funding_global.csv,FTS,percentFunded,3805,2623,68.9356,1182
+fts_requirements_funding_globalcluster_global.csv,FTS,countryCode,10630,0,0.0,10630
+fts_requirements_funding_globalcluster_global.csv,FTS,id,10630,0,0.0,10630
+fts_requirements_funding_globalcluster_global.csv,FTS,name,10630,0,0.0,10630
+fts_requirements_funding_globalcluster_global.csv,FTS,code,10630,0,0.0,10630
+fts_requirements_funding_globalcluster_global.csv,FTS,startDate,10630,0,0.0,10630
+fts_requirements_funding_globalcluster_global.csv,FTS,endDate,10630,0,0.0,10630
+fts_requirements_funding_globalcluster_global.csv,FTS,year,10630,0,0.0,10630
+fts_requirements_funding_globalcluster_global.csv,FTS,clusterCode,10630,1630,15.334,9000
+fts_requirements_funding_globalcluster_global.csv,FTS,cluster,10630,0,0.0,10630
+fts_requirements_funding_globalcluster_global.csv,FTS,requirements,10630,2438,22.9351,8192
+fts_requirements_funding_globalcluster_global.csv,FTS,funding,10630,1004,9.445,9626
+fts_requirements_funding_globalcluster_global.csv,FTS,percentFunded,10630,3283,30.8843,7347
+hpc_hno_2024.csv,HNO,Country ISO3,387819,0,0.0,387819
+hpc_hno_2024.csv,HNO,Admin 1 PCode,387819,371299,95.7403,16520
+hpc_hno_2024.csv,HNO,Admin 1 Name,387819,371299,95.7403,16520
+hpc_hno_2024.csv,HNO,Admin 2 PCode,387819,166377,42.9007,221442
+hpc_hno_2024.csv,HNO,Admin 2 Name,387819,166377,42.9007,221442
+hpc_hno_2024.csv,HNO,Admin 3 PCode,387819,240514,62.0171,147305
+hpc_hno_2024.csv,HNO,Admin 3 Name,387819,240514,62.0171,147305
+hpc_hno_2024.csv,HNO,Description,387819,1,0.0003,387818
+hpc_hno_2024.csv,HNO,Cluster,387819,853,0.2199,386966
+hpc_hno_2024.csv,HNO,Category,387819,360,0.0928,387459
+hpc_hno_2024.csv,HNO,Population,387819,376929,97.192,10890
+hpc_hno_2024.csv,HNO,In Need,387819,6505,1.6773,381314
+hpc_hno_2024.csv,HNO,Targeted,387819,69575,17.9401,318244
+hpc_hno_2024.csv,HNO,Affected,387819,383823,98.9696,3996
+hpc_hno_2024.csv,HNO,Reached,387819,387308,99.8682,511
+hpc_hno_2024.csv,HNO,Info,387819,386794,99.7357,1025
+hpc_hno_2025.csv,HNO,Country ISO3,318259,0,0.0,318259
+hpc_hno_2025.csv,HNO,Admin 1 PCode,318259,302467,95.038,15792
+hpc_hno_2025.csv,HNO,Admin 1 Name,318259,302467,95.038,15792
+hpc_hno_2025.csv,HNO,Admin 2 PCode,318259,90103,28.3112,228156
+hpc_hno_2025.csv,HNO,Admin 2 Name,318259,90103,28.3112,228156
+hpc_hno_2025.csv,HNO,Admin 3 PCode,318259,246442,77.4344,71817
+hpc_hno_2025.csv,HNO,Admin 3 Name,318259,246442,77.4344,71817
+hpc_hno_2025.csv,HNO,Description,318259,0,0.0,318259
+hpc_hno_2025.csv,HNO,Cluster,318259,5570,1.7501,312689
+hpc_hno_2025.csv,HNO,Category,318259,337,0.1059,317922
+hpc_hno_2025.csv,HNO,Population,318259,287361,90.2916,30898
+hpc_hno_2025.csv,HNO,In Need,318259,8060,2.5325,310199
+hpc_hno_2025.csv,HNO,Targeted,318259,48978,15.3894,269281
+hpc_hno_2025.csv,HNO,Affected,318259,315027,98.9845,3232
+hpc_hno_2025.csv,HNO,Reached,318259,318237,99.9931,22
+hpc_hno_2025.csv,HNO,Info,318259,312689,98.2499,5570
+hpc_hno_2026.csv,HNO,Country ISO3,134,0,0.0,134
+hpc_hno_2026.csv,HNO,Description,134,0,0.0,134
+hpc_hno_2026.csv,HNO,Cluster,134,0,0.0,134
+hpc_hno_2026.csv,HNO,Category,134,134,100.0,0
+hpc_hno_2026.csv,HNO,Population,134,114,85.0746,20
+hpc_hno_2026.csv,HNO,In Need,134,6,4.4776,128
+hpc_hno_2026.csv,HNO,Targeted,134,0,0.0,134
+hpc_hno_2026.csv,HNO,Affected,134,134,100.0,0
+hpc_hno_2026.csv,HNO,Reached,134,134,100.0,0
+hpc_hno_2026.csv,HNO,Info,134,134,100.0,0
+humanitarian-response-plans.csv,HRP,code,910,1,0.1099,909
+humanitarian-response-plans.csv,HRP,internalId,910,0,0.0,910
+humanitarian-response-plans.csv,HRP,startDate,910,0,0.0,910
+humanitarian-response-plans.csv,HRP,endDate,910,0,0.0,910
+humanitarian-response-plans.csv,HRP,planVersion,910,0,0.0,910
+humanitarian-response-plans.csv,HRP,categories,910,0,0.0,910
+humanitarian-response-plans.csv,HRP,locations,910,23,2.5275,887
+humanitarian-response-plans.csv,HRP,years,910,0,0.0,910
+humanitarian-response-plans.csv,HRP,origRequirements,910,0,0.0,910
+humanitarian-response-plans.csv,HRP,revisedRequirements,910,0,0.0,910
