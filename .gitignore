@@ -101,7 +101,6 @@ ENV/
 .mypy_cache/
 
 # Data and large files
-initial_data/
 *.xlsx
 *.parquet
 *.jsonl
