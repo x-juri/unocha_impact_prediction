@@ -1,0 +1,10 @@
+validation,status,detail
+expected_file_count,pass,Expected 26 files and found 26.
+snapshot_row_counts,pass,All logical row counts match the checked-in snapshot.
+cbpf_duplicate_contribution_files,pass,CBPF contribution duplicate pair detected by sha256.
+hxl_metadata_detection,pass,Detected HXL metadata rows in: hpc_hno_2024.csv | hpc_hno_2025.csv | humanitarian-response-plans.csv.
+hno_country_to_cod_iso3,pass,Matched 20 values.
+hno_admin1_pcode_to_cod_admin1_pcode,pass,Matched 52 values.
+hrp_code_to_fts_plan_code,pass,Matched 882 values.
+hno_sector_label_to_fts_cluster,pass,Matched 93 values.
+initial_data_unchanged,pass,Input CSV sha256 values match before and after report generation.

@@ -1,0 +1,145 @@
+file,check_type,column,status,affected_count,total_count,affected_pct,detail
+AffectedPersons__20260418_072029_UTC.csv,row_structure,,ok,0,16,0.0,Rows have the same number of parsed fields as the header.
+AffectedPersons__20260418_072029_UTC.csv,duplicate_rows,,ok,0,16,0.0,Exact duplicate logical rows.
+AllocationFlow__20260418_071755_UTC.csv,row_structure,,ok,0,198,0.0,Rows have the same number of parsed fields as the header.
+AllocationFlow__20260418_071755_UTC.csv,duplicate_rows,,ok,0,198,0.0,Exact duplicate logical rows.
+AllocationsByOrgType__20260418_071803_UTC.csv,row_structure,,ok,0,18,0.0,Rows have the same number of parsed fields as the header.
+AllocationsByOrgType__20260418_071803_UTC.csv,duplicate_rows,,ok,0,18,0.0,Exact duplicate logical rows.
+AllocationsTimeline__20260418_071808_UTC.csv,row_structure,,ok,0,49,0.0,Rows have the same number of parsed fields as the header.
+AllocationsTimeline__20260418_071808_UTC.csv,duplicate_rows,,ok,0,49,0.0,Exact duplicate logical rows.
+AllocationsTimeline__20260418_071808_UTC.csv,date_parse,Start Date,warning,49,49,100.0,Non-empty date-like values that do not parse with expected formats.
+AllocationsTimeline__20260418_071808_UTC.csv,date_parse,End Date,warning,49,49,100.0,Non-empty date-like values that do not parse with expected formats.
+Allocations__20260418_071733_UTC.csv,row_structure,,ok,0,33,0.0,Rows have the same number of parsed fields as the header.
+Allocations__20260418_071733_UTC.csv,duplicate_rows,,ok,0,33,0.0,Exact duplicate logical rows.
+CBPFcontributions__20260418_071813_UTC.csv,row_structure,,ok,0,145,0.0,Rows have the same number of parsed fields as the header.
+CBPFcontributions__20260418_071813_UTC.csv,duplicate_rows,,ok,0,145,0.0,Exact duplicate logical rows.
+ContributionTrends__20260418_071819_UTC.csv,row_structure,,ok,0,381,0.0,Rows have the same number of parsed fields as the header.
+ContributionTrends__20260418_071819_UTC.csv,duplicate_rows,,ok,0,381,0.0,Exact duplicate logical rows.
+ContributionsFlow__20260418_071825_UTC.csv,row_structure,,ok,0,145,0.0,Rows have the same number of parsed fields as the header.
+ContributionsFlow__20260418_071825_UTC.csv,duplicate_rows,,ok,0,145,0.0,Exact duplicate logical rows.
+GenderAgeMarker__20260418_072032_UTC.csv,row_structure,,ok,0,35,0.0,Rows have the same number of parsed fields as the header.
+GenderAgeMarker__20260418_072032_UTC.csv,duplicate_rows,,ok,0,35,0.0,Exact duplicate logical rows.
+SectorsOverview__20260418_071833_UTC.csv,row_structure,,ok,0,97,0.0,Rows have the same number of parsed fields as the header.
+SectorsOverview__20260418_071833_UTC.csv,duplicate_rows,,ok,0,97,0.0,Exact duplicate logical rows.
+cod_population_admin0.csv,missingness,ADM1_PCODE,warning,6722,6722,100.0,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+cod_population_admin0.csv,missingness,ADM1_NAME,warning,6722,6722,100.0,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+cod_population_admin0.csv,missingness,ADM2_PCODE,warning,6722,6722,100.0,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+cod_population_admin0.csv,missingness,ADM2_NAME,warning,6722,6722,100.0,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+cod_population_admin0.csv,missingness,ADM3_PCODE,warning,6722,6722,100.0,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+cod_population_admin0.csv,missingness,ADM3_NAME,warning,6722,6722,100.0,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+cod_population_admin0.csv,missingness,ADM4_PCODE,warning,6722,6722,100.0,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+cod_population_admin0.csv,missingness,ADM4_NAME,warning,6722,6722,100.0,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+cod_population_admin0.csv,row_structure,,ok,0,6722,0.0,Rows have the same number of parsed fields as the header.
+cod_population_admin0.csv,duplicate_rows,,ok,0,6722,0.0,Exact duplicate logical rows.
+cod_population_admin1.csv,missingness,ADM2_PCODE,warning,91471,91471,100.0,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+cod_population_admin1.csv,missingness,ADM2_NAME,warning,91471,91471,100.0,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+cod_population_admin1.csv,missingness,ADM3_PCODE,warning,91471,91471,100.0,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+cod_population_admin1.csv,missingness,ADM3_NAME,warning,91471,91471,100.0,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+cod_population_admin1.csv,missingness,ADM4_PCODE,warning,91471,91471,100.0,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+cod_population_admin1.csv,missingness,ADM4_NAME,warning,91471,91471,100.0,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+cod_population_admin1.csv,row_structure,,ok,0,91471,0.0,Rows have the same number of parsed fields as the header.
+cod_population_admin1.csv,duplicate_rows,,warning,5,91471,0.0055,Exact duplicate logical rows.
+cod_population_admin1.csv,cod_required_missing,ADM1_PCODE,warning,345,91471,0.3772,COD-PS required/expected analysis field is blank.
+cod_population_admin2.csv,missingness,ADM3_PCODE,warning,1001583,1001583,100.0,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+cod_population_admin2.csv,missingness,ADM3_NAME,warning,1001583,1001583,100.0,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+cod_population_admin2.csv,missingness,ADM4_PCODE,warning,1001583,1001583,100.0,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+cod_population_admin2.csv,missingness,ADM4_NAME,warning,1001583,1001583,100.0,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+cod_population_admin2.csv,row_structure,,ok,0,1001583,0.0,Rows have the same number of parsed fields as the header.
+cod_population_admin2.csv,duplicate_rows,,ok,0,1001583,0.0,Exact duplicate logical rows.
+cod_population_admin2.csv,cod_required_missing,ADM2_NAME,warning,108,1001583,0.0108,COD-PS required/expected analysis field is blank.
+cod_population_admin2.csv,cod_required_missing,ADM2_PCODE,warning,1566,1001583,0.1564,COD-PS required/expected analysis field is blank.
+cod_population_admin3.csv,missingness,ADM4_PCODE,warning,241962,241962,100.0,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+cod_population_admin3.csv,missingness,ADM4_NAME,warning,241962,241962,100.0,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+cod_population_admin3.csv,row_structure,,ok,0,241962,0.0,Rows have the same number of parsed fields as the header.
+cod_population_admin3.csv,duplicate_rows,,ok,0,241962,0.0,Exact duplicate logical rows.
+cod_population_admin4.csv,missingness,Age_min,warning,17465,17465,100.0,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+cod_population_admin4.csv,missingness,Age_max,warning,17465,17465,100.0,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+cod_population_admin4.csv,row_structure,,ok,0,17465,0.0,Rows have the same number of parsed fields as the header.
+cod_population_admin4.csv,duplicate_rows,,ok,0,17465,0.0,Exact duplicate logical rows.
+fts_incoming_funding_global.csv,missingness,destProject,warning,7870,7990,98.4981,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+fts_incoming_funding_global.csv,missingness,destProjectCode,warning,7870,7990,98.4981,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+fts_incoming_funding_global.csv,missingness,destEmergency,warning,7492,7990,93.7672,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+fts_incoming_funding_global.csv,missingness,keywords,warning,6630,7990,82.9787,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+fts_incoming_funding_global.csv,row_structure,,ok,0,7990,0.0,Rows have the same number of parsed fields as the header.
+fts_incoming_funding_global.csv,duplicate_rows,,warning,440,7990,5.5069,Exact duplicate logical rows.
+fts_incoming_funding_global.csv,negative_numeric_value,amountUSD,needs_domain_review,29,7990,0.363,Negative values in a measure column.
+fts_incoming_funding_global.csv,negative_numeric_value,originalAmount,needs_domain_review,12,7990,0.1502,Negative values in a measure column.
+fts_internal_funding_global.csv,missingness,destProject,warning,675,675,100.0,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+fts_internal_funding_global.csv,missingness,destProjectCode,warning,675,675,100.0,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+fts_internal_funding_global.csv,missingness,destEmergency,warning,636,675,94.2222,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+fts_internal_funding_global.csv,missingness,keywords,warning,675,675,100.0,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+fts_internal_funding_global.csv,missingness,originalAmount,warning,648,675,96.0,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+fts_internal_funding_global.csv,missingness,originalCurrency,warning,648,675,96.0,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+fts_internal_funding_global.csv,missingness,exchangeRate,warning,648,675,96.0,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+fts_internal_funding_global.csv,row_structure,,ok,0,675,0.0,Rows have the same number of parsed fields as the header.
+fts_internal_funding_global.csv,duplicate_rows,,ok,0,675,0.0,Exact duplicate logical rows.
+fts_outgoing_funding_global.csv,missingness,destProject,warning,3182,3199,99.4686,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+fts_outgoing_funding_global.csv,missingness,destProjectCode,warning,3182,3199,99.4686,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+fts_outgoing_funding_global.csv,missingness,destEmergency,warning,3100,3199,96.9053,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+fts_outgoing_funding_global.csv,missingness,keywords,warning,2895,3199,90.497,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+fts_outgoing_funding_global.csv,row_structure,,ok,0,3199,0.0,Rows have the same number of parsed fields as the header.
+fts_outgoing_funding_global.csv,duplicate_rows,,ok,0,3199,0.0,Exact duplicate logical rows.
+fts_outgoing_funding_global.csv,negative_numeric_value,amountUSD,needs_domain_review,21,3199,0.6565,Negative values in a measure column.
+fts_outgoing_funding_global.csv,negative_numeric_value,originalAmount,needs_domain_review,12,3199,0.3751,Negative values in a measure column.
+fts_requirements_funding_cluster_global.csv,row_structure,,ok,0,8030,0.0,Rows have the same number of parsed fields as the header.
+fts_requirements_funding_cluster_global.csv,duplicate_rows,,ok,0,8030,0.0,Exact duplicate logical rows.
+fts_requirements_funding_cluster_global.csv,negative_numeric_value,funding,needs_domain_review,35,8030,0.4359,Negative values in a measure column.
+fts_requirements_funding_cluster_global.csv,percentage_range,percentFunded,needs_domain_review,470,8030,5.8531,Percentage-like values outside 0..100.
+fts_requirements_funding_cluster_global.csv,funding_gt_requirements,,needs_domain_review,477,8030,5.9402,Logical comparison flagged by the profiling rules.
+fts_requirements_funding_covid_global.csv,row_structure,,ok,0,152,0.0,Rows have the same number of parsed fields as the header.
+fts_requirements_funding_covid_global.csv,duplicate_rows,,ok,0,152,0.0,Exact duplicate logical rows.
+fts_requirements_funding_covid_global.csv,funding_gt_requirements,,needs_domain_review,6,152,3.9474,Logical comparison flagged by the profiling rules.
+fts_requirements_funding_global.csv,missingness,id,warning,2554,3805,67.1222,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+fts_requirements_funding_global.csv,missingness,code,warning,2559,3805,67.2536,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+fts_requirements_funding_global.csv,missingness,typeId,warning,2554,3805,67.1222,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+fts_requirements_funding_global.csv,missingness,typeName,warning,2554,3805,67.1222,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+fts_requirements_funding_global.csv,missingness,startDate,warning,2554,3805,67.1222,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+fts_requirements_funding_global.csv,missingness,endDate,warning,2554,3805,67.1222,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+fts_requirements_funding_global.csv,missingness,requirements,warning,2607,3805,68.5151,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+fts_requirements_funding_global.csv,missingness,percentFunded,warning,2623,3805,68.9356,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+fts_requirements_funding_global.csv,row_structure,,ok,0,3805,0.0,Rows have the same number of parsed fields as the header.
+fts_requirements_funding_global.csv,duplicate_rows,,ok,0,3805,0.0,Exact duplicate logical rows.
+fts_requirements_funding_global.csv,negative_numeric_value,funding,needs_domain_review,7,3805,0.184,Negative values in a measure column.
+fts_requirements_funding_global.csv,percentage_range,percentFunded,needs_domain_review,49,3805,1.2878,Percentage-like values outside 0..100.
+fts_requirements_funding_global.csv,funding_gt_requirements,,needs_domain_review,49,3805,1.2878,Logical comparison flagged by the profiling rules.
+fts_requirements_funding_globalcluster_global.csv,row_structure,,ok,0,10630,0.0,Rows have the same number of parsed fields as the header.
+fts_requirements_funding_globalcluster_global.csv,duplicate_rows,,ok,0,10630,0.0,Exact duplicate logical rows.
+fts_requirements_funding_globalcluster_global.csv,negative_numeric_value,funding,needs_domain_review,26,10630,0.2446,Negative values in a measure column.
+fts_requirements_funding_globalcluster_global.csv,percentage_range,percentFunded,needs_domain_review,608,10630,5.7197,Percentage-like values outside 0..100.
+fts_requirements_funding_globalcluster_global.csv,funding_gt_requirements,,needs_domain_review,619,10630,5.8231,Logical comparison flagged by the profiling rules.
+hpc_hno_2024.csv,missingness,Admin 1 PCode,warning,371299,387819,95.7403,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+hpc_hno_2024.csv,missingness,Admin 1 Name,warning,371299,387819,95.7403,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+hpc_hno_2024.csv,missingness,Admin 3 PCode,warning,240514,387819,62.0171,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+hpc_hno_2024.csv,missingness,Admin 3 Name,warning,240514,387819,62.0171,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+hpc_hno_2024.csv,missingness,Population,warning,376929,387819,97.192,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+hpc_hno_2024.csv,missingness,Affected,warning,383823,387819,98.9696,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+hpc_hno_2024.csv,missingness,Reached,warning,387308,387819,99.8682,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+hpc_hno_2024.csv,missingness,Info,warning,386794,387819,99.7357,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+hpc_hno_2024.csv,row_structure,,ok,0,387819,0.0,Rows have the same number of parsed fields as the header.
+hpc_hno_2024.csv,duplicate_rows,,ok,0,387819,0.0,Exact duplicate logical rows.
+hpc_hno_2024.csv,negative_numeric_value,In Need,needs_domain_review,16,387819,0.0041,Negative values in a measure column.
+hpc_hno_2024.csv,negative_numeric_value,Targeted,needs_domain_review,9,387819,0.0023,Negative values in a measure column.
+hpc_hno_2024.csv,reached_gt_targeted,,needs_domain_review,2,387819,0.0005,Logical comparison flagged by the profiling rules.
+hpc_hno_2024.csv,targeted_gt_in_need,,needs_domain_review,7475,387819,1.9274,Logical comparison flagged by the profiling rules.
+hpc_hno_2025.csv,missingness,Admin 1 PCode,warning,302467,318259,95.038,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+hpc_hno_2025.csv,missingness,Admin 1 Name,warning,302467,318259,95.038,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+hpc_hno_2025.csv,missingness,Admin 3 PCode,warning,246442,318259,77.4344,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+hpc_hno_2025.csv,missingness,Admin 3 Name,warning,246442,318259,77.4344,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+hpc_hno_2025.csv,missingness,Population,warning,287361,318259,90.2916,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+hpc_hno_2025.csv,missingness,Affected,warning,315027,318259,98.9845,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+hpc_hno_2025.csv,missingness,Reached,warning,318237,318259,99.9931,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+hpc_hno_2025.csv,missingness,Info,warning,312689,318259,98.2499,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+hpc_hno_2025.csv,row_structure,,ok,0,318259,0.0,Rows have the same number of parsed fields as the header.
+hpc_hno_2025.csv,duplicate_rows,,ok,0,318259,0.0,Exact duplicate logical rows.
+hpc_hno_2025.csv,negative_numeric_value,In Need,needs_domain_review,5,318259,0.0016,Negative values in a measure column.
+hpc_hno_2025.csv,reached_gt_targeted,,needs_domain_review,2,318259,0.0006,Logical comparison flagged by the profiling rules.
+hpc_hno_2025.csv,targeted_gt_in_need,,needs_domain_review,4920,318259,1.5459,Logical comparison flagged by the profiling rules.
+hpc_hno_2026.csv,missingness,Category,warning,134,134,100.0,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+hpc_hno_2026.csv,missingness,Population,warning,114,134,85.0746,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+hpc_hno_2026.csv,missingness,Affected,warning,134,134,100.0,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+hpc_hno_2026.csv,missingness,Reached,warning,134,134,100.0,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+hpc_hno_2026.csv,missingness,Info,warning,134,134,100.0,Column is blank in at least half of logical rows. Review whether this is structural or data loss.
+hpc_hno_2026.csv,row_structure,,ok,0,134,0.0,Rows have the same number of parsed fields as the header.
+hpc_hno_2026.csv,duplicate_rows,,ok,0,134,0.0,Exact duplicate logical rows.
+humanitarian-response-plans.csv,row_structure,,ok,0,910,0.0,Rows have the same number of parsed fields as the header.
+humanitarian-response-plans.csv,duplicate_rows,,ok,0,910,0.0,Exact duplicate logical rows.
