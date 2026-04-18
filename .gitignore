@@ -102,7 +102,6 @@ ENV/
 
 # Data and large files
 initial_data/
-*.csv
 *.xlsx
 *.parquet
 *.jsonl
