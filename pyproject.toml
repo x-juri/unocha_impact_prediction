@@ -1,7 +1,7 @@
 [project]
 name = "analytics-datathon-2026"
 version = "0.1.0"
-description = "CSV modeling dashboard and initial data quality report for the analytics datathon."
+description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [

@@ -64,12 +64,12 @@ The initial data quality report generator uses only the Python standard library.
 No extra packages are required for `scripts/generate_initial_data_quality_report.py`.
 
 ## Run The Dashboard
+You need uv installed to run the project.
 
 From the repository root:
 
 ```bash
-python3 -m pip install -r requirements.txt
-python3 dashboard/app.py
+uv run dashboard/app.py
 ```
 
 Then open:
