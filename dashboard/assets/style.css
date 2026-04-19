@@ -1,0 +1,309 @@
+:root {
+  --ink: #1f2933;
+  --muted: #64748b;
+  --line: #d8e0e8;
+  --surface: #ffffff;
+  --soft: #f5f8fa;
+  --accent: #1f7a8c;
+  --accent-strong: #14515d;
+  --warn: #9b2c2c;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--soft);
+  color: var(--ink);
+  font-family: Arial, sans-serif;
+}
+
+.app-shell {
+  min-height: 100vh;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 34px 42px 28px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--line);
+}
+
+.header-copy {
+  max-width: 760px;
+}
+
+.eyebrow,
+.section-kicker,
+.metric-label,
+.prediction-label,
+.source-panel span {
+  display: block;
+  margin: 0 0 8px;
+  color: var(--accent-strong);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+h1,
+h2 {
+  margin: 0;
+  line-height: 1.15;
+}
+
+h1 {
+  font-size: 36px;
+}
+
+h2 {
+  font-size: 24px;
+}
+
+.lede,
+.muted {
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.lede {
+  max-width: 700px;
+  margin: 12px 0 0;
+  font-size: 16px;
+}
+
+.source-panel,
+.metric-card,
+.prediction-box,
+.diagnostics {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.source-panel {
+  min-width: 260px;
+  padding: 16px;
+}
+
+.source-panel strong,
+.source-panel small {
+  display: block;
+}
+
+.source-panel small {
+  margin-top: 8px;
+  color: var(--muted);
+}
+
+main {
+  display: grid;
+  gap: 22px;
+  padding: 24px 42px 42px;
+}
+
+.panel {
+  padding: 24px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.section-heading {
+  margin-bottom: 20px;
+}
+
+.filter-grid,
+.model-grid,
+.model-columns {
+  display: grid;
+  gap: 16px;
+}
+
+.filter-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  align-items: end;
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+input {
+  width: 100%;
+  min-height: 38px;
+  padding: 8px 10px;
+  border: 1px solid #cbd5df;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+button {
+  min-height: 40px;
+  margin-top: 6px;
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--accent);
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+button:hover {
+  background: var(--accent-strong);
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.metrics-grid.compact {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: 12px;
+}
+
+.metric-card {
+  padding: 16px;
+}
+
+.metric-card strong {
+  display: block;
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.metric-card small {
+  display: block;
+  margin-top: 8px;
+  color: var(--muted);
+}
+
+.chart-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.chart-grid > div:last-child {
+  grid-column: 1 / -1;
+}
+
+.chart-grid .diagnostics {
+  grid-column: 1 / -1;
+}
+
+.model-columns {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+}
+
+.model-grid {
+  grid-template-columns: minmax(280px, 420px) 1fr;
+  align-items: start;
+}
+
+.model-card {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.model-card h3 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.model-form {
+  display: grid;
+  gap: 12px;
+}
+
+.model-results {
+  display: grid;
+  gap: 16px;
+}
+
+.prediction-box {
+  padding: 22px;
+}
+
+.prediction-box strong {
+  display: block;
+  margin: 4px 0 8px;
+  color: var(--accent-strong);
+  font-size: 44px;
+  line-height: 1;
+}
+
+.prediction-box p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.prediction-box.warning {
+  border-color: #e7b4b4;
+  color: var(--warn);
+}
+
+.diagnostics {
+  padding: 18px;
+}
+
+@media (max-width: 1000px) {
+  .page-header,
+  .model-grid,
+  .model-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .page-header {
+    display: grid;
+    align-items: start;
+    padding: 26px 20px;
+  }
+
+  main {
+    padding: 20px;
+  }
+
+  .filter-grid,
+  .metrics-grid,
+  .chart-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  h1 {
+    font-size: 30px;
+  }
+
+  .filter-grid,
+  .metrics-grid,
+  .metrics-grid.compact,
+  .chart-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .panel {
+    padding: 18px;
+  }
+}
