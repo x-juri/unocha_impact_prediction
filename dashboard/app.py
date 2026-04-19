@@ -12,6 +12,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from dash import ALL, Dash, Input, Output, State, dcc, html, dash_table
 
+# Import supports both `python dashboard/app.py` and package-style imports.
 try:
     from .data_model import (
         DEFAULT_MODEL_KEY,
@@ -40,10 +41,14 @@ except ImportError:
     )
 
 
+# Runtime state is intentionally in memory. The app is a local exploratory tool,
+# so uploaded data and fitted models are scoped to the current process.
 DATASET_CACHE: dict[str, pd.DataFrame] = {}
 MODEL_CACHE: dict[str, DynamicModelBundle] = {}
 MAX_CACHE_ITEMS = 8
 
+
+# Shared UI configuration
 COLOR_SEQUENCE = ["#1f7a8c", "#74b3ce", "#f2a65a", "#8f3985", "#4f6f52", "#d45d79"]
 CORRELATION_METHOD_OPTIONS = [
     {"label": "Spearman", "value": "spearman"},
@@ -65,7 +70,9 @@ ENCODING_OPTIONS = [
 ]
 
 
+# Cache and upload helpers
 def _cache_put(cache: dict[str, Any], value: Any) -> str:
+    """Store a value in a small FIFO cache and return its generated key."""
     key = uuid.uuid4().hex
     cache[key] = value
     while len(cache) > MAX_CACHE_ITEMS:
@@ -81,6 +88,7 @@ def _cache_get(cache: dict[str, Any], key: str | None):
 
 
 def _decode_upload(contents: str) -> pd.DataFrame:
+    """Decode Dash's base64 upload payload into a pandas DataFrame."""
     if not contents:
         raise ValueError("Upload payload is empty.")
     _, content_string = contents.split(",", 1)
@@ -90,6 +98,7 @@ def _decode_upload(contents: str) -> pd.DataFrame:
 
 
 def _pick_default_target(df: pd.DataFrame, roles: dict[str, str]) -> str:
+    """Choose a useful initial target, favoring outcome/CIRV-style numeric columns."""
     numeric_columns = [column for column, role in roles.items() if role == "numeric"]
     if not numeric_columns:
         return str(df.columns[0])
@@ -113,6 +122,7 @@ def _pick_default_target(df: pd.DataFrame, roles: dict[str, str]) -> str:
     return numeric_columns[0]
 
 
+# Formatting and reusable UI components
 def format_target_value(value: float | int | None) -> str:
     if value is None:
         return "n/a"
@@ -181,6 +191,7 @@ def prediction_box(
     )
 
 
+# Model quality messaging
 def pitfalls_box(messages: list[str], stale: bool = False) -> html.Div:
     class_name = "pitfalls-box"
     if stale:
@@ -246,6 +257,22 @@ def _empty_pitfall_message() -> list[str]:
     return ["Train a model to see adaptive warnings and quality checks."]
 
 
+def _training_error_response(
+    title: str,
+    message: str,
+    figure_message: str,
+    pitfall_messages: list[str] | None = None,
+):
+    figures = [empty_figure(figure_message) for _ in range(5)]
+    return (
+        None,
+        warning_box(title, message),
+        [],
+        *figures,
+        pitfalls_box(pitfall_messages or _empty_pitfall_message()),
+    )
+
+
 def _stale_pitfall_messages(bundle: DynamicModelBundle) -> list[str]:
     return [
         "Selections changed after training. Retrain to get warnings for the current setup.",
@@ -291,6 +318,7 @@ def _pitfall_messages(bundle: DynamicModelBundle) -> list[str]:
     return messages
 
 
+# Chart helpers
 def apply_chart_style(fig):
     fig.update_layout(
         template="plotly_white",
@@ -538,6 +566,7 @@ def target_distribution(series: pd.Series, title: str, target_label: str):
     return apply_chart_style(fig)
 
 
+# App layout
 app = Dash(__name__, title="On-the-go CIRV-style modeling")
 server = app.server
 
@@ -552,7 +581,8 @@ app.layout = html.Div(
                 html.Div(
                     [
                         html.P("Explorative model training", className="eyebrow"),
-                        html.H1("CSV impact estimator"),
+                        html.H1("Not a dashboard"),
+                        html.P("The decision assistant.", className="lede"),
                         html.P(
                             "Upload any CSV, configure feature encodings, train on the fly, and run inference with model ribbons.",
                             className="lede",
@@ -691,6 +721,7 @@ app.layout = html.Div(
 )
 
 
+# Callbacks
 @app.callback(
     Output("dataset-key", "data"),
     Output("target-column", "options"),
@@ -898,30 +929,18 @@ def train_model(
 ):
     df = _cache_get(DATASET_CACHE, dataset_key)
     if df is None:
-        return (
-            None,
-            warning_box("Training blocked", "Upload a CSV first."),
-            [],
-            empty_figure("Upload data before training"),
-            empty_figure("Upload data before training"),
-            empty_figure("Upload data before training"),
-            empty_figure("Upload data before training"),
-            empty_figure("Upload data before training"),
-            pitfalls_box(_empty_pitfall_message()),
+        return _training_error_response(
+            "Training blocked",
+            "Upload a CSV first.",
+            "Upload data before training",
         )
 
     errors = validate_training_setup(df, target_column, treatments)
     if errors:
-        return (
-            None,
-            warning_box("Training blocked", " ".join(errors)),
-            [],
-            empty_figure("Fix setup errors before training"),
-            empty_figure("Fix setup errors before training"),
-            empty_figure("Fix setup errors before training"),
-            empty_figure("Fix setup errors before training"),
-            empty_figure("Fix setup errors before training"),
-            pitfalls_box(_empty_pitfall_message()),
+        return _training_error_response(
+            "Training blocked",
+            " ".join(errors),
+            "Fix setup errors before training",
         )
 
     specs = _build_feature_specs(treatments or [], encoding_values or [], delimiter_values or [])
@@ -933,16 +952,11 @@ def train_model(
             model_key=str(model_type or DEFAULT_MODEL_KEY),
         )
     except Exception as exc:
-        return (
-            None,
-            warning_box("Training failed", str(exc)),
-            [],
-            empty_figure("Training failed"),
-            empty_figure("Training failed"),
-            empty_figure("Training failed"),
-            empty_figure("Training failed"),
-            empty_figure("Training failed"),
-            pitfalls_box(["Training failed, so model quality warnings are not available yet."]),
+        return _training_error_response(
+            "Training failed",
+            str(exc),
+            "Training failed",
+            ["Training failed, so model quality warnings are not available yet."],
         )
 
     model_key = _cache_put(MODEL_CACHE, bundle)

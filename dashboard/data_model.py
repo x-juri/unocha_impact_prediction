@@ -20,12 +20,8 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-CERF_DATA_PATH = PROJECT_ROOT / "Final" / "CERF_UFE_2017_24_CIRV_Match.csv"
-CBPF_DATA_PATH = (
-    PROJECT_ROOT
-    / "Final"
-    / "Data_ CERF Donor Contributions and Allocations - allocations - CBPFs Projects.csv"
-)
+CERF_DATA_PATH = PROJECT_ROOT / "Final" / "cerf_ufe_cirv_match_2017_2024.csv"
+CBPF_DATA_PATH = PROJECT_ROOT / "Final" / "cbpf_projects_allocations.csv"
 DATA_PATH = CERF_DATA_PATH
 
 TARGET_LABEL = "CIRV - Inc"

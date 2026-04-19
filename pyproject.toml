@@ -1,11 +1,12 @@
 [project]
 name = "analytics-datathon-2026"
 version = "0.1.0"
-description = "Add your description here"
+description = "CSV modeling dashboard and initial data quality report for the analytics datathon."
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "dash>=2.17",
+    "numpy>=1.26",
     "pandas>=2.0",
     "plotly>=5.20",
     "scikit-learn>=1.3",

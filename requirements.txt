@@ -1,4 +1,9 @@
+# Runtime dependencies for the interactive dashboard in dashboard/.
 dash>=2.17
+numpy>=1.26
 plotly>=5.20
 pandas>=2.0
 scikit-learn>=1.3
+
+# The tracked initial data quality report script uses only the Python standard
+# library and does not need extra packages.
