@@ -17,10 +17,16 @@ same target concept and labels it as `CIRV - Inc` in the UI.
 
 ## Approach
 
-Both models are trained at app startup with scikit-learn `BayesianRidge`. The
-point estimate is the model mean prediction for `CIRV - Inc`; the interval shown
-in the app is an approximate 90% Bayesian Ridge predictive interval. These are
-model uncertainty intervals, not causal impact claims.
+Both datasets train two selectable scikit-learn models at app startup:
+
+- `RandomForestRegressor`, the default dashboard choice.
+- `BayesianRidge`, retained as the interpretable linear baseline.
+
+The point estimate is the selected model prediction for `CIRV - Inc`. Random
+Forest intervals are approximate 90% model intervals based on the 5th-95th
+percentile spread across individual tree predictions. Bayesian Ridge intervals
+use the model predictive standard deviation. These are model uncertainty
+intervals, not causal impact claims.
 
 CERF model features:
 
@@ -45,6 +51,8 @@ Coefficient notes:
 - Numeric coefficients are on standardized feature scale.
 - Categorical coefficients are relative to their dropped reference category.
 - CBPF project sector coefficients are multi-hot indicator effects.
+- The coefficient tables are for the Bayesian Ridge baseline. Random Forest is
+  nonlinear and does not expose regression coefficients.
 - Coefficients are associative model terms and should not be read causally.
 
 ## Budget Sensecheck
@@ -72,7 +80,9 @@ Sample raw values: `102640.61`, `2125691.55`, `463266.3`, `550889.55`,
 
 | Model | Train rows | Test rows | Test R2 | Test MAE | Mean test std |
 | --- | ---: | ---: | ---: | ---: | ---: |
+| CERF Random Forest | 768 | 256 | 0.1998 | 0.0950 | 0.0778 |
 | CERF Bayesian Ridge | 768 | 256 | 0.2109 | 0.0960 | 0.1342 |
+| CBPF Random Forest | 8,404 | 2,802 | 0.8844 | 0.0221 | 0.0268 |
 | CBPF Bayesian Ridge | 8,404 | 2,802 | 0.0268 | 0.0950 | 0.1273 |
 
 ## Top Regression Coefficients

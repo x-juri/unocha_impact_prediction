@@ -5,6 +5,7 @@ import os
 
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 from dash import Dash, Input, Output, State, dcc, html
 
 try:
@@ -21,6 +22,10 @@ try:
         CBPF_YEAR_COLUMN,
         CERF_DATA_PATH,
         CIRV_PREV_NUMERIC_COLUMN,
+        DEFAULT_MODEL_KEY,
+        MODEL_BAYESIAN_RIDGE,
+        MODEL_OPTIONS,
+        MODEL_RANDOM_FOREST,
         TARGET_NUMERIC_COLUMN,
         budget_sensecheck,
         cbpf_sector_feature_columns,
@@ -31,8 +36,8 @@ try:
         make_cbpf_prediction_frame,
         make_cerf_prediction_frame,
         predict_with_uncertainty,
-        train_cbpf_model,
-        train_cerf_model,
+        train_cbpf_models,
+        train_cerf_models,
         year_options,
     )
 except ImportError:
@@ -49,6 +54,10 @@ except ImportError:
         CBPF_YEAR_COLUMN,
         CERF_DATA_PATH,
         CIRV_PREV_NUMERIC_COLUMN,
+        DEFAULT_MODEL_KEY,
+        MODEL_BAYESIAN_RIDGE,
+        MODEL_OPTIONS,
+        MODEL_RANDOM_FOREST,
         TARGET_NUMERIC_COLUMN,
         budget_sensecheck,
         cbpf_sector_feature_columns,
@@ -59,17 +68,23 @@ except ImportError:
         make_cbpf_prediction_frame,
         make_cerf_prediction_frame,
         predict_with_uncertainty,
-        train_cbpf_model,
-        train_cerf_model,
+        train_cbpf_models,
+        train_cerf_models,
         year_options,
     )
 
 
 CERF_DATA = load_and_clean_cerf_data(CERF_DATA_PATH)
 CBPF_DATA = load_and_clean_cbpf_projects(CBPF_DATA_PATH)
-CERF_MODEL = train_cerf_model(CERF_DATA)
-CBPF_MODEL = train_cbpf_model(CBPF_DATA)
+CERF_MODELS = train_cerf_models(CERF_DATA)
+CBPF_MODELS = train_cbpf_models(CBPF_DATA)
 CBPF_SECTOR_COLUMNS = cbpf_sector_feature_columns(CBPF_DATA)
+
+CERF_DEFAULT_AMOUNT = float(CERF_DATA[AMOUNT_NUMERIC_COLUMN].median())
+CBPF_DEFAULT_DURATION = float(CBPF_DATA[CBPF_DURATION_NUMERIC_COLUMN].median())
+CBPF_DEFAULT_BUDGET = float(CBPF_DATA[CBPF_BUDGET_NUMERIC_COLUMN].median())
+CBPF_DEFAULT_PEOPLE = float(CBPF_DATA[CBPF_TOTAL_PEOPLE_NUMERIC_COLUMN].median())
+CBPF_DEFAULT_CIRV_PREV = float(CBPF_DATA[CIRV_PREV_NUMERIC_COLUMN].median())
 
 CERF_COUNTRY_OPTIONS = dropdown_options(CERF_DATA["countryName"])
 CERF_EMERGENCY_OPTIONS = dropdown_options(CERF_DATA["emergencyTypeName"])
@@ -110,6 +125,26 @@ def most_common(df: pd.DataFrame, column: str) -> str | None:
     return str(values.mode().iloc[0])
 
 
+def select_model(models: dict, model_key: str | None):
+    return models.get(model_key or DEFAULT_MODEL_KEY, models[DEFAULT_MODEL_KEY])
+
+
+def coerce_number(value, fallback: float) -> float:
+    if value is None:
+        return fallback
+    try:
+        if isinstance(value, str):
+            clean_value = value.strip().replace(",", "")
+            if not clean_value:
+                return fallback
+            number = float(clean_value)
+        else:
+            number = float(value)
+    except (TypeError, ValueError):
+        return fallback
+    return number if math.isfinite(number) else fallback
+
+
 def format_cirv(value: float | int | None) -> str:
     if value is None or not math.isfinite(float(value)):
         return "n/a"
@@ -147,10 +182,10 @@ def model_diagnostics(bundle, description: str) -> html.Div:
             html.Span("Model diagnostics", className="section-kicker"),
             html.Div(
                 [
+                    metric_card("Model", bundle.model_label),
                     metric_card("Test R2", f"{metrics['test_r2']:.3f}"),
                     metric_card("Test MAE", f"{metrics['test_mae']:.3f}"),
                     metric_card("Mean test std", f"{metrics['test_mean_std']:.3f}"),
-                    metric_card("Rows", f"{int(metrics['train_rows'] + metrics['test_rows']):,}"),
                 ],
                 className="metrics-grid compact",
             ),
@@ -160,13 +195,32 @@ def model_diagnostics(bundle, description: str) -> html.Div:
     )
 
 
-def prediction_box(result, label: str = "Estimated CIRV - Inc") -> html.Div:
+def model_description(bundle, dataset: str) -> str:
+    if bundle.model_key == MODEL_RANDOM_FOREST:
+        interval_text = "The interval is the 5th-95th percentile spread across the fitted trees."
+    elif bundle.model_key == MODEL_BAYESIAN_RIDGE:
+        interval_text = "The interval uses the Bayesian Ridge predictive standard deviation."
+    else:
+        interval_text = "The interval is model-derived."
+
+    if dataset == "CERF":
+        features = "total amount approved plus encoded emergency type, country, and project sector"
+    else:
+        features = (
+            "duration, budget, total people, CIRV - Prev, encoded allocation source, "
+            "organization type, and multi-hot project sectors"
+        )
+    rows = int(bundle.metrics["train_rows"] + bundle.metrics["test_rows"])
+    return f"{bundle.model_label} using {features}. {interval_text} Rows used for evaluation: {rows:,}."
+
+
+def prediction_box(result, model_label: str, label: str = "Estimated CIRV - Inc") -> html.Div:
     return html.Div(
         [
             html.Span(label, className="prediction-label"),
             html.Strong(format_cirv(result.prediction)),
             html.P(f"90% model interval: {format_cirv(result.lower)} to {format_cirv(result.upper)}"),
-            html.Small(f"Predictive standard deviation: {result.std:.3f}"),
+            html.Small(f"{model_label} uncertainty std: {result.std:.3f}"),
         ],
         className="prediction-box",
     )
@@ -304,14 +358,16 @@ def cbpf_summary_cards(df: pd.DataFrame) -> list[html.Div]:
 def target_distribution(df: pd.DataFrame, title: str):
     if df.empty:
         return empty_figure("No CIRV values for the active filters")
-    fig = px.histogram(
-        df,
-        x=TARGET_NUMERIC_COLUMN,
-        nbins=30,
-        labels=LABELS,
-        title=title,
-        color_discrete_sequence=["#1f7a8c"],
+    fig = go.Figure(
+        data=[
+            go.Histogram(
+                x=df[TARGET_NUMERIC_COLUMN],
+                nbinsx=30,
+                marker_color="#1f7a8c",
+            )
+        ]
     )
+    fig.update_layout(title=title, xaxis_title=LABELS[TARGET_NUMERIC_COLUMN], yaxis_title="Count")
     return apply_chart_style(fig)
 
 
@@ -453,7 +509,7 @@ app.layout = html.Div(
                         html.P("CERF and CBPF 2017-2024", className="eyebrow"),
                         html.H1("CIRV impact estimator"),
                         html.P(
-                            "Estimate CIRV - Inc with Bayesian Ridge models, then explore the historical records behind each dataset.",
+                            "Estimate CIRV - Inc with selectable Random Forest or Bayesian Ridge models, then explore the historical records behind each dataset.",
                             className="lede",
                         ),
                     ],
@@ -480,7 +536,7 @@ app.layout = html.Div(
                                 html.Span("Models", className="section-kicker"),
                                 html.H2("Estimate CIRV - Inc"),
                                 html.P(
-                                    "Intervals are Bayesian Ridge predictive intervals from the model, not causal uncertainty bounds.",
+                                    "Random Forest is the default model. Intervals are approximate model uncertainty ranges, not causal uncertainty bounds.",
                                     className="muted",
                                 ),
                             ],
@@ -493,13 +549,19 @@ app.layout = html.Div(
                                         html.H3("CERF UFE allocation model"),
                                         html.Div(
                                             [
+                                                html.Label("Model"),
+                                                dcc.Dropdown(
+                                                    id="cerf-model-type",
+                                                    options=MODEL_OPTIONS,
+                                                    value=DEFAULT_MODEL_KEY,
+                                                    clearable=False,
+                                                ),
                                                 html.Label("Total amount approved"),
                                                 dcc.Input(
                                                     id="cerf-model-amount",
                                                     type="number",
-                                                    min=0,
                                                     step=10_000,
-                                                    value=round(float(CERF_DATA[AMOUNT_NUMERIC_COLUMN].median()), 2),
+                                                    value=round(CERF_DEFAULT_AMOUNT, 2),
                                                     debounce=True,
                                                 ),
                                                 html.Label("Emergency type"),
@@ -528,9 +590,12 @@ app.layout = html.Div(
                                             className="model-form",
                                         ),
                                         html.Div(id="cerf-prediction-output"),
-                                        model_diagnostics(
-                                            CERF_MODEL,
-                                            "Bayesian Ridge using total amount approved plus one-hot encoded emergency type, country, and project sector.",
+                                        html.Div(
+                                            id="cerf-model-diagnostics",
+                                            children=model_diagnostics(
+                                                CERF_MODELS[DEFAULT_MODEL_KEY],
+                                                model_description(CERF_MODELS[DEFAULT_MODEL_KEY], "CERF"),
+                                            ),
                                         ),
                                     ],
                                     className="model-card",
@@ -540,6 +605,13 @@ app.layout = html.Div(
                                         html.H3("CBPF project model"),
                                         html.Div(
                                             [
+                                                html.Label("Model"),
+                                                dcc.Dropdown(
+                                                    id="cbpf-model-type",
+                                                    options=MODEL_OPTIONS,
+                                                    value=DEFAULT_MODEL_KEY,
+                                                    clearable=False,
+                                                ),
                                                 html.Label("Allocation source"),
                                                 dcc.Dropdown(
                                                     id="cbpf-model-allocation",
@@ -558,27 +630,24 @@ app.layout = html.Div(
                                                 dcc.Input(
                                                     id="cbpf-model-duration",
                                                     type="number",
-                                                    min=0,
                                                     step=1,
-                                                    value=round(float(CBPF_DATA[CBPF_DURATION_NUMERIC_COLUMN].median()), 2),
+                                                    value=round(CBPF_DEFAULT_DURATION, 2),
                                                     debounce=True,
                                                 ),
                                                 html.Label("Budget"),
                                                 dcc.Input(
                                                     id="cbpf-model-budget",
                                                     type="number",
-                                                    min=0,
                                                     step=1000,
-                                                    value=round(float(CBPF_DATA[CBPF_BUDGET_NUMERIC_COLUMN].median()), 2),
+                                                    value=round(CBPF_DEFAULT_BUDGET, 2),
                                                     debounce=True,
                                                 ),
                                                 html.Label("Total people"),
                                                 dcc.Input(
                                                     id="cbpf-model-people",
                                                     type="number",
-                                                    min=0,
                                                     step=100,
-                                                    value=round(float(CBPF_DATA[CBPF_TOTAL_PEOPLE_NUMERIC_COLUMN].median()), 2),
+                                                    value=round(CBPF_DEFAULT_PEOPLE, 2),
                                                     debounce=True,
                                                 ),
                                                 html.Label("CIRV - Prev"),
@@ -586,7 +655,7 @@ app.layout = html.Div(
                                                     id="cbpf-model-prev",
                                                     type="number",
                                                     step=0.1,
-                                                    value=round(float(CBPF_DATA[CIRV_PREV_NUMERIC_COLUMN].median()), 2),
+                                                    value=round(CBPF_DEFAULT_CIRV_PREV, 2),
                                                     debounce=True,
                                                 ),
                                                 html.Label("Project sectors"),
@@ -602,9 +671,12 @@ app.layout = html.Div(
                                             className="model-form",
                                         ),
                                         html.Div(id="cbpf-prediction-output"),
-                                        model_diagnostics(
-                                            CBPF_MODEL,
-                                            "Bayesian Ridge using scaled numeric fields, dropped-reference one-hot categories, and multi-hot project sectors.",
+                                        html.Div(
+                                            id="cbpf-model-diagnostics",
+                                            children=model_diagnostics(
+                                                CBPF_MODELS[DEFAULT_MODEL_KEY],
+                                                model_description(CBPF_MODELS[DEFAULT_MODEL_KEY], "CBPF"),
+                                            ),
                                         ),
                                     ],
                                     className="model-card",
@@ -771,17 +843,34 @@ app.layout = html.Div(
 
 
 @app.callback(
+    Output("cerf-model-diagnostics", "children"),
+    Input("cerf-model-type", "value"),
+)
+def update_cerf_model_diagnostics(model_key):
+    bundle = select_model(CERF_MODELS, model_key)
+    return model_diagnostics(bundle, model_description(bundle, "CERF"))
+
+
+@app.callback(
+    Output("cbpf-model-diagnostics", "children"),
+    Input("cbpf-model-type", "value"),
+)
+def update_cbpf_model_diagnostics(model_key):
+    bundle = select_model(CBPF_MODELS, model_key)
+    return model_diagnostics(bundle, model_description(bundle, "CBPF"))
+
+
+@app.callback(
     Output("cerf-prediction-output", "children"),
     Input("cerf-estimate-button", "n_clicks"),
+    State("cerf-model-type", "value"),
     State("cerf-model-amount", "value"),
     State("cerf-model-emergency", "value"),
     State("cerf-model-country", "value"),
     State("cerf-model-sector", "value"),
 )
-def update_cerf_prediction(_n_clicks, amount, emergency_type, country, sector):
+def update_cerf_prediction(_n_clicks, model_key, amount, emergency_type, country, sector):
     missing = []
-    if amount is None:
-        missing.append("total amount approved")
     if emergency_type is None:
         missing.append("emergency type")
     if country is None:
@@ -790,16 +879,17 @@ def update_cerf_prediction(_n_clicks, amount, emergency_type, country, sector):
         missing.append("project sector")
     if missing:
         return warning_box("Input needed", f"Add {', '.join(missing)} to estimate CIRV - Inc.")
-    if float(amount) < 0:
-        return warning_box("Check amount", "Total amount approved must be zero or greater.")
 
-    frame = make_cerf_prediction_frame(float(amount), str(emergency_type), str(country), str(sector))
-    return prediction_box(predict_with_uncertainty(CERF_MODEL, frame))
+    bundle = select_model(CERF_MODELS, model_key)
+    amount_value = coerce_number(amount, CERF_DEFAULT_AMOUNT)
+    frame = make_cerf_prediction_frame(amount_value, str(emergency_type), str(country), str(sector))
+    return prediction_box(predict_with_uncertainty(bundle, frame), bundle.model_label)
 
 
 @app.callback(
     Output("cbpf-prediction-output", "children"),
     Input("cbpf-estimate-button", "n_clicks"),
+    State("cbpf-model-type", "value"),
     State("cbpf-model-allocation", "value"),
     State("cbpf-model-org", "value"),
     State("cbpf-model-duration", "value"),
@@ -810,6 +900,7 @@ def update_cerf_prediction(_n_clicks, amount, emergency_type, country, sector):
 )
 def update_cbpf_prediction(
     _n_clicks,
+    model_key,
     allocation_source,
     organization_type,
     duration,
@@ -822,33 +913,26 @@ def update_cbpf_prediction(
     for value, label in [
         (allocation_source, "allocation source"),
         (organization_type, "organization type"),
-        (duration, "project duration"),
-        (budget, "budget"),
-        (people, "total people"),
-        (cirv_prev, "CIRV - Prev"),
     ]:
         if value is None:
             missing.append(label)
-    if not sectors:
-        missing.append("project sectors")
     if missing:
         return warning_box("Input needed", f"Add {', '.join(missing)} to estimate CIRV - Inc.")
 
-    for value, label in [(duration, "Project duration"), (budget, "Budget"), (people, "Total people")]:
-        if float(value) < 0:
-            return warning_box("Check input", f"{label} must be zero or greater.")
+    bundle = select_model(CBPF_MODELS, model_key)
+    selected_sectors = [str(sector) for sector in (sectors or [])]
 
     frame = make_cbpf_prediction_frame(
         CBPF_SECTOR_COLUMNS,
         allocation_source=str(allocation_source),
         organization_type=str(organization_type),
-        project_duration_months=float(duration),
-        budget=float(budget),
-        total_people=float(people),
-        cirv_prev=float(cirv_prev),
-        project_sectors=[str(sector) for sector in sectors],
+        project_duration_months=coerce_number(duration, CBPF_DEFAULT_DURATION),
+        budget=coerce_number(budget, CBPF_DEFAULT_BUDGET),
+        total_people=coerce_number(people, CBPF_DEFAULT_PEOPLE),
+        cirv_prev=coerce_number(cirv_prev, CBPF_DEFAULT_CIRV_PREV),
+        project_sectors=selected_sectors,
     )
-    return prediction_box(predict_with_uncertainty(CBPF_MODEL, frame))
+    return prediction_box(predict_with_uncertainty(bundle, frame), bundle.model_label)
 
 
 @app.callback(

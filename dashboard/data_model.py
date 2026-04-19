@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
 
+import numpy as np
 import pandas as pd
 from sklearn.base import clone
 from sklearn.compose import ColumnTransformer
@@ -14,6 +15,7 @@ from sklearn.linear_model import BayesianRidge
 from sklearn.metrics import mean_absolute_error, r2_score
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 
@@ -25,6 +27,19 @@ CBPF_DATA_PATH = (
     / "Data_ CERF Donor Contributions and Allocations - allocations - CBPFs Projects.csv"
 )
 DATA_PATH = CERF_DATA_PATH
+
+MODEL_BAYESIAN_RIDGE = "bayesian_ridge"
+MODEL_RANDOM_FOREST = "random_forest"
+DEFAULT_MODEL_KEY = MODEL_RANDOM_FOREST
+MODEL_LABELS = {
+    MODEL_RANDOM_FOREST: "Random Forest",
+    MODEL_BAYESIAN_RIDGE: "Bayesian Ridge",
+}
+MODEL_OPTIONS = [
+    {"label": MODEL_LABELS[MODEL_RANDOM_FOREST], "value": MODEL_RANDOM_FOREST},
+    {"label": MODEL_LABELS[MODEL_BAYESIAN_RIDGE], "value": MODEL_BAYESIAN_RIDGE},
+]
+AVAILABLE_MODEL_KEYS = [option["value"] for option in MODEL_OPTIONS]
 
 TARGET_LABEL = "CIRV - Inc"
 TARGET_COLUMN = "CIRV - Inc"
@@ -88,6 +103,8 @@ class ModelBundle:
     metrics: dict[str, float]
     feature_columns: list[str]
     target_column: str
+    model_key: str
+    model_label: str
     interval_z: float = 1.64
 
 
@@ -238,7 +255,23 @@ def cbpf_sector_feature_columns(df: pd.DataFrame) -> list[str]:
     return [sector_feature_column(sector) for sector in cbpf_sector_names(df)]
 
 
-def build_cerf_regression_pipeline() -> Pipeline:
+def _regressor_for_model(model_key: str, random_state: int = 42):
+    if model_key == MODEL_BAYESIAN_RIDGE:
+        return BayesianRidge()
+    if model_key == MODEL_RANDOM_FOREST:
+        return RandomForestRegressor(
+            n_estimators=300,
+            min_samples_leaf=4,
+            random_state=random_state,
+            n_jobs=-1,
+        )
+    raise ValueError(f"Unsupported model key: {model_key}")
+
+
+def build_cerf_regression_pipeline(
+    model_key: str = MODEL_BAYESIAN_RIDGE,
+    random_state: int = 42,
+) -> Pipeline:
     numeric_pipeline = Pipeline(
         steps=[
             ("imputer", SimpleImputer(strategy="median")),
@@ -260,16 +293,23 @@ def build_cerf_regression_pipeline() -> Pipeline:
     return Pipeline(
         steps=[
             ("preprocess", preprocessor),
-            ("regressor", BayesianRidge()),
+            ("regressor", _regressor_for_model(model_key, random_state=random_state)),
         ]
     )
 
 
-def build_regression_pipeline() -> Pipeline:
-    return build_cerf_regression_pipeline()
+def build_regression_pipeline(
+    model_key: str = MODEL_BAYESIAN_RIDGE,
+    random_state: int = 42,
+) -> Pipeline:
+    return build_cerf_regression_pipeline(model_key=model_key, random_state=random_state)
 
 
-def build_cbpf_regression_pipeline(sector_columns: list[str]) -> Pipeline:
+def build_cbpf_regression_pipeline(
+    sector_columns: list[str],
+    model_key: str = MODEL_BAYESIAN_RIDGE,
+    random_state: int = 42,
+) -> Pipeline:
     numeric_pipeline = Pipeline(
         steps=[
             ("imputer", SimpleImputer(strategy="median")),
@@ -299,7 +339,7 @@ def build_cbpf_regression_pipeline(sector_columns: list[str]) -> Pipeline:
     return Pipeline(
         steps=[
             ("preprocess", preprocessor),
-            ("regressor", BayesianRidge()),
+            ("regressor", _regressor_for_model(model_key, random_state=random_state)),
         ]
     )
 
@@ -309,6 +349,7 @@ def _train_model_bundle(
     feature_columns: list[str],
     pipeline: Pipeline,
     target_column: str = TARGET_NUMERIC_COLUMN,
+    model_key: str = MODEL_BAYESIAN_RIDGE,
     random_state: int = 42,
 ) -> ModelBundle:
     model_data = df.dropna(subset=[target_column, *feature_columns]).copy()
@@ -360,30 +401,72 @@ def _train_model_bundle(
         metrics=metrics,
         feature_columns=feature_columns,
         target_column=target_column,
+        model_key=model_key,
+        model_label=MODEL_LABELS[model_key],
     )
 
 
-def train_cerf_model(df: pd.DataFrame, random_state: int = 42) -> ModelBundle:
+def train_cerf_model(
+    df: pd.DataFrame,
+    model_key: str = MODEL_BAYESIAN_RIDGE,
+    random_state: int = 42,
+) -> ModelBundle:
     return _train_model_bundle(
         df=df,
         feature_columns=CERF_MODEL_FEATURES,
-        pipeline=build_cerf_regression_pipeline(),
+        pipeline=build_cerf_regression_pipeline(model_key=model_key, random_state=random_state),
+        model_key=model_key,
         random_state=random_state,
     )
 
 
-def train_model(df: pd.DataFrame, random_state: int = 42) -> ModelBundle:
-    return train_cerf_model(df, random_state=random_state)
+def train_model(
+    df: pd.DataFrame,
+    model_key: str = MODEL_BAYESIAN_RIDGE,
+    random_state: int = 42,
+) -> ModelBundle:
+    return train_cerf_model(df, model_key=model_key, random_state=random_state)
 
 
-def train_cbpf_model(df: pd.DataFrame, random_state: int = 42) -> ModelBundle:
+def train_cbpf_model(
+    df: pd.DataFrame,
+    model_key: str = MODEL_BAYESIAN_RIDGE,
+    random_state: int = 42,
+) -> ModelBundle:
     sector_columns = cbpf_sector_feature_columns(df)
     return _train_model_bundle(
         df=df,
         feature_columns=[*CBPF_NUMERIC_FEATURES, *CBPF_CATEGORICAL_FEATURES, *sector_columns],
-        pipeline=build_cbpf_regression_pipeline(sector_columns),
+        pipeline=build_cbpf_regression_pipeline(
+            sector_columns,
+            model_key=model_key,
+            random_state=random_state,
+        ),
+        model_key=model_key,
         random_state=random_state,
     )
+
+
+def train_cerf_models(
+    df: pd.DataFrame,
+    model_keys: Iterable[str] = AVAILABLE_MODEL_KEYS,
+    random_state: int = 42,
+) -> dict[str, ModelBundle]:
+    return {
+        model_key: train_cerf_model(df, model_key=model_key, random_state=random_state)
+        for model_key in model_keys
+    }
+
+
+def train_cbpf_models(
+    df: pd.DataFrame,
+    model_keys: Iterable[str] = AVAILABLE_MODEL_KEYS,
+    random_state: int = 42,
+) -> dict[str, ModelBundle]:
+    return {
+        model_key: train_cbpf_model(df, model_key=model_key, random_state=random_state)
+        for model_key in model_keys
+    }
 
 
 def predict_with_uncertainty_from_frame(pipeline: Pipeline, frame: pd.DataFrame) -> pd.DataFrame:
@@ -396,8 +479,26 @@ def predict_with_uncertainty_from_frame(pipeline: Pipeline, frame: pd.DataFrame)
             category=UserWarning,
         )
         transformed = preprocessor.transform(frame)
-        predictions, std = regressor.predict(transformed, return_std=True)
-    return pd.DataFrame({"prediction": predictions, "std": std})
+        if hasattr(regressor, "estimators_"):
+            tree_predictions = np.vstack(
+                [estimator.predict(transformed) for estimator in regressor.estimators_]
+            )
+            predictions = regressor.predict(transformed)
+            std = tree_predictions.std(axis=0, ddof=1)
+            lower = np.percentile(tree_predictions, 5, axis=0)
+            upper = np.percentile(tree_predictions, 95, axis=0)
+        else:
+            predictions, std = regressor.predict(transformed, return_std=True)
+            lower = predictions - 1.64 * std
+            upper = predictions + 1.64 * std
+    return pd.DataFrame(
+        {
+            "prediction": predictions,
+            "std": std,
+            "lower": lower,
+            "upper": upper,
+        }
+    )
 
 
 def _safe_predict(pipeline: Pipeline, frame: pd.DataFrame):
@@ -416,8 +517,8 @@ def predict_with_uncertainty(bundle: ModelBundle, frame: pd.DataFrame) -> Predic
     std = float(result["std"])
     return PredictionResult(
         prediction=prediction,
-        lower=prediction - bundle.interval_z * std,
-        upper=prediction + bundle.interval_z * std,
+        lower=float(result.get("lower", prediction - bundle.interval_z * std)),
+        upper=float(result.get("upper", prediction + bundle.interval_z * std)),
         std=std,
     )
 
@@ -483,7 +584,10 @@ def make_cbpf_prediction_frame(
 
 def feature_coefficients(bundle: ModelBundle) -> pd.DataFrame:
     feature_names = bundle.pipeline.named_steps["preprocess"].get_feature_names_out()
-    coefficients = bundle.pipeline.named_steps["regressor"].coef_
+    regressor = bundle.pipeline.named_steps["regressor"]
+    if not hasattr(regressor, "coef_"):
+        raise ValueError(f"{bundle.model_label} does not expose regression coefficients.")
+    coefficients = regressor.coef_
     return (
         pd.DataFrame(
             {
