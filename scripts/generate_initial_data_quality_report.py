@@ -22,9 +22,9 @@ from typing import Iterable
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "initial_data"
-REPORT_DIR = ROOT / "reports"
-TABLE_DIR = REPORT_DIR / "tables"
-REPORT_PATH = REPORT_DIR / "initial_data_quality_report.md"
+APPENDIX_DIR = ROOT / "initial_data_quality_appendix"
+TABLE_DIR = APPENDIX_DIR / "tables"
+APPENDIX_PATH = APPENDIX_DIR / "initial_data_quality_appendix.md"
 
 UNIQUE_CAP = 250_000
 TOP_VALUE_CAP = 10_000
@@ -1129,17 +1129,17 @@ def build_report(
         "",
         "## Appendix Tables",
         "",
-        "- `reports/tables/file_inventory.csv`",
-        "- `reports/tables/dataset_catalog.csv`",
-        "- `reports/tables/column_profile.csv`",
-        "- `reports/tables/missingness_profile.csv`",
-        "- `reports/tables/value_distributions.csv`",
-        "- `reports/tables/numeric_profile.csv`",
-        "- `reports/tables/duplicate_checks.csv`",
-        "- `reports/tables/quality_flags.csv`",
-        "- `reports/tables/cross_reference_coverage.csv`",
-        "- `reports/tables/can_cannot_say_matrix.csv`",
-        "- `reports/tables/validation_results.csv`",
+        "- `initial_data_quality_appendix/tables/file_inventory.csv`",
+        "- `initial_data_quality_appendix/tables/dataset_catalog.csv`",
+        "- `initial_data_quality_appendix/tables/column_profile.csv`",
+        "- `initial_data_quality_appendix/tables/missingness_profile.csv`",
+        "- `initial_data_quality_appendix/tables/value_distributions.csv`",
+        "- `initial_data_quality_appendix/tables/numeric_profile.csv`",
+        "- `initial_data_quality_appendix/tables/duplicate_checks.csv`",
+        "- `initial_data_quality_appendix/tables/quality_flags.csv`",
+        "- `initial_data_quality_appendix/tables/cross_reference_coverage.csv`",
+        "- `initial_data_quality_appendix/tables/can_cannot_say_matrix.csv`",
+        "- `initial_data_quality_appendix/tables/validation_results.csv`",
         "",
         "## Source Notes",
         "",
@@ -1220,7 +1220,7 @@ def main() -> int:
     if not DATA_DIR.exists():
         print(f"Missing data directory: {DATA_DIR}", file=sys.stderr)
         return 1
-    REPORT_DIR.mkdir(parents=True, exist_ok=True)
+    APPENDIX_DIR.mkdir(parents=True, exist_ok=True)
     TABLE_DIR.mkdir(parents=True, exist_ok=True)
 
     paths = csv_paths()
@@ -1255,7 +1255,7 @@ def main() -> int:
     write_csv(TABLE_DIR / "can_cannot_say_matrix.csv", can_cannot)
     write_csv(TABLE_DIR / "validation_results.csv", validation_results)
 
-    REPORT_PATH.write_text(
+    APPENDIX_PATH.write_text(
         build_report(
             file_inventory,
             dataset_catalog,
@@ -1274,7 +1274,7 @@ def main() -> int:
             print(f"VALIDATION FAILED: {row['validation']}: {row['detail']}", file=sys.stderr)
         return 2
 
-    print(f"Wrote {REPORT_PATH.relative_to(ROOT)}", flush=True)
+    print(f"Wrote {APPENDIX_PATH.relative_to(ROOT)}", flush=True)
     print(f"Wrote appendix tables under {TABLE_DIR.relative_to(ROOT)}", flush=True)
     return 0
 

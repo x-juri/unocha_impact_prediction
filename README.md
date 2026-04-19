@@ -22,7 +22,7 @@ justify deeper work on predicting project impact and understanding which project
 features deserve closer attention.
 
 For more detail on the reasoning, assumptions, and approach, see the technical
-report: [Technical Report_Not a dashboard.pdf](Technical%20Report_Not%20a%20dashboard.pdf).
+report: [TECHNICAL REPORT_Not a dashboard.pdf](TECHNICAL%20REPORT_Not%20a%20dashboard.pdf).
 That report is the more complete narrative companion to the code and dashboard.
 
 ## What Is In This Repo
@@ -33,9 +33,13 @@ This repository currently has two main pieces:
   numeric target, configuring feature encodings, training a model, reviewing
   diagnostics, and running single-row predictions.
 - `scripts/generate_initial_data_quality_report.py`: a standard-library-only
-  script that generated the initial data quality report tables under `reports/`.
-- `Technical Report_Not a dashboard.pdf`: the project report with more detail
-  on the approach, design choices, and interpretation.
+  script that generated the supporting initial data quality appendix under
+  `initial_data_quality_appendix/`.
+- `TECHNICAL REPORT_Not a dashboard.pdf`: the main project report with more
+  detail on the approach, design choices, and interpretation.
+- `initial_data_quality_appendix/`: supporting generated data-quality appendix
+  files. This is not the main report; use the technical report PDF for the full
+  narrative.
 
 The tracked final CSV snapshots are:
 
@@ -111,7 +115,7 @@ Prediction intervals are model-derived:
 - Bayesian Ridge: prediction plus/minus `1.64 * std`, an approximate 90% model
   interval.
 
-## Regenerate The Initial Data Report
+## Regenerate The Initial Data Quality Appendix
 
 The report script expects source CSVs under `initial_data/`. If those files are
 present locally, run:
@@ -120,4 +124,5 @@ present locally, run:
 python3 scripts/generate_initial_data_quality_report.py
 ```
 
-It writes Markdown and CSV appendix tables under `reports/`.
+It writes supporting Markdown and CSV appendix tables under
+`initial_data_quality_appendix/`.

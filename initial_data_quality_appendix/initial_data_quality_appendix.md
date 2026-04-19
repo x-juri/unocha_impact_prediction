@@ -134,17 +134,17 @@ Generated from the checked-in CSV snapshot in `initial_data`. Source documentati
 
 ## Appendix Tables
 
-- `reports/tables/file_inventory.csv`
-- `reports/tables/dataset_catalog.csv`
-- `reports/tables/column_profile.csv`
-- `reports/tables/missingness_profile.csv`
-- `reports/tables/value_distributions.csv`
-- `reports/tables/numeric_profile.csv`
-- `reports/tables/duplicate_checks.csv`
-- `reports/tables/quality_flags.csv`
-- `reports/tables/cross_reference_coverage.csv`
-- `reports/tables/can_cannot_say_matrix.csv`
-- `reports/tables/validation_results.csv`
+- `initial_data_quality_appendix/tables/file_inventory.csv`
+- `initial_data_quality_appendix/tables/dataset_catalog.csv`
+- `initial_data_quality_appendix/tables/column_profile.csv`
+- `initial_data_quality_appendix/tables/missingness_profile.csv`
+- `initial_data_quality_appendix/tables/value_distributions.csv`
+- `initial_data_quality_appendix/tables/numeric_profile.csv`
+- `initial_data_quality_appendix/tables/duplicate_checks.csv`
+- `initial_data_quality_appendix/tables/quality_flags.csv`
+- `initial_data_quality_appendix/tables/cross_reference_coverage.csv`
+- `initial_data_quality_appendix/tables/can_cannot_say_matrix.csv`
+- `initial_data_quality_appendix/tables/validation_results.csv`
 
 ## Source Notes
 
