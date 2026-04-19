@@ -297,6 +297,35 @@ button:hover {
   padding: 18px;
 }
 
+.pitfalls-box {
+  margin: 12px 0 18px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(245, 248, 250, 0.8);
+}
+
+.pitfalls-box h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  color: var(--ink);
+}
+
+.pitfalls-box ul {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+}
+
+.pitfalls-box li + li {
+  margin-top: 6px;
+}
+
+.pitfalls-box.stale {
+  border-color: #d7b87a;
+  background: rgba(250, 245, 232, 0.8);
+}
+
 .dataset-head-block {
   margin-top: 8px;
 }

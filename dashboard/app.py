@@ -181,6 +181,116 @@ def prediction_box(
     )
 
 
+def pitfalls_box(messages: list[str], stale: bool = False) -> html.Div:
+    class_name = "pitfalls-box"
+    if stale:
+        class_name += " stale"
+    return html.Div(
+        [
+            html.H3("Pitfalls"),
+            html.Ul([html.Li(message) for message in messages]),
+        ],
+        className=class_name,
+    )
+
+
+def _same_feature_configuration(bundle: DynamicModelBundle, current_specs: list[FeatureEncodingSpec]) -> bool:
+    trained = sorted(
+        [
+            (
+                spec.column,
+                spec.encoding,
+                spec.delimiter if spec.encoding == "multi_hot_delimited" else None,
+            )
+            for spec in bundle.feature_specs
+        ]
+    )
+    current = sorted(
+        [
+            (
+                spec.column,
+                spec.encoding,
+                spec.delimiter if spec.encoding == "multi_hot_delimited" else None,
+            )
+            for spec in current_specs
+        ]
+    )
+    return trained == current
+
+
+def _selection_is_stale(
+    bundle: DynamicModelBundle,
+    selected_model: str | None,
+    selected_target: str | None,
+    selected_specs: list[FeatureEncodingSpec],
+) -> bool:
+    if selected_model and selected_model != bundle.model_key:
+        return True
+    if selected_target and selected_target != bundle.target_column:
+        return True
+    return not _same_feature_configuration(bundle, selected_specs)
+
+
+def _latest_r2_message(bundle: DynamicModelBundle) -> str:
+    test_r2 = float(bundle.metrics.get("test_r2", float("nan")))
+    if not math.isfinite(test_r2):
+        return "Last trained model has no reliable holdout R2 yet."
+    return f"Last trained model test R2: {test_r2:.3f}."
+
+
+def _pitfall_intro(bundle: DynamicModelBundle) -> str:
+    return f"Warnings are based on the currently trained {bundle.model_label} model."
+
+
+def _empty_pitfall_message() -> list[str]:
+    return ["Train a model to see adaptive warnings and quality checks."]
+
+
+def _stale_pitfall_messages(bundle: DynamicModelBundle) -> list[str]:
+    return [
+        "Selections changed after training. Retrain to get warnings for the current setup.",
+        _latest_r2_message(bundle),
+    ]
+
+
+def _pitfall_messages(bundle: DynamicModelBundle) -> list[str]:
+    messages: list[str] = []
+    metrics = bundle.metrics
+    test_r2 = float(metrics.get("test_r2", float("nan")))
+    train_r2 = float(metrics.get("train_r2", float("nan")))
+    test_rows = int(metrics.get("test_rows", 0.0))
+    train_rows = int(metrics.get("train_rows", 0.0))
+
+    if not math.isfinite(test_r2) or test_rows <= 0:
+        messages.append("Not enough holdout data to judge model quality. Train with more rows for a reliable check.")
+        return messages
+
+    if test_r2 >= 0.85:
+        messages.append("R2 is very high. Be careful, this model might be overfitting.")
+    elif test_r2 < 0.0:
+        messages.append("R2 is below 0. This model performs worse than a simple average baseline.")
+    elif test_r2 < 0.1:
+        messages.append("R2 is near 0. This model has no significant predictive performance.")
+
+    if math.isfinite(train_r2) and (train_r2 - test_r2) > 0.25 and train_r2 > 0.6:
+        messages.append("Training performance is much better than holdout performance. The model may be overfitting.")
+
+    if test_rows < 30:
+        messages.append("The holdout sample is small. Evaluation metrics may move a lot with new data.")
+
+    encoded_features = len(bundle.encoded_feature_names)
+    total_rows = max(train_rows + test_rows, 1)
+    if encoded_features > max(100, int(0.5 * total_rows)):
+        messages.append("You have many encoded features for the available rows. Predictions may be unstable.")
+
+    if "forest" in bundle.model_label.lower() and total_rows < 200:
+        messages.append("Random Forest on small datasets can vary across samples. Validate with more data if possible.")
+
+    if not messages:
+        messages.append("No major warning signs right now, but treat predictions as directional and validate on fresh data.")
+    return messages
+
+
 def apply_chart_style(fig):
     fig.update_layout(
         template="plotly_white",
@@ -541,6 +651,7 @@ app.layout = html.Div(
                             className="section-heading",
                         ),
                         html.Div(id="model-metrics", className="metrics-grid"),
+                        html.Div(id="pitfalls-box"),
                         html.Div(
                             [
                                 dcc.Graph(id="target-distribution", config={"displayModeBar": False}),
@@ -721,6 +832,39 @@ def _build_feature_specs(treatments, encodings, delimiters) -> list[FeatureEncod
 
 
 @app.callback(
+    Output("pitfalls-box", "children", allow_duplicate=True),
+    Input("model-key", "data"),
+    Input("model-type", "value"),
+    Input("target-column", "value"),
+    Input("treatment-columns", "value"),
+    Input({"type": "encoding-select", "column": ALL}, "value"),
+    Input({"type": "encoding-delimiter", "column": ALL}, "value"),
+    prevent_initial_call=True,
+)
+def refresh_pitfalls_from_selection(
+    model_key,
+    selected_model,
+    selected_target,
+    selected_treatments,
+    selected_encodings,
+    selected_delimiters,
+):
+    bundle = _cache_get(MODEL_CACHE, model_key)
+    if bundle is None:
+        return pitfalls_box(_empty_pitfall_message())
+
+    specs = _build_feature_specs(
+        selected_treatments or [],
+        selected_encodings or [],
+        selected_delimiters or [],
+    )
+    stale = _selection_is_stale(bundle, selected_model, selected_target, specs)
+    if stale:
+        return pitfalls_box(_stale_pitfall_messages(bundle), stale=True)
+    return pitfalls_box([_pitfall_intro(bundle), *_pitfall_messages(bundle)])
+
+
+@app.callback(
     Output("model-key", "data"),
     Output("train-status", "children"),
     Output("model-metrics", "children"),
@@ -729,6 +873,7 @@ def _build_feature_specs(treatments, encodings, delimiters) -> list[FeatureEncod
     Output("feature-corr-heatmap", "figure"),
     Output("holdout-prediction", "figure"),
     Output("holdout-residual", "figure"),
+    Output("pitfalls-box", "children"),
     Input("train-button", "n_clicks"),
     State("dataset-key", "data"),
     State("model-type", "value"),
@@ -762,6 +907,7 @@ def train_model(
             empty_figure("Upload data before training"),
             empty_figure("Upload data before training"),
             empty_figure("Upload data before training"),
+            pitfalls_box(_empty_pitfall_message()),
         )
 
     errors = validate_training_setup(df, target_column, treatments)
@@ -775,6 +921,7 @@ def train_model(
             empty_figure("Fix setup errors before training"),
             empty_figure("Fix setup errors before training"),
             empty_figure("Fix setup errors before training"),
+            pitfalls_box(_empty_pitfall_message()),
         )
 
     specs = _build_feature_specs(treatments or [], encoding_values or [], delimiter_values or [])
@@ -795,6 +942,7 @@ def train_model(
             empty_figure("Training failed"),
             empty_figure("Training failed"),
             empty_figure("Training failed"),
+            pitfalls_box(["Training failed, so model quality warnings are not available yet."]),
         )
 
     model_key = _cache_put(MODEL_CACHE, bundle)
@@ -849,6 +997,7 @@ def train_model(
             bundle.interval_z,
             bundle.target_column,
         ),
+        pitfalls_box([_pitfall_intro(bundle), *_pitfall_messages(bundle)]),
     )
 
 
