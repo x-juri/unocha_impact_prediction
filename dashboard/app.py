@@ -5,6 +5,7 @@ import os
 
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 from dash import Dash, Input, Output, State, dcc, html
 
 try:
@@ -101,6 +102,17 @@ LABELS = {
     "mean_cirv": "Mean CIRV - Inc",
     "count": "Rows",
 }
+CORRELATION_METHOD_OPTIONS = [
+    {"label": "Spearman", "value": "spearman"},
+    {"label": "Pearson", "value": "pearson"},
+]
+CORRELATION_TOP_N_OPTIONS = [
+    {"label": "Top 5", "value": 5},
+    {"label": "Top 10", "value": 10},
+    {"label": "Top 20", "value": 20},
+    {"label": "Top 30", "value": 30},
+    {"label": "Top 50", "value": 50},
+]
 
 
 def most_common(df: pd.DataFrame, column: str) -> str | None:
@@ -214,10 +226,6 @@ def apply_chart_style(fig):
     return fig
 
 
-def top_values(df: pd.DataFrame, column: str, limit: int) -> list[str]:
-    return df[column].value_counts().head(limit).index.tolist()
-
-
 def filter_cerf_data(years, countries, emergency_types, sectors) -> pd.DataFrame:
     filtered = CERF_DATA
     if years:
@@ -315,105 +323,288 @@ def target_distribution(df: pd.DataFrame, title: str):
     return apply_chart_style(fig)
 
 
-def cerf_amount_scatter(df: pd.DataFrame):
-    if df.empty:
-        return empty_figure("No amount records for the active filters")
-    fig = px.scatter(
-        df,
-        x=AMOUNT_NUMERIC_COLUMN,
-        y=TARGET_NUMERIC_COLUMN,
-        color="emergencyTypeName",
-        hover_data=["countryName", "year", "projectsectors"],
-        labels=LABELS,
-        log_x=True,
-        title="CERF approved amount vs CIRV - Inc",
+def _format_feature_name(name: str) -> str:
+    replacements = [
+        ("countryName_", "Country: "),
+        ("emergencyTypeName_", "Emergency type: "),
+        ("projectsectors_", "Project sector: "),
+        (f"{CBPF_ALLOCATION_SOURCE_COLUMN}_", "Allocation source: "),
+        (f"{CBPF_ORGANIZATION_TYPE_COLUMN}_", "Organization type: "),
+        ("sector__", "Project sector: "),
+    ]
+    for prefix, label in replacements:
+        if name.startswith(prefix):
+            return f"{label}{name.removeprefix(prefix)}"
+    return LABELS.get(name, name)
+
+
+def _prepare_feature_matrix(
+    df: pd.DataFrame,
+    numeric_columns: list[str],
+    categorical_columns: list[str],
+    passthrough_columns: list[str] | None = None,
+) -> pd.DataFrame:
+    passthrough_columns = passthrough_columns or []
+    available_numeric = [column for column in numeric_columns if column in df.columns]
+    available_categorical = [column for column in categorical_columns if column in df.columns]
+    available_passthrough = [column for column in passthrough_columns if column in df.columns]
+
+    numeric_frame = df[available_numeric].apply(pd.to_numeric, errors="coerce")
+    encoded = pd.get_dummies(
+        df[available_categorical],
+        columns=available_categorical,
+        prefix=available_categorical,
+        drop_first=True,
+        dtype=float,
     )
-    return apply_chart_style(fig)
+    passthrough = df[available_passthrough].apply(pd.to_numeric, errors="coerce")
+
+    features = pd.concat([numeric_frame, encoded, passthrough], axis=1)
+    features = features.loc[:, features.notna().any(axis=0)]
+    features = features.fillna(features.median(numeric_only=True))
+    if features.empty:
+        return features
+    variances = features.var(axis=0, numeric_only=True)
+    return features.loc[:, variances > 0]
 
 
-def cbpf_budget_scatter(df: pd.DataFrame):
-    if df.empty:
-        return empty_figure("No budget records for the active filters")
-    fig = px.scatter(
-        df,
-        x=CBPF_BUDGET_NUMERIC_COLUMN,
-        y=TARGET_NUMERIC_COLUMN,
-        color=CBPF_ORGANIZATION_TYPE_COLUMN,
-        hover_data=[CBPF_COUNTRY_COLUMN, CBPF_YEAR_COLUMN, CBPF_ALLOCATION_SOURCE_COLUMN],
-        labels=LABELS,
-        log_x=True,
-        title="CBPF budget vs CIRV - Inc",
+def _feature_target_correlation(
+    features: pd.DataFrame,
+    target: pd.Series,
+    method: str,
+    top_n: int,
+) -> pd.DataFrame:
+    if features.empty:
+        return pd.DataFrame(columns=["feature", "correlation", "abs_correlation", "feature_label"])
+
+    corr_input = features.copy()
+    corr_input["__target__"] = pd.to_numeric(target, errors="coerce")
+    corr_input = corr_input.dropna(subset=["__target__"])
+    if corr_input.empty:
+        return pd.DataFrame(columns=["feature", "correlation", "abs_correlation", "feature_label"])
+
+    correlations = corr_input.corr(method=method, numeric_only=True)["__target__"].drop("__target__").dropna()
+    if correlations.empty:
+        return pd.DataFrame(columns=["feature", "correlation", "abs_correlation", "feature_label"])
+
+    selected = correlations.abs().sort_values(ascending=False).head(max(1, int(top_n))).index
+    ranked = correlations.loc[selected].sort_values(key=lambda values: values.abs())
+    return pd.DataFrame(
+        {
+            "feature": ranked.index,
+            "correlation": ranked.values,
+        }
+    ).assign(
+        abs_correlation=lambda frame: frame["correlation"].abs(),
+        feature_label=lambda frame: frame["feature"].map(_format_feature_name),
     )
-    return apply_chart_style(fig)
 
 
-def box_by_category(df: pd.DataFrame, column: str, limit: int, title: str):
-    if df.empty:
-        return empty_figure("No category records for the active filters")
-    values = top_values(df, column, limit)
-    chart_df = df[df[column].isin(values)]
-    fig = px.box(
-        chart_df,
-        x=column,
-        y=TARGET_NUMERIC_COLUMN,
-        points="outliers",
-        labels=LABELS,
+def correlation_heatmap(
+    features: pd.DataFrame,
+    top_features: pd.DataFrame,
+    method: str,
+    title: str,
+):
+    if features.empty or top_features.empty:
+        return empty_figure("Not enough data for pairwise feature correlation")
+
+    selected_columns = [column for column in top_features["feature"] if column in features.columns]
+    if len(selected_columns) < 2:
+        return empty_figure("Need at least two non-constant features for pairwise correlation")
+
+    corr_matrix = features[selected_columns].corr(method=method, numeric_only=True)
+    axis_labels = [_format_feature_name(column) for column in corr_matrix.columns]
+    fig = px.imshow(
+        corr_matrix,
+        x=axis_labels,
+        y=axis_labels,
+        zmin=-1,
+        zmax=1,
+        color_continuous_scale="RdBu",
+        origin="lower",
+        aspect="auto",
         title=title,
     )
-    fig.update_xaxes(tickangle=35)
+    fig.update_layout(coloraxis_colorbar={"title": "Corr"}, height=max(380, 48 * len(axis_labels) + 180))
+    fig.update_xaxes(tickangle=30)
     return apply_chart_style(fig)
 
 
-def mean_bar(df: pd.DataFrame, column: str, limit: int, title: str):
-    if df.empty:
-        return empty_figure("No category records for the active filters")
-    values = top_values(df, column, limit)
-    grouped = (
-        df[df[column].isin(values)]
-        .groupby(column, as_index=False)
-        .agg(mean_cirv=(TARGET_NUMERIC_COLUMN, "mean"), count=(TARGET_NUMERIC_COLUMN, "size"))
-        .sort_values("mean_cirv")
-    )
+def feature_target_correlation_bar(correlation_df: pd.DataFrame, title: str):
+    if correlation_df.empty:
+        return empty_figure("Not enough data for feature-to-target correlation")
+
     fig = px.bar(
-        grouped,
-        x="mean_cirv",
-        y=column,
+        correlation_df,
+        x="correlation",
+        y="feature_label",
         orientation="h",
-        hover_data=["count"],
-        labels=LABELS,
+        color="correlation",
+        labels={"correlation": "Correlation", "feature_label": "Feature"},
         title=title,
-        color_discrete_sequence=["#1f7a8c"],
+        color_continuous_scale="RdBu",
+        range_color=[-1, 1],
+        hover_data={"abs_correlation": ":.3f", "feature": True, "correlation": ":.3f"},
     )
-    fig.update_layout(height=max(360, 32 * len(grouped) + 120))
+    fig.update_layout(coloraxis_colorbar={"title": "Corr"}, height=max(360, 36 * len(correlation_df) + 120))
     return apply_chart_style(fig)
 
 
-def cbpf_sector_bar(df: pd.DataFrame, limit: int):
-    if df.empty:
-        return empty_figure("No project sector records for the active filters")
-    exploded = (
-        df[[TARGET_NUMERIC_COLUMN, CBPF_PROJECT_SECTOR_LIST_COLUMN]]
-        .explode(CBPF_PROJECT_SECTOR_LIST_COLUMN)
-        .rename(columns={CBPF_PROJECT_SECTOR_LIST_COLUMN: "sector"})
-    )
-    exploded = exploded[exploded["sector"].notna()]
-    values = top_values(exploded, "sector", limit)
+def _filter_holdout(bundle, filtered: pd.DataFrame) -> pd.DataFrame:
+    holdout = bundle.holdout_diagnostics
+    if holdout.empty or filtered.empty or "source_index" not in holdout.columns:
+        return holdout.iloc[0:0].copy()
+    return holdout[holdout["source_index"].isin(filtered.index)].copy()
+
+
+def _binned_line(frame: pd.DataFrame, x_column: str, bins: int = 20, interval_z: float = 1.64) -> pd.DataFrame:
+    if frame.empty:
+        return frame
+    columns = list(dict.fromkeys([x_column, "prediction", "lower", "upper", "residual", "std"]))
+    working = frame[columns].dropna().copy()
+    if len(working) < 8:
+        return pd.DataFrame()
+    unique_x = working[x_column].nunique()
+    if unique_x < 4:
+        return pd.DataFrame()
+
+    bin_count = max(4, min(bins, unique_x))
+    working["bin"] = pd.qcut(working[x_column], q=bin_count, duplicates="drop")
     grouped = (
-        exploded[exploded["sector"].isin(values)]
-        .groupby("sector", as_index=False)
-        .agg(mean_cirv=(TARGET_NUMERIC_COLUMN, "mean"), count=(TARGET_NUMERIC_COLUMN, "size"))
-        .sort_values("mean_cirv")
+        working.groupby("bin", observed=True, as_index=False)
+        .agg(
+            x=(x_column, "mean"),
+            prediction=("prediction", "mean"),
+            lower=("lower", "mean"),
+            upper=("upper", "mean"),
+            residual=("residual", "mean"),
+            std=("std", "mean"),
+        )
+        .sort_values("x")
     )
-    fig = px.bar(
-        grouped,
-        x="mean_cirv",
-        y="sector",
-        orientation="h",
-        hover_data=["count"],
-        labels=LABELS,
-        title=f"Mean CIRV - Inc by top {len(grouped)} CBPF project sectors",
-        color_discrete_sequence=["#1f7a8c"],
+    grouped["residual_lower"] = grouped["residual"] - interval_z * grouped["std"]
+    grouped["residual_upper"] = grouped["residual"] + interval_z * grouped["std"]
+    return grouped
+
+
+def predicted_vs_actual_ribbon(holdout: pd.DataFrame, title: str, interval_z: float = 1.64):
+    if holdout.empty:
+        return empty_figure("No holdout rows for the active filters")
+
+    fig = go.Figure()
+    fig.add_trace(
+        go.Scatter(
+            x=holdout["actual"],
+            y=holdout["prediction"],
+            mode="markers",
+            marker={"size": 6, "opacity": 0.35, "color": "#1f7a8c"},
+            name="Holdout rows",
+            hovertemplate="Actual: %{x:.3f}<br>Prediction: %{y:.3f}<extra></extra>",
+        )
     )
+
+    ribbon = _binned_line(holdout, "actual", interval_z=interval_z)
+    if not ribbon.empty:
+        fig.add_trace(
+            go.Scatter(
+                x=ribbon["x"],
+                y=ribbon["lower"],
+                mode="lines",
+                line={"width": 0},
+                showlegend=False,
+                hoverinfo="skip",
+            )
+        )
+        fig.add_trace(
+            go.Scatter(
+                x=ribbon["x"],
+                y=ribbon["upper"],
+                mode="lines",
+                line={"width": 0},
+                fill="tonexty",
+                fillcolor="rgba(31, 122, 140, 0.18)",
+                name="90% model ribbon",
+                hovertemplate="Ribbon: %{y:.3f}<extra></extra>",
+            )
+        )
+        fig.add_trace(
+            go.Scatter(
+                x=ribbon["x"],
+                y=ribbon["prediction"],
+                mode="lines",
+                line={"color": "#14515d", "width": 2.5},
+                name="Mean prediction",
+            )
+        )
+
+    low = min(holdout["actual"].min(), holdout["prediction"].min())
+    high = max(holdout["actual"].max(), holdout["prediction"].max())
+    fig.add_trace(
+        go.Scatter(
+            x=[low, high],
+            y=[low, high],
+            mode="lines",
+            line={"color": "#9aa5b1", "dash": "dash"},
+            name="Perfect calibration",
+        )
+    )
+    fig.update_layout(title=title, xaxis_title="Actual CIRV - Inc", yaxis_title="Predicted CIRV - Inc")
+    return apply_chart_style(fig)
+
+
+def residual_ribbon(holdout: pd.DataFrame, title: str, interval_z: float = 1.64):
+    if holdout.empty:
+        return empty_figure("No holdout rows for the active filters")
+
+    fig = go.Figure()
+    fig.add_trace(
+        go.Scatter(
+            x=holdout["prediction"],
+            y=holdout["residual"],
+            mode="markers",
+            marker={"size": 6, "opacity": 0.32, "color": "#74b3ce"},
+            name="Residuals",
+            hovertemplate="Predicted: %{x:.3f}<br>Residual: %{y:.3f}<extra></extra>",
+        )
+    )
+
+    ribbon = _binned_line(holdout, "prediction", interval_z=interval_z)
+    if not ribbon.empty:
+        fig.add_trace(
+            go.Scatter(
+                x=ribbon["x"],
+                y=ribbon["residual_lower"],
+                mode="lines",
+                line={"width": 0},
+                showlegend=False,
+                hoverinfo="skip",
+            )
+        )
+        fig.add_trace(
+            go.Scatter(
+                x=ribbon["x"],
+                y=ribbon["residual_upper"],
+                mode="lines",
+                line={"width": 0},
+                fill="tonexty",
+                fillcolor="rgba(242, 166, 90, 0.2)",
+                name="90% model ribbon",
+                hovertemplate="Ribbon: %{y:.3f}<extra></extra>",
+            )
+        )
+        fig.add_trace(
+            go.Scatter(
+                x=ribbon["x"],
+                y=ribbon["residual"],
+                mode="lines",
+                line={"color": "#f2a65a", "width": 2.5},
+                name="Mean residual",
+            )
+        )
+
+    fig.add_hline(y=0, line_dash="dash", line_color="#9aa5b1")
+    fig.update_layout(title=title, xaxis_title="Predicted CIRV - Inc", yaxis_title="Residual (actual - predicted)")
     return apply_chart_style(fig)
 
 
@@ -670,6 +861,20 @@ app.layout = html.Div(
                                     multi=True,
                                     placeholder="All sectors",
                                 ),
+                                html.Label("Correlation method"),
+                                dcc.Dropdown(
+                                    id="cbpf-corr-method",
+                                    options=CORRELATION_METHOD_OPTIONS,
+                                    value="spearman",
+                                    clearable=False,
+                                ),
+                                html.Label("Top features (correlation)"),
+                                dcc.Dropdown(
+                                    id="cbpf-corr-top-n",
+                                    options=CORRELATION_TOP_N_OPTIONS,
+                                    value=5,
+                                    clearable=False,
+                                ),
                             ],
                             className="filter-grid",
                         ),
@@ -678,9 +883,18 @@ app.layout = html.Div(
                             [
                                 budget_sensecheck_component(),
                                 dcc.Graph(id="cbpf-target-distribution", config={"displayModeBar": False}),
-                                dcc.Graph(id="cbpf-budget-scatter", config={"displayModeBar": False}),
-                                dcc.Graph(id="cbpf-org-box", config={"displayModeBar": False}),
-                                dcc.Graph(id="cbpf-sector-bar", config={"displayModeBar": False}),
+                                dcc.Graph(
+                                    id="cbpf-feature-target-corr",
+                                    config={"displayModeBar": False},
+                                    className="chart-span-full",
+                                ),
+                                dcc.Graph(
+                                    id="cbpf-feature-corr-heatmap",
+                                    config={"displayModeBar": False},
+                                    className="chart-span-full",
+                                ),
+                                dcc.Graph(id="cbpf-holdout-prediction", config={"displayModeBar": False}),
+                                dcc.Graph(id="cbpf-holdout-residual", config={"displayModeBar": False}),
                             ],
                             className="chart-grid",
                         ),
@@ -734,16 +948,18 @@ app.layout = html.Div(
                                     multi=True,
                                     placeholder="All project sectors",
                                 ),
-                                html.Label("Top categories shown"),
+                                html.Label("Correlation method"),
                                 dcc.Dropdown(
-                                    id="cerf-top-n",
-                                    options=[
-                                        {"label": "Top 10", "value": 10},
-                                        {"label": "Top 15", "value": 15},
-                                        {"label": "Top 25", "value": 25},
-                                        {"label": "Top 50", "value": 50},
-                                    ],
-                                    value=15,
+                                    id="cerf-corr-method",
+                                    options=CORRELATION_METHOD_OPTIONS,
+                                    value="spearman",
+                                    clearable=False,
+                                ),
+                                html.Label("Top features (correlation)"),
+                                dcc.Dropdown(
+                                    id="cerf-corr-top-n",
+                                    options=CORRELATION_TOP_N_OPTIONS,
+                                    value=5,
                                     clearable=False,
                                 ),
                             ],
@@ -753,10 +969,18 @@ app.layout = html.Div(
                         html.Div(
                             [
                                 dcc.Graph(id="cerf-target-distribution", config={"displayModeBar": False}),
-                                dcc.Graph(id="cerf-amount-scatter", config={"displayModeBar": False}),
-                                dcc.Graph(id="cerf-emergency-box", config={"displayModeBar": False}),
-                                dcc.Graph(id="cerf-country-bar", config={"displayModeBar": False}),
-                                dcc.Graph(id="cerf-sector-bar", config={"displayModeBar": False}),
+                                dcc.Graph(
+                                    id="cerf-feature-target-corr",
+                                    config={"displayModeBar": False},
+                                    className="chart-span-full",
+                                ),
+                                dcc.Graph(
+                                    id="cerf-feature-corr-heatmap",
+                                    config={"displayModeBar": False},
+                                    className="chart-span-full",
+                                ),
+                                dcc.Graph(id="cerf-holdout-prediction", config={"displayModeBar": False}),
+                                dcc.Graph(id="cerf-holdout-residual", config={"displayModeBar": False}),
                             ],
                             className="chart-grid",
                         ),
@@ -854,63 +1078,123 @@ def update_cbpf_prediction(
 @app.callback(
     Output("cbpf-summary-cards", "children"),
     Output("cbpf-target-distribution", "figure"),
-    Output("cbpf-budget-scatter", "figure"),
-    Output("cbpf-org-box", "figure"),
-    Output("cbpf-sector-bar", "figure"),
+    Output("cbpf-feature-target-corr", "figure"),
+    Output("cbpf-feature-corr-heatmap", "figure"),
+    Output("cbpf-holdout-prediction", "figure"),
+    Output("cbpf-holdout-residual", "figure"),
     Input("cbpf-year-filter", "value"),
     Input("cbpf-country-filter", "value"),
     Input("cbpf-allocation-filter", "value"),
     Input("cbpf-org-filter", "value"),
     Input("cbpf-sector-filter", "value"),
+    Input("cbpf-corr-method", "value"),
+    Input("cbpf-corr-top-n", "value"),
 )
-def update_cbpf_eda(years, countries, allocation_sources, org_types, sectors):
+def update_cbpf_eda(years, countries, allocation_sources, org_types, sectors, corr_method, corr_top_n):
     filtered = filter_cbpf_data(years, countries, allocation_sources, org_types, sectors)
+    method = str(corr_method or "spearman")
+    top_n = int(corr_top_n or 5)
+
+    cbpf_features = _prepare_feature_matrix(
+        filtered,
+        numeric_columns=[
+            CBPF_YEAR_COLUMN,
+            CBPF_DURATION_NUMERIC_COLUMN,
+            CBPF_BUDGET_NUMERIC_COLUMN,
+            CBPF_TOTAL_PEOPLE_NUMERIC_COLUMN,
+            CIRV_PREV_NUMERIC_COLUMN,
+        ],
+        categorical_columns=[CBPF_ALLOCATION_SOURCE_COLUMN, CBPF_ORGANIZATION_TYPE_COLUMN],
+        passthrough_columns=CBPF_SECTOR_COLUMNS,
+    )
+    cbpf_corr = _feature_target_correlation(
+        cbpf_features,
+        filtered[TARGET_NUMERIC_COLUMN],
+        method=method,
+        top_n=top_n,
+    )
+    cbpf_holdout = _filter_holdout(CBPF_MODEL, filtered)
+
     return (
         cbpf_summary_cards(filtered),
         target_distribution(filtered, "CBPF CIRV - Inc distribution"),
-        cbpf_budget_scatter(filtered),
-        box_by_category(
-            filtered,
-            CBPF_ORGANIZATION_TYPE_COLUMN,
-            10,
-            "CIRV - Inc by CBPF organization type",
+        feature_target_correlation_bar(
+            cbpf_corr,
+            f"CBPF top {top_n} feature to CIRV correlation ({method.capitalize()})",
         ),
-        cbpf_sector_bar(filtered, 15),
+        correlation_heatmap(
+            cbpf_features,
+            cbpf_corr,
+            method,
+            f"CBPF pairwise feature correlation ({method.capitalize()}, top {len(cbpf_corr)})",
+        ),
+        predicted_vs_actual_ribbon(
+            cbpf_holdout,
+            "CBPF holdout predicted vs actual with 90% model ribbon",
+            interval_z=CBPF_MODEL.interval_z,
+        ),
+        residual_ribbon(
+            cbpf_holdout,
+            "CBPF holdout residuals with 90% model ribbon",
+            interval_z=CBPF_MODEL.interval_z,
+        ),
     )
 
 
 @app.callback(
     Output("cerf-summary-cards", "children"),
     Output("cerf-target-distribution", "figure"),
-    Output("cerf-amount-scatter", "figure"),
-    Output("cerf-emergency-box", "figure"),
-    Output("cerf-country-bar", "figure"),
-    Output("cerf-sector-bar", "figure"),
+    Output("cerf-feature-target-corr", "figure"),
+    Output("cerf-feature-corr-heatmap", "figure"),
+    Output("cerf-holdout-prediction", "figure"),
+    Output("cerf-holdout-residual", "figure"),
     Input("cerf-year-filter", "value"),
     Input("cerf-country-filter", "value"),
     Input("cerf-emergency-filter", "value"),
     Input("cerf-sector-filter", "value"),
-    Input("cerf-top-n", "value"),
+    Input("cerf-corr-method", "value"),
+    Input("cerf-corr-top-n", "value"),
 )
-def update_cerf_eda(years, countries, emergency_types, sectors, top_n):
+def update_cerf_eda(years, countries, emergency_types, sectors, corr_method, corr_top_n):
     filtered = filter_cerf_data(years, countries, emergency_types, sectors)
-    limit = int(top_n or 15)
+    method = str(corr_method or "spearman")
+    corr_limit = int(corr_top_n or 5)
+
+    cerf_features = _prepare_feature_matrix(
+        filtered,
+        numeric_columns=["year", AMOUNT_NUMERIC_COLUMN, CIRV_PREV_NUMERIC_COLUMN],
+        categorical_columns=["emergencyTypeName", "countryName", "projectsectors"],
+    )
+    cerf_corr = _feature_target_correlation(
+        cerf_features,
+        filtered[TARGET_NUMERIC_COLUMN],
+        method=method,
+        top_n=corr_limit,
+    )
+    cerf_holdout = _filter_holdout(CERF_MODEL, filtered)
+
     return (
         cerf_summary_cards(filtered),
         target_distribution(filtered, "CERF CIRV - Inc distribution"),
-        cerf_amount_scatter(filtered),
-        box_by_category(
-            filtered,
-            "emergencyTypeName",
-            limit,
-            f"CIRV - Inc by top {limit} CERF emergency types",
+        feature_target_correlation_bar(
+            cerf_corr,
+            f"CERF top {corr_limit} feature to CIRV correlation ({method.capitalize()})",
         ),
-        mean_bar(filtered, "countryName", limit, f"Mean CIRV - Inc by top {limit} CERF countries"),
-        mean_bar(
-            filtered,
-            "projectsectors",
-            limit,
-            f"Mean CIRV - Inc by top {limit} CERF project sectors",
+        correlation_heatmap(
+            cerf_features,
+            cerf_corr,
+            method,
+            f"CERF pairwise feature correlation ({method.capitalize()}, top {len(cerf_corr)})",
+        ),
+        predicted_vs_actual_ribbon(
+            cerf_holdout,
+            "CERF holdout predicted vs actual with 90% model ribbon",
+            interval_z=CERF_MODEL.interval_z,
+        ),
+        residual_ribbon(
+            cerf_holdout,
+            "CERF holdout residuals with 90% model ribbon",
+            interval_z=CERF_MODEL.interval_z,
         ),
     )
 

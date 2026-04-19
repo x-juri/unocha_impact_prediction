@@ -126,7 +126,7 @@ main {
 }
 
 .filter-grid {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   align-items: end;
   margin-bottom: 20px;
 }
@@ -204,6 +204,10 @@ button:hover {
 }
 
 .chart-grid .diagnostics {
+  grid-column: 1 / -1;
+}
+
+.chart-span-full {
   grid-column: 1 / -1;
 }
 

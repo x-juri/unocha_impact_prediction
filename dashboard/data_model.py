@@ -88,6 +88,7 @@ class ModelBundle:
     metrics: dict[str, float]
     feature_columns: list[str]
     target_column: str
+    holdout_diagnostics: pd.DataFrame
     interval_z: float = 1.64
 
 
@@ -310,6 +311,7 @@ def _train_model_bundle(
     pipeline: Pipeline,
     target_column: str = TARGET_NUMERIC_COLUMN,
     random_state: int = 42,
+    interval_z: float = 1.64,
 ) -> ModelBundle:
     model_data = df.dropna(subset=[target_column, *feature_columns]).copy()
     if model_data.empty:
@@ -317,6 +319,14 @@ def _train_model_bundle(
 
     x = model_data[feature_columns]
     y = model_data[target_column]
+    holdout_diagnostics = model_data.iloc[0:0].copy()
+    holdout_diagnostics["source_index"] = pd.Series(dtype="int64")
+    holdout_diagnostics["actual"] = pd.Series(dtype="float64")
+    holdout_diagnostics["prediction"] = pd.Series(dtype="float64")
+    holdout_diagnostics["std"] = pd.Series(dtype="float64")
+    holdout_diagnostics["lower"] = pd.Series(dtype="float64")
+    holdout_diagnostics["upper"] = pd.Series(dtype="float64")
+    holdout_diagnostics["residual"] = pd.Series(dtype="float64")
 
     if len(model_data) >= 8:
         x_train, x_test, y_train, y_test = train_test_split(
@@ -331,6 +341,21 @@ def _train_model_bundle(
         test_predictions = _safe_predict(evaluation_pipeline, x_test)
         train_uncertainty = predict_with_uncertainty_from_frame(evaluation_pipeline, x_train)
         test_uncertainty = predict_with_uncertainty_from_frame(evaluation_pipeline, x_test)
+
+        holdout_diagnostics = model_data.loc[x_test.index].copy()
+        holdout_diagnostics["source_index"] = holdout_diagnostics.index
+        holdout_diagnostics["actual"] = y_test.to_numpy()
+        holdout_diagnostics["prediction"] = test_predictions
+        holdout_diagnostics["std"] = test_uncertainty["std"].to_numpy()
+        holdout_diagnostics["lower"] = (
+            holdout_diagnostics["prediction"] - interval_z * holdout_diagnostics["std"]
+        )
+        holdout_diagnostics["upper"] = (
+            holdout_diagnostics["prediction"] + interval_z * holdout_diagnostics["std"]
+        )
+        holdout_diagnostics["residual"] = (
+            holdout_diagnostics["actual"] - holdout_diagnostics["prediction"]
+        )
         metrics = {
             "train_r2": float(r2_score(y_train, train_predictions)),
             "test_r2": float(r2_score(y_test, test_predictions)),
@@ -360,6 +385,8 @@ def _train_model_bundle(
         metrics=metrics,
         feature_columns=feature_columns,
         target_column=target_column,
+        holdout_diagnostics=holdout_diagnostics,
+        interval_z=interval_z,
     )
 
 

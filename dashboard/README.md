@@ -75,6 +75,23 @@ Sample raw values: `102640.61`, `2125691.55`, `463266.3`, `550889.55`,
 | CERF Bayesian Ridge | 768 | 256 | 0.2109 | 0.0960 | 0.1342 |
 | CBPF Bayesian Ridge | 8,404 | 2,802 | 0.0268 | 0.0950 | 0.1273 |
 
+## Correlation and Holdout Diagnostics Views
+
+Each EDA section now includes correlation diagnostics tied to the active filters:
+
+- Feature-to-target correlation bar chart (Pearson or Spearman).
+- Pairwise feature correlation heatmap based on top-N correlated features.
+- User-selectable top-N feature cap (default `Top 5`).
+
+Each EDA section also includes holdout evaluation plots built from the model test
+split:
+
+- Predicted vs actual plot with a model-based 90% uncertainty ribbon.
+- Residuals vs predictions plot with a model-based 90% uncertainty ribbon.
+
+The ribbon uses the same Bayesian interval semantics shown elsewhere in the app
+(`prediction ± 1.64 * std`), aggregated over quantile bins for readability.
+
 ## Top Regression Coefficients
 
 Top coefficients are sorted by absolute coefficient size.
