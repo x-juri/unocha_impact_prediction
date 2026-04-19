@@ -81,6 +81,9 @@ http://127.0.0.1:8050/
 The app is local and process-memory based. Uploaded datasets and trained models
 live only in the running Dash process.
 
+You can test it with one of the CSV files present in the `Final/` directory.
+What interesting results can you find?
+
 ## Dashboard Workflow
 
 1. Upload a CSV file.
