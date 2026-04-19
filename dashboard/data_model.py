@@ -6,9 +6,11 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
 
+import numpy as np
 import pandas as pd
 from sklearn.base import clone
 from sklearn.compose import ColumnTransformer
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import BayesianRidge
 from sklearn.metrics import mean_absolute_error, r2_score
@@ -38,6 +40,18 @@ CERF_CATEGORICAL_FEATURES = ["emergencyTypeName", "countryName", "projectsectors
 CATEGORICAL_FEATURES = CERF_CATEGORICAL_FEATURES
 CERF_MODEL_FEATURES = [AMOUNT_NUMERIC_COLUMN, *CERF_CATEGORICAL_FEATURES]
 MODEL_FEATURES = CERF_MODEL_FEATURES
+MODEL_BAYESIAN_RIDGE = "bayesian_ridge"
+MODEL_RANDOM_FOREST = "random_forest"
+DEFAULT_MODEL_KEY = MODEL_RANDOM_FOREST
+MODEL_LABELS = {
+    MODEL_RANDOM_FOREST: "Random Forest",
+    MODEL_BAYESIAN_RIDGE: "Bayesian Ridge",
+}
+MODEL_OPTIONS = [
+    {"label": MODEL_LABELS[MODEL_RANDOM_FOREST], "value": MODEL_RANDOM_FOREST},
+    {"label": MODEL_LABELS[MODEL_BAYESIAN_RIDGE], "value": MODEL_BAYESIAN_RIDGE},
+]
+AVAILABLE_MODEL_KEYS = [option["value"] for option in MODEL_OPTIONS]
 CERF_REQUIRED_COLUMNS = [
     AMOUNT_COLUMN,
     TARGET_COLUMN,
@@ -614,7 +628,7 @@ class FittedFeatureSpec:
 
 @dataclass(frozen=True)
 class DynamicModelBundle:
-    regressor: BayesianRidge
+    regressor: BayesianRidge | RandomForestRegressor
     target_column: str
     feature_specs: list[FittedFeatureSpec]
     encoded_feature_names: list[str]
@@ -622,7 +636,42 @@ class DynamicModelBundle:
     holdout_diagnostics: pd.DataFrame
     training_encoded: pd.DataFrame
     training_target: pd.Series
+    model_key: str = MODEL_BAYESIAN_RIDGE
+    model_label: str = MODEL_LABELS[MODEL_BAYESIAN_RIDGE]
     interval_z: float = 1.64
+
+
+def _regressor_for_model(model_key: str, random_state: int = 42):
+    if model_key == MODEL_BAYESIAN_RIDGE:
+        return BayesianRidge()
+    if model_key == MODEL_RANDOM_FOREST:
+        return RandomForestRegressor(
+            n_estimators=300,
+            min_samples_leaf=4,
+            random_state=random_state,
+            n_jobs=-1,
+        )
+    raise ValueError(f"Unsupported model key: {model_key}")
+
+
+def _predict_with_uncertainty_matrix(
+    regressor,
+    frame: pd.DataFrame,
+    interval_z: float,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    if hasattr(regressor, "estimators_"):
+        matrix = frame.to_numpy(copy=False)
+        tree_predictions = np.vstack([estimator.predict(matrix) for estimator in regressor.estimators_])
+        predictions = regressor.predict(frame)
+        std = tree_predictions.std(axis=0, ddof=1)
+        lower = np.percentile(tree_predictions, 5, axis=0)
+        upper = np.percentile(tree_predictions, 95, axis=0)
+        return predictions, std, lower, upper
+
+    predictions, std = regressor.predict(frame, return_std=True)
+    lower = predictions - interval_z * std
+    upper = predictions + interval_z * std
+    return predictions, std, lower, upper
 
 
 def detect_column_role(series: pd.Series) -> str:
@@ -896,6 +945,7 @@ def train_dynamic_model(
     df: pd.DataFrame,
     target_column: str,
     feature_specs: list[FeatureEncodingSpec],
+    model_key: str = DEFAULT_MODEL_KEY,
     random_state: int = 42,
     test_size: float = 0.25,
     interval_z: float = 1.64,
@@ -935,6 +985,8 @@ def train_dynamic_model(
         columns=["source_index", "actual", "prediction", "std", "lower", "upper", "residual"]
     )
 
+    regressor = _regressor_for_model(model_key=model_key, random_state=random_state)
+
     if len(encoded_valid) >= 12:
         x_train, x_test, y_train, y_test = train_test_split(
             encoded_valid,
@@ -942,20 +994,24 @@ def train_dynamic_model(
             test_size=test_size,
             random_state=random_state,
         )
-        eval_model = BayesianRidge()
+        eval_model = clone(regressor)
         eval_model.fit(x_train, y_train)
-        train_pred, train_std = eval_model.predict(x_train, return_std=True)
-        test_pred, test_std = eval_model.predict(x_test, return_std=True)
+        train_pred, train_std, _, _ = _predict_with_uncertainty_matrix(eval_model, x_train, interval_z=interval_z)
+        test_pred, test_std, test_lower, test_upper = _predict_with_uncertainty_matrix(
+            eval_model,
+            x_test,
+            interval_z=interval_z,
+        )
         holdout_diagnostics = pd.DataFrame(
             {
                 "source_index": x_test.index,
                 "actual": y_test.to_numpy(),
                 "prediction": test_pred,
                 "std": test_std,
+                "lower": test_lower,
+                "upper": test_upper,
             }
         )
-        holdout_diagnostics["lower"] = holdout_diagnostics["prediction"] - interval_z * holdout_diagnostics["std"]
-        holdout_diagnostics["upper"] = holdout_diagnostics["prediction"] + interval_z * holdout_diagnostics["std"]
         holdout_diagnostics["residual"] = holdout_diagnostics["actual"] - holdout_diagnostics["prediction"]
         metrics = {
             "train_r2": float(r2_score(y_train, train_pred)),
@@ -979,7 +1035,7 @@ def train_dynamic_model(
             "test_rows": 0.0,
         }
 
-    final_model = BayesianRidge()
+    final_model = clone(regressor)
     final_model.fit(encoded_valid, target_valid)
     return DynamicModelBundle(
         regressor=final_model,
@@ -990,6 +1046,8 @@ def train_dynamic_model(
         holdout_diagnostics=holdout_diagnostics,
         training_encoded=encoded_valid,
         training_target=target_valid,
+        model_key=model_key,
+        model_label=MODEL_LABELS[model_key],
         interval_z=interval_z,
     )
 
@@ -1004,12 +1062,16 @@ def predict_dynamic(bundle: DynamicModelBundle, frame: pd.DataFrame) -> Predicti
         if column not in transformed.columns:
             transformed[column] = 0.0
     transformed = transformed[bundle.encoded_feature_names]
-    prediction, std = bundle.regressor.predict(transformed, return_std=True)
+    prediction, std, lower, upper = _predict_with_uncertainty_matrix(
+        bundle.regressor,
+        transformed,
+        interval_z=bundle.interval_z,
+    )
     value = float(prediction[0])
     uncertainty = float(std[0])
     return PredictionResult(
         prediction=value,
-        lower=value - bundle.interval_z * uncertainty,
-        upper=value + bundle.interval_z * uncertainty,
+        lower=float(lower[0]),
+        upper=float(upper[0]),
         std=uncertainty,
     )

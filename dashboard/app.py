@@ -14,8 +14,10 @@ from dash import ALL, Dash, Input, Output, State, dcc, html, dash_table
 
 try:
     from .data_model import (
+        DEFAULT_MODEL_KEY,
         DynamicModelBundle,
         FeatureEncodingSpec,
+        MODEL_OPTIONS,
         default_encoding_for_series,
         infer_column_roles,
         make_dynamic_prediction_frame,
@@ -25,8 +27,10 @@ try:
     )
 except ImportError:
     from data_model import (
+        DEFAULT_MODEL_KEY,
         DynamicModelBundle,
         FeatureEncodingSpec,
+        MODEL_OPTIONS,
         default_encoding_for_series,
         infer_column_roles,
         make_dynamic_prediction_frame,
@@ -154,16 +158,24 @@ def warning_box(title: str, message: str) -> html.Div:
     )
 
 
-def prediction_box(prediction, target_label: str = "Target") -> html.Div:
+def prediction_box(
+    prediction,
+    target_label: str = "Target",
+    model_label: str | None = None,
+) -> html.Div:
+    interval_caption = "90% model interval"
+    if model_label and "forest" in model_label.lower():
+        interval_caption = "Tree ensemble interval (p5-p95)"
     return html.Div(
         [
             html.Span(f"Estimated {target_label}", className="prediction-label"),
             html.Strong(format_target_value(prediction.prediction)),
             html.P(
-                f"90% model interval: {format_target_value(prediction.lower)}"
+                f"{interval_caption}: {format_target_value(prediction.lower)}"
                 f" to {format_target_value(prediction.upper)}"
             ),
             html.Small(f"Predictive standard deviation: {format_target_value(prediction.std)}"),
+            html.Small(f"Model: {model_label}" if model_label else ""),
         ],
         className="prediction-box",
     )
@@ -475,6 +487,17 @@ app.layout = html.Div(
                         ),
                         html.Div(
                             [
+                                html.Div(
+                                    [
+                                        html.Label("Model type"),
+                                        dcc.Dropdown(
+                                            id="model-type",
+                                            options=MODEL_OPTIONS,
+                                            value=DEFAULT_MODEL_KEY,
+                                            clearable=False,
+                                        ),
+                                    ]
+                                ),
                                 html.Div([html.Label("Target column"), dcc.Dropdown(id="target-column")]),
                                 html.Div([html.Label("Treatment variables"), dcc.Dropdown(id="treatment-columns", multi=True)]),
                                 html.Div(
@@ -708,6 +731,7 @@ def _build_feature_specs(treatments, encodings, delimiters) -> list[FeatureEncod
     Output("holdout-residual", "figure"),
     Input("train-button", "n_clicks"),
     State("dataset-key", "data"),
+    State("model-type", "value"),
     State("target-column", "value"),
     State("treatment-columns", "value"),
     State({"type": "encoding-select", "column": ALL}, "value"),
@@ -719,6 +743,7 @@ def _build_feature_specs(treatments, encodings, delimiters) -> list[FeatureEncod
 def train_model(
     _n_clicks,
     dataset_key,
+    model_type,
     target_column,
     treatments,
     encoding_values,
@@ -754,7 +779,12 @@ def train_model(
 
     specs = _build_feature_specs(treatments or [], encoding_values or [], delimiter_values or [])
     try:
-        bundle = train_dynamic_model(df, str(target_column), specs)
+        bundle = train_dynamic_model(
+            df,
+            str(target_column),
+            specs,
+            model_key=str(model_type or DEFAULT_MODEL_KEY),
+        )
     except Exception as exc:
         return (
             None,
@@ -783,7 +813,10 @@ def train_model(
     status = html.Div(
         [
             html.Span("Model ready", className="section-kicker"),
-            html.P("Training complete. You can inspect diagnostics and run inference below.", className="muted"),
+            html.P(
+                f"Training complete with {bundle.model_label}. You can inspect diagnostics and run inference below.",
+                className="muted",
+            ),
         ],
         className="diagnostics",
     )
@@ -908,7 +941,11 @@ def run_prediction(_n_clicks, model_key, input_values):
         prediction = predict_dynamic(bundle, frame)
     except Exception as exc:
         return warning_box("Inference failed", str(exc))
-    return prediction_box(prediction, target_label=bundle.target_column)
+    return prediction_box(
+        prediction,
+        target_label=bundle.target_column,
+        model_label=bundle.model_label,
+    )
 
 
 if __name__ == "__main__":
