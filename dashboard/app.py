@@ -1,107 +1,46 @@
 from __future__ import annotations
 
+import base64
+import io
 import math
 import os
+import uuid
+from typing import Any
 
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from dash import Dash, Input, Output, State, dcc, html
+from dash import ALL, Dash, Input, Output, State, dcc, html
 
 try:
     from .data_model import (
-        AMOUNT_NUMERIC_COLUMN,
-        CBPF_ALLOCATION_SOURCE_COLUMN,
-        CBPF_BUDGET_NUMERIC_COLUMN,
-        CBPF_COUNTRY_COLUMN,
-        CBPF_DATA_PATH,
-        CBPF_DURATION_NUMERIC_COLUMN,
-        CBPF_ORGANIZATION_TYPE_COLUMN,
-        CBPF_PROJECT_SECTOR_LIST_COLUMN,
-        CBPF_TOTAL_PEOPLE_NUMERIC_COLUMN,
-        CBPF_YEAR_COLUMN,
-        CERF_DATA_PATH,
-        CIRV_PREV_NUMERIC_COLUMN,
-        TARGET_NUMERIC_COLUMN,
-        budget_sensecheck,
-        cbpf_sector_feature_columns,
-        cbpf_sector_names,
-        dropdown_options,
-        load_and_clean_cbpf_projects,
-        load_and_clean_cerf_data,
-        make_cbpf_prediction_frame,
-        make_cerf_prediction_frame,
-        predict_with_uncertainty,
-        train_cbpf_model,
-        train_cerf_model,
-        year_options,
+        DynamicModelBundle,
+        FeatureEncodingSpec,
+        default_encoding_for_series,
+        infer_column_roles,
+        make_dynamic_prediction_frame,
+        predict_dynamic,
+        train_dynamic_model,
+        validate_training_setup,
     )
 except ImportError:
     from data_model import (
-        AMOUNT_NUMERIC_COLUMN,
-        CBPF_ALLOCATION_SOURCE_COLUMN,
-        CBPF_BUDGET_NUMERIC_COLUMN,
-        CBPF_COUNTRY_COLUMN,
-        CBPF_DATA_PATH,
-        CBPF_DURATION_NUMERIC_COLUMN,
-        CBPF_ORGANIZATION_TYPE_COLUMN,
-        CBPF_PROJECT_SECTOR_LIST_COLUMN,
-        CBPF_TOTAL_PEOPLE_NUMERIC_COLUMN,
-        CBPF_YEAR_COLUMN,
-        CERF_DATA_PATH,
-        CIRV_PREV_NUMERIC_COLUMN,
-        TARGET_NUMERIC_COLUMN,
-        budget_sensecheck,
-        cbpf_sector_feature_columns,
-        cbpf_sector_names,
-        dropdown_options,
-        load_and_clean_cbpf_projects,
-        load_and_clean_cerf_data,
-        make_cbpf_prediction_frame,
-        make_cerf_prediction_frame,
-        predict_with_uncertainty,
-        train_cbpf_model,
-        train_cerf_model,
-        year_options,
+        DynamicModelBundle,
+        FeatureEncodingSpec,
+        default_encoding_for_series,
+        infer_column_roles,
+        make_dynamic_prediction_frame,
+        predict_dynamic,
+        train_dynamic_model,
+        validate_training_setup,
     )
 
 
-CERF_DATA = load_and_clean_cerf_data(CERF_DATA_PATH)
-CBPF_DATA = load_and_clean_cbpf_projects(CBPF_DATA_PATH)
-CERF_MODEL = train_cerf_model(CERF_DATA)
-CBPF_MODEL = train_cbpf_model(CBPF_DATA)
-CBPF_SECTOR_COLUMNS = cbpf_sector_feature_columns(CBPF_DATA)
-
-CERF_COUNTRY_OPTIONS = dropdown_options(CERF_DATA["countryName"])
-CERF_EMERGENCY_OPTIONS = dropdown_options(CERF_DATA["emergencyTypeName"])
-CERF_SECTOR_OPTIONS = dropdown_options(CERF_DATA["projectsectors"])
-CERF_YEAR_OPTIONS = year_options(CERF_DATA)
-
-CBPF_COUNTRY_OPTIONS = dropdown_options(CBPF_DATA[CBPF_COUNTRY_COLUMN])
-CBPF_ALLOCATION_OPTIONS = dropdown_options(CBPF_DATA[CBPF_ALLOCATION_SOURCE_COLUMN])
-CBPF_ORG_OPTIONS = dropdown_options(CBPF_DATA[CBPF_ORGANIZATION_TYPE_COLUMN])
-CBPF_SECTOR_OPTIONS = dropdown_options(cbpf_sector_names(CBPF_DATA))
-CBPF_YEAR_OPTIONS = year_options(CBPF_DATA, CBPF_YEAR_COLUMN)
-CBPF_BUDGET_PROFILE = budget_sensecheck(CBPF_DATA)
+DATASET_CACHE: dict[str, pd.DataFrame] = {}
+MODEL_CACHE: dict[str, DynamicModelBundle] = {}
+MAX_CACHE_ITEMS = 8
 
 COLOR_SEQUENCE = ["#1f7a8c", "#74b3ce", "#f2a65a", "#8f3985", "#4f6f52", "#d45d79"]
-LABELS = {
-    TARGET_NUMERIC_COLUMN: "CIRV - Inc",
-    AMOUNT_NUMERIC_COLUMN: "Total amount approved (USD)",
-    CBPF_BUDGET_NUMERIC_COLUMN: "Budget",
-    CBPF_DURATION_NUMERIC_COLUMN: "Project duration (months)",
-    CBPF_TOTAL_PEOPLE_NUMERIC_COLUMN: "Total people",
-    CIRV_PREV_NUMERIC_COLUMN: "CIRV - Prev",
-    "countryName": "Country",
-    "emergencyTypeName": "Emergency type",
-    "projectsectors": "Project sector",
-    CBPF_COUNTRY_COLUMN: "Country",
-    CBPF_ALLOCATION_SOURCE_COLUMN: "Allocation source",
-    CBPF_ORGANIZATION_TYPE_COLUMN: "Organization type",
-    "sector": "Project sector",
-    "mean_cirv": "Mean CIRV - Inc",
-    "count": "Rows",
-}
 CORRELATION_METHOD_OPTIONS = [
     {"label": "Spearman", "value": "spearman"},
     {"label": "Pearson", "value": "pearson"},
@@ -111,38 +50,63 @@ CORRELATION_TOP_N_OPTIONS = [
     {"label": "Top 10", "value": 10},
     {"label": "Top 20", "value": 20},
     {"label": "Top 30", "value": 30},
-    {"label": "Top 50", "value": 50},
+]
+ENCODING_OPTIONS = [
+    {"label": "Numeric (scaled)", "value": "numeric_scaled"},
+    {"label": "Numeric (raw)", "value": "numeric_raw"},
+    {"label": "One-hot", "value": "one_hot"},
+    {"label": "Ordinal", "value": "ordinal"},
+    {"label": "Multi-hot (literal list)", "value": "multi_hot_literal"},
+    {"label": "Multi-hot (delimiter)", "value": "multi_hot_delimited"},
 ]
 
 
-def most_common(df: pd.DataFrame, column: str) -> str | None:
-    values = df[column].dropna()
-    if values.empty:
+def _cache_put(cache: dict[str, Any], value: Any) -> str:
+    key = uuid.uuid4().hex
+    cache[key] = value
+    while len(cache) > MAX_CACHE_ITEMS:
+        oldest = next(iter(cache))
+        del cache[oldest]
+    return key
+
+
+def _cache_get(cache: dict[str, Any], key: str | None):
+    if not key:
         return None
-    return str(values.mode().iloc[0])
+    return cache.get(key)
+
+
+def _decode_upload(contents: str) -> pd.DataFrame:
+    if not contents:
+        raise ValueError("Upload payload is empty.")
+    _, content_string = contents.split(",", 1)
+    decoded = base64.b64decode(content_string)
+    buffer = io.StringIO(decoded.decode("utf-8-sig"))
+    return pd.read_csv(buffer)
 
 
 def format_cirv(value: float | int | None) -> str:
-    if value is None or not math.isfinite(float(value)):
+    if value is None:
         return "n/a"
-    return f"{float(value):+.3f}"
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        return "n/a"
+    if not math.isfinite(numeric):
+        return "n/a"
+    return f"{numeric:+.3f}"
 
 
 def format_number(value: float | int | None) -> str:
-    if value is None or not math.isfinite(float(value)):
+    if value is None:
         return "n/a"
-    return f"{float(value):,.0f}"
-
-
-def format_money(value: float | int | None) -> str:
-    if value is None or not math.isfinite(float(value)):
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
         return "n/a"
-    value = float(value)
-    if abs(value) >= 1_000_000_000:
-        return f"${value / 1_000_000_000:,.2f}B"
-    if abs(value) >= 1_000_000:
-        return f"${value / 1_000_000:,.1f}M"
-    return f"${value:,.0f}"
+    if not math.isfinite(numeric):
+        return "n/a"
+    return f"{numeric:,.0f}"
 
 
 def metric_card(label: str, value: str, helper: str | None = None) -> html.Div:
@@ -152,46 +116,37 @@ def metric_card(label: str, value: str, helper: str | None = None) -> html.Div:
     return html.Div(children, className="metric-card")
 
 
-def model_diagnostics(bundle, description: str) -> html.Div:
-    metrics = bundle.metrics
+def warning_box(title: str, message: str) -> html.Div:
     return html.Div(
-        [
-            html.Span("Model diagnostics", className="section-kicker"),
-            html.Div(
-                [
-                    metric_card("Test R2", f"{metrics['test_r2']:.3f}"),
-                    metric_card("Test MAE", f"{metrics['test_mae']:.3f}"),
-                    metric_card("Mean test std", f"{metrics['test_mean_std']:.3f}"),
-                    metric_card("Rows", f"{int(metrics['train_rows'] + metrics['test_rows']):,}"),
-                ],
-                className="metrics-grid compact",
-            ),
-            html.P(description, className="muted"),
-        ],
-        className="diagnostics",
+        [html.Span(title, className="prediction-label"), html.P(message)],
+        className="prediction-box warning",
     )
 
 
-def prediction_box(result, label: str = "Estimated CIRV - Inc") -> html.Div:
+def prediction_box(prediction) -> html.Div:
     return html.Div(
         [
-            html.Span(label, className="prediction-label"),
-            html.Strong(format_cirv(result.prediction)),
-            html.P(f"90% model interval: {format_cirv(result.lower)} to {format_cirv(result.upper)}"),
-            html.Small(f"Predictive standard deviation: {result.std:.3f}"),
+            html.Span("Estimated target", className="prediction-label"),
+            html.Strong(format_cirv(prediction.prediction)),
+            html.P(f"90% model interval: {format_cirv(prediction.lower)} to {format_cirv(prediction.upper)}"),
+            html.Small(f"Predictive standard deviation: {prediction.std:.3f}"),
         ],
         className="prediction-box",
     )
 
 
-def warning_box(title: str, message: str) -> html.Div:
-    return html.Div(
-        [
-            html.Span(title, className="prediction-label"),
-            html.P(message),
-        ],
-        className="prediction-box warning",
+def apply_chart_style(fig):
+    fig.update_layout(
+        template="plotly_white",
+        colorway=COLOR_SEQUENCE,
+        margin={"l": 40, "r": 20, "t": 60, "b": 40},
+        paper_bgcolor="white",
+        plot_bgcolor="white",
+        legend_title_text="",
+        font={"family": "Arial, sans-serif", "size": 13, "color": "#1f2933"},
+        title={"font": {"size": 18}},
     )
+    return fig
 
 
 def empty_figure(message: str):
@@ -212,181 +167,17 @@ def empty_figure(message: str):
     return apply_chart_style(fig)
 
 
-def apply_chart_style(fig):
-    fig.update_layout(
-        template="plotly_white",
-        colorway=COLOR_SEQUENCE,
-        margin={"l": 40, "r": 20, "t": 60, "b": 40},
-        paper_bgcolor="white",
-        plot_bgcolor="white",
-        legend_title_text="",
-        font={"family": "Arial, sans-serif", "size": 13, "color": "#1f2933"},
-        title={"font": {"size": 18}},
-    )
-    return fig
-
-
-def filter_cerf_data(years, countries, emergency_types, sectors) -> pd.DataFrame:
-    filtered = CERF_DATA
-    if years:
-        filtered = filtered[filtered["year"].astype(int).isin(years)]
-    if countries:
-        filtered = filtered[filtered["countryName"].isin(countries)]
-    if emergency_types:
-        filtered = filtered[filtered["emergencyTypeName"].isin(emergency_types)]
-    if sectors:
-        filtered = filtered[filtered["projectsectors"].isin(sectors)]
-    return filtered.copy()
-
-
-def filter_cbpf_data(years, countries, allocation_sources, org_types, sectors) -> pd.DataFrame:
-    filtered = CBPF_DATA
-    if years:
-        filtered = filtered[filtered[CBPF_YEAR_COLUMN].astype(int).isin(years)]
-    if countries:
-        filtered = filtered[filtered[CBPF_COUNTRY_COLUMN].isin(countries)]
-    if allocation_sources:
-        filtered = filtered[filtered[CBPF_ALLOCATION_SOURCE_COLUMN].isin(allocation_sources)]
-    if org_types:
-        filtered = filtered[filtered[CBPF_ORGANIZATION_TYPE_COLUMN].isin(org_types)]
-    if sectors:
-        selected = set(sectors)
-        filtered = filtered[
-            filtered[CBPF_PROJECT_SECTOR_LIST_COLUMN].apply(lambda values: bool(selected.intersection(values)))
-        ]
-    return filtered.copy()
-
-
-def cerf_summary_cards(df: pd.DataFrame) -> list[html.Div]:
-    if df.empty:
-        return [
-            metric_card("Rows", "0", "No records match the active filters"),
-            metric_card("Year range", "n/a"),
-            metric_card("Mean CIRV - Inc", "n/a"),
-            metric_card("Total approved", "n/a"),
-        ]
-
-    min_year = int(df["year"].min())
-    max_year = int(df["year"].max())
-    year_label = str(min_year) if min_year == max_year else f"{min_year}-{max_year}"
-    return [
-        metric_card("Rows", f"{len(df):,}", f"{df['countryName'].nunique():,} countries"),
-        metric_card("Year range", year_label),
-        metric_card(
-            "Mean / median CIRV - Inc",
-            format_cirv(df[TARGET_NUMERIC_COLUMN].mean()),
-            f"Median {format_cirv(df[TARGET_NUMERIC_COLUMN].median())}",
-        ),
-        metric_card("Total approved", format_money(df[AMOUNT_NUMERIC_COLUMN].sum())),
-    ]
-
-
-def cbpf_summary_cards(df: pd.DataFrame) -> list[html.Div]:
-    if df.empty:
-        return [
-            metric_card("Rows", "0", "No records match the active filters"),
-            metric_card("Year range", "n/a"),
-            metric_card("Mean CIRV - Inc", "n/a"),
-            metric_card("Total budget", "n/a"),
-        ]
-
-    min_year = int(df[CBPF_YEAR_COLUMN].min())
-    max_year = int(df[CBPF_YEAR_COLUMN].max())
-    year_label = str(min_year) if min_year == max_year else f"{min_year}-{max_year}"
-    return [
-        metric_card("Rows", f"{len(df):,}", f"{df[CBPF_COUNTRY_COLUMN].nunique():,} countries"),
-        metric_card("Year range", year_label),
-        metric_card(
-            "Mean / median CIRV - Inc",
-            format_cirv(df[TARGET_NUMERIC_COLUMN].mean()),
-            f"Median {format_cirv(df[TARGET_NUMERIC_COLUMN].median())}",
-        ),
-        metric_card(
-            "Total budget / people",
-            format_money(df[CBPF_BUDGET_NUMERIC_COLUMN].sum()),
-            f"{format_number(df[CBPF_TOTAL_PEOPLE_NUMERIC_COLUMN].sum())} people",
-        ),
-    ]
-
-
-def target_distribution(df: pd.DataFrame, title: str):
-    if df.empty:
-        return empty_figure("No CIRV values for the active filters")
-    fig = px.histogram(
-        df,
-        x=TARGET_NUMERIC_COLUMN,
-        nbins=30,
-        labels=LABELS,
-        title=title,
-        color_discrete_sequence=["#1f7a8c"],
-    )
-    return apply_chart_style(fig)
-
-
-def _format_feature_name(name: str) -> str:
-    replacements = [
-        ("countryName_", "Country: "),
-        ("emergencyTypeName_", "Emergency type: "),
-        ("projectsectors_", "Project sector: "),
-        (f"{CBPF_ALLOCATION_SOURCE_COLUMN}_", "Allocation source: "),
-        (f"{CBPF_ORGANIZATION_TYPE_COLUMN}_", "Organization type: "),
-        ("sector__", "Project sector: "),
-    ]
-    for prefix, label in replacements:
-        if name.startswith(prefix):
-            return f"{label}{name.removeprefix(prefix)}"
-    return LABELS.get(name, name)
-
-
-def _prepare_feature_matrix(
-    df: pd.DataFrame,
-    numeric_columns: list[str],
-    categorical_columns: list[str],
-    passthrough_columns: list[str] | None = None,
-) -> pd.DataFrame:
-    passthrough_columns = passthrough_columns or []
-    available_numeric = [column for column in numeric_columns if column in df.columns]
-    available_categorical = [column for column in categorical_columns if column in df.columns]
-    available_passthrough = [column for column in passthrough_columns if column in df.columns]
-
-    numeric_frame = df[available_numeric].apply(pd.to_numeric, errors="coerce")
-    encoded = pd.get_dummies(
-        df[available_categorical],
-        columns=available_categorical,
-        prefix=available_categorical,
-        drop_first=True,
-        dtype=float,
-    )
-    passthrough = df[available_passthrough].apply(pd.to_numeric, errors="coerce")
-
-    features = pd.concat([numeric_frame, encoded, passthrough], axis=1)
-    features = features.loc[:, features.notna().any(axis=0)]
-    features = features.fillna(features.median(numeric_only=True))
-    if features.empty:
-        return features
-    variances = features.var(axis=0, numeric_only=True)
-    return features.loc[:, variances > 0]
-
-
-def _feature_target_correlation(
-    features: pd.DataFrame,
-    target: pd.Series,
-    method: str,
-    top_n: int,
-) -> pd.DataFrame:
-    if features.empty:
-        return pd.DataFrame(columns=["feature", "correlation", "abs_correlation", "feature_label"])
-
-    corr_input = features.copy()
+def _feature_target_correlation(encoded: pd.DataFrame, target: pd.Series, method: str, top_n: int) -> pd.DataFrame:
+    if encoded.empty:
+        return pd.DataFrame(columns=["feature", "correlation", "abs_correlation"])
+    corr_input = encoded.copy()
     corr_input["__target__"] = pd.to_numeric(target, errors="coerce")
     corr_input = corr_input.dropna(subset=["__target__"])
     if corr_input.empty:
-        return pd.DataFrame(columns=["feature", "correlation", "abs_correlation", "feature_label"])
-
+        return pd.DataFrame(columns=["feature", "correlation", "abs_correlation"])
     correlations = corr_input.corr(method=method, numeric_only=True)["__target__"].drop("__target__").dropna()
     if correlations.empty:
-        return pd.DataFrame(columns=["feature", "correlation", "abs_correlation", "feature_label"])
-
+        return pd.DataFrame(columns=["feature", "correlation", "abs_correlation"])
     selected = correlations.abs().sort_values(ascending=False).head(max(1, int(top_n))).index
     ranked = correlations.loc[selected].sort_values(key=lambda values: values.abs())
     return pd.DataFrame(
@@ -394,31 +185,38 @@ def _feature_target_correlation(
             "feature": ranked.index,
             "correlation": ranked.values,
         }
-    ).assign(
-        abs_correlation=lambda frame: frame["correlation"].abs(),
-        feature_label=lambda frame: frame["feature"].map(_format_feature_name),
+    ).assign(abs_correlation=lambda frame: frame["correlation"].abs())
+
+
+def feature_target_correlation_bar(correlation_df: pd.DataFrame, title: str):
+    if correlation_df.empty:
+        return empty_figure("Not enough data for feature-to-target correlation")
+    fig = px.bar(
+        correlation_df,
+        x="correlation",
+        y="feature",
+        orientation="h",
+        color="correlation",
+        labels={"correlation": "Correlation", "feature": "Feature"},
+        title=title,
+        color_continuous_scale="RdBu",
+        range_color=[-1, 1],
     )
+    fig.update_layout(coloraxis_colorbar={"title": "Corr"}, height=max(360, 30 * len(correlation_df) + 120))
+    return apply_chart_style(fig)
 
 
-def correlation_heatmap(
-    features: pd.DataFrame,
-    top_features: pd.DataFrame,
-    method: str,
-    title: str,
-):
-    if features.empty or top_features.empty:
+def correlation_heatmap(encoded: pd.DataFrame, top_features: pd.DataFrame, method: str, title: str):
+    if encoded.empty or top_features.empty:
         return empty_figure("Not enough data for pairwise feature correlation")
-
-    selected_columns = [column for column in top_features["feature"] if column in features.columns]
-    if len(selected_columns) < 2:
+    selected = [column for column in top_features["feature"] if column in encoded.columns]
+    if len(selected) < 2:
         return empty_figure("Need at least two non-constant features for pairwise correlation")
-
-    corr_matrix = features[selected_columns].corr(method=method, numeric_only=True)
-    axis_labels = [_format_feature_name(column) for column in corr_matrix.columns]
+    matrix = encoded[selected].corr(method=method, numeric_only=True)
     fig = px.imshow(
-        corr_matrix,
-        x=axis_labels,
-        y=axis_labels,
+        matrix,
+        x=matrix.columns,
+        y=matrix.columns,
         zmin=-1,
         zmax=1,
         color_continuous_scale="RdBu",
@@ -426,41 +224,12 @@ def correlation_heatmap(
         aspect="auto",
         title=title,
     )
-    fig.update_layout(coloraxis_colorbar={"title": "Corr"}, height=max(380, 48 * len(axis_labels) + 180))
+    fig.update_layout(coloraxis_colorbar={"title": "Corr"}, height=max(420, 40 * len(selected) + 180))
     fig.update_xaxes(tickangle=30)
     return apply_chart_style(fig)
 
 
-def feature_target_correlation_bar(correlation_df: pd.DataFrame, title: str):
-    if correlation_df.empty:
-        return empty_figure("Not enough data for feature-to-target correlation")
-
-    fig = px.bar(
-        correlation_df,
-        x="correlation",
-        y="feature_label",
-        orientation="h",
-        color="correlation",
-        labels={"correlation": "Correlation", "feature_label": "Feature"},
-        title=title,
-        color_continuous_scale="RdBu",
-        range_color=[-1, 1],
-        hover_data={"abs_correlation": ":.3f", "feature": True, "correlation": ":.3f"},
-    )
-    fig.update_layout(coloraxis_colorbar={"title": "Corr"}, height=max(360, 36 * len(correlation_df) + 120))
-    return apply_chart_style(fig)
-
-
-def _filter_holdout(bundle, filtered: pd.DataFrame) -> pd.DataFrame:
-    holdout = bundle.holdout_diagnostics
-    if holdout.empty or filtered.empty or "source_index" not in holdout.columns:
-        return holdout.iloc[0:0].copy()
-    return holdout[holdout["source_index"].isin(filtered.index)].copy()
-
-
-def _binned_line(frame: pd.DataFrame, x_column: str, bins: int = 20, interval_z: float = 1.64) -> pd.DataFrame:
-    if frame.empty:
-        return frame
+def _binned_line(frame: pd.DataFrame, x_column: str, interval_z: float = 1.64, bins: int = 20) -> pd.DataFrame:
     columns = list(dict.fromkeys([x_column, "prediction", "lower", "upper", "residual", "std"]))
     working = frame[columns].dropna().copy()
     if len(working) < 8:
@@ -468,7 +237,6 @@ def _binned_line(frame: pd.DataFrame, x_column: str, bins: int = 20, interval_z:
     unique_x = working[x_column].nunique()
     if unique_x < 4:
         return pd.DataFrame()
-
     bin_count = max(4, min(bins, unique_x))
     working["bin"] = pd.qcut(working[x_column], q=bin_count, duplicates="drop")
     grouped = (
@@ -488,10 +256,9 @@ def _binned_line(frame: pd.DataFrame, x_column: str, bins: int = 20, interval_z:
     return grouped
 
 
-def predicted_vs_actual_ribbon(holdout: pd.DataFrame, title: str, interval_z: float = 1.64):
+def predicted_vs_actual_ribbon(holdout: pd.DataFrame, title: str, interval_z: float):
     if holdout.empty:
-        return empty_figure("No holdout rows for the active filters")
-
+        return empty_figure("No holdout rows are available for diagnostics")
     fig = go.Figure()
     fig.add_trace(
         go.Scatter(
@@ -500,22 +267,11 @@ def predicted_vs_actual_ribbon(holdout: pd.DataFrame, title: str, interval_z: fl
             mode="markers",
             marker={"size": 6, "opacity": 0.35, "color": "#1f7a8c"},
             name="Holdout rows",
-            hovertemplate="Actual: %{x:.3f}<br>Prediction: %{y:.3f}<extra></extra>",
         )
     )
-
     ribbon = _binned_line(holdout, "actual", interval_z=interval_z)
     if not ribbon.empty:
-        fig.add_trace(
-            go.Scatter(
-                x=ribbon["x"],
-                y=ribbon["lower"],
-                mode="lines",
-                line={"width": 0},
-                showlegend=False,
-                hoverinfo="skip",
-            )
-        )
+        fig.add_trace(go.Scatter(x=ribbon["x"], y=ribbon["lower"], mode="lines", line={"width": 0}, showlegend=False))
         fig.add_trace(
             go.Scatter(
                 x=ribbon["x"],
@@ -525,7 +281,6 @@ def predicted_vs_actual_ribbon(holdout: pd.DataFrame, title: str, interval_z: fl
                 fill="tonexty",
                 fillcolor="rgba(31, 122, 140, 0.18)",
                 name="90% model ribbon",
-                hovertemplate="Ribbon: %{y:.3f}<extra></extra>",
             )
         )
         fig.add_trace(
@@ -537,7 +292,6 @@ def predicted_vs_actual_ribbon(holdout: pd.DataFrame, title: str, interval_z: fl
                 name="Mean prediction",
             )
         )
-
     low = min(holdout["actual"].min(), holdout["prediction"].min())
     high = max(holdout["actual"].max(), holdout["prediction"].max())
     fig.add_trace(
@@ -549,14 +303,13 @@ def predicted_vs_actual_ribbon(holdout: pd.DataFrame, title: str, interval_z: fl
             name="Perfect calibration",
         )
     )
-    fig.update_layout(title=title, xaxis_title="Actual CIRV - Inc", yaxis_title="Predicted CIRV - Inc")
+    fig.update_layout(title=title, xaxis_title="Actual target", yaxis_title="Predicted target")
     return apply_chart_style(fig)
 
 
-def residual_ribbon(holdout: pd.DataFrame, title: str, interval_z: float = 1.64):
+def residual_ribbon(holdout: pd.DataFrame, title: str, interval_z: float):
     if holdout.empty:
-        return empty_figure("No holdout rows for the active filters")
-
+        return empty_figure("No holdout rows are available for diagnostics")
     fig = go.Figure()
     fig.add_trace(
         go.Scatter(
@@ -565,21 +318,12 @@ def residual_ribbon(holdout: pd.DataFrame, title: str, interval_z: float = 1.64)
             mode="markers",
             marker={"size": 6, "opacity": 0.32, "color": "#74b3ce"},
             name="Residuals",
-            hovertemplate="Predicted: %{x:.3f}<br>Residual: %{y:.3f}<extra></extra>",
         )
     )
-
     ribbon = _binned_line(holdout, "prediction", interval_z=interval_z)
     if not ribbon.empty:
         fig.add_trace(
-            go.Scatter(
-                x=ribbon["x"],
-                y=ribbon["residual_lower"],
-                mode="lines",
-                line={"width": 0},
-                showlegend=False,
-                hoverinfo="skip",
-            )
+            go.Scatter(x=ribbon["x"], y=ribbon["residual_lower"], mode="lines", line={"width": 0}, showlegend=False)
         )
         fig.add_trace(
             go.Scatter(
@@ -590,7 +334,6 @@ def residual_ribbon(holdout: pd.DataFrame, title: str, interval_z: float = 1.64)
                 fill="tonexty",
                 fillcolor="rgba(242, 166, 90, 0.2)",
                 name="90% model ribbon",
-                hovertemplate="Ribbon: %{y:.3f}<extra></extra>",
             )
         )
         fig.add_trace(
@@ -602,62 +345,46 @@ def residual_ribbon(holdout: pd.DataFrame, title: str, interval_z: float = 1.64)
                 name="Mean residual",
             )
         )
-
     fig.add_hline(y=0, line_dash="dash", line_color="#9aa5b1")
-    fig.update_layout(title=title, xaxis_title="Predicted CIRV - Inc", yaxis_title="Residual (actual - predicted)")
+    fig.update_layout(title=title, xaxis_title="Predicted target", yaxis_title="Residual (actual - predicted)")
     return apply_chart_style(fig)
 
 
-def budget_sensecheck_component() -> html.Div:
-    examples = ", ".join(CBPF_BUDGET_PROFILE["examples"][:5])
-    return html.Div(
-        [
-            html.Span("Budget parsing check", className="section-kicker"),
-            html.Div(
-                [
-                    metric_card("Raw dtype", str(CBPF_BUDGET_PROFILE["raw_dtype"])),
-                    metric_card("Comma values", str(CBPF_BUDGET_PROFILE["raw_values_with_comma"])),
-                    metric_card("Parsed missing", str(CBPF_BUDGET_PROFILE["parsed_missing"])),
-                    metric_card("Median budget", format_money(CBPF_BUDGET_PROFILE["median"])),
-                ],
-                className="metrics-grid compact",
-            ),
-            html.P(
-                f"Sample raw values: {examples}. Parsed range: "
-                f"{format_money(CBPF_BUDGET_PROFILE['min'])} to {format_money(CBPF_BUDGET_PROFILE['max'])}.",
-                className="muted",
-            ),
-        ],
-        className="diagnostics",
+def target_distribution(series: pd.Series, title: str):
+    numeric = pd.to_numeric(series, errors="coerce").dropna()
+    if numeric.empty:
+        return empty_figure("Target could not be parsed as numeric values")
+    fig = px.histogram(
+        x=numeric,
+        nbins=30,
+        title=title,
+        labels={"x": "Target"},
+        color_discrete_sequence=["#1f7a8c"],
     )
+    return apply_chart_style(fig)
 
 
-app = Dash(__name__, title="CERF and CBPF CIRV Dashboard")
+app = Dash(__name__, title="On-the-go CIRV-style modeling")
 server = app.server
+
 
 app.layout = html.Div(
     [
+        dcc.Store(id="session-id", data=str(uuid.uuid4())),
+        dcc.Store(id="dataset-key"),
+        dcc.Store(id="model-key"),
         html.Header(
             [
                 html.Div(
                     [
-                        html.P("CERF and CBPF 2017-2024", className="eyebrow"),
-                        html.H1("CIRV impact estimator"),
+                        html.P("Explorative model training", className="eyebrow"),
+                        html.H1("CSV impact estimator"),
                         html.P(
-                            "Estimate CIRV - Inc with Bayesian Ridge models, then explore the historical records behind each dataset.",
+                            "Upload any CSV, configure feature encodings, train on the fly, and run inference with model ribbons.",
                             className="lede",
                         ),
                     ],
                     className="header-copy",
-                ),
-                html.Div(
-                    [
-                        html.Span("Data sources"),
-                        html.Strong(CERF_DATA_PATH.name),
-                        html.Strong(CBPF_DATA_PATH.name),
-                        html.Small(f"{len(CERF_DATA):,} CERF rows, {len(CBPF_DATA):,} CBPF rows"),
-                    ],
-                    className="source-panel",
                 ),
             ],
             className="page-header",
@@ -668,141 +395,19 @@ app.layout = html.Div(
                     [
                         html.Div(
                             [
-                                html.Span("Models", className="section-kicker"),
-                                html.H2("Estimate CIRV - Inc"),
-                                html.P(
-                                    "Intervals are Bayesian Ridge predictive intervals from the model, not causal uncertainty bounds.",
-                                    className="muted",
-                                ),
+                                html.Span("Data", className="section-kicker"),
+                                html.H2("1) Upload CSV"),
                             ],
                             className="section-heading",
                         ),
-                        html.Div(
-                            [
-                                html.Div(
-                                    [
-                                        html.H3("CERF UFE allocation model"),
-                                        html.Div(
-                                            [
-                                                html.Label("Total amount approved"),
-                                                dcc.Input(
-                                                    id="cerf-model-amount",
-                                                    type="number",
-                                                    min=0,
-                                                    step=10_000,
-                                                    value=round(float(CERF_DATA[AMOUNT_NUMERIC_COLUMN].median()), 2),
-                                                    debounce=True,
-                                                ),
-                                                html.Label("Emergency type"),
-                                                dcc.Dropdown(
-                                                    id="cerf-model-emergency",
-                                                    options=CERF_EMERGENCY_OPTIONS,
-                                                    value=most_common(CERF_DATA, "emergencyTypeName"),
-                                                    clearable=False,
-                                                ),
-                                                html.Label("Country"),
-                                                dcc.Dropdown(
-                                                    id="cerf-model-country",
-                                                    options=CERF_COUNTRY_OPTIONS,
-                                                    value=most_common(CERF_DATA, "countryName"),
-                                                    clearable=False,
-                                                ),
-                                                html.Label("Project sector"),
-                                                dcc.Dropdown(
-                                                    id="cerf-model-sector",
-                                                    options=CERF_SECTOR_OPTIONS,
-                                                    value=most_common(CERF_DATA, "projectsectors"),
-                                                    clearable=False,
-                                                ),
-                                                html.Button("Estimate CERF", id="cerf-estimate-button", n_clicks=0),
-                                            ],
-                                            className="model-form",
-                                        ),
-                                        html.Div(id="cerf-prediction-output"),
-                                        model_diagnostics(
-                                            CERF_MODEL,
-                                            "Bayesian Ridge using total amount approved plus one-hot encoded emergency type, country, and project sector.",
-                                        ),
-                                    ],
-                                    className="model-card",
-                                ),
-                                html.Div(
-                                    [
-                                        html.H3("CBPF project model"),
-                                        html.Div(
-                                            [
-                                                html.Label("Allocation source"),
-                                                dcc.Dropdown(
-                                                    id="cbpf-model-allocation",
-                                                    options=CBPF_ALLOCATION_OPTIONS,
-                                                    value=most_common(CBPF_DATA, CBPF_ALLOCATION_SOURCE_COLUMN),
-                                                    clearable=False,
-                                                ),
-                                                html.Label("Organization type"),
-                                                dcc.Dropdown(
-                                                    id="cbpf-model-org",
-                                                    options=CBPF_ORG_OPTIONS,
-                                                    value=most_common(CBPF_DATA, CBPF_ORGANIZATION_TYPE_COLUMN),
-                                                    clearable=False,
-                                                ),
-                                                html.Label("Project duration (months)"),
-                                                dcc.Input(
-                                                    id="cbpf-model-duration",
-                                                    type="number",
-                                                    min=0,
-                                                    step=1,
-                                                    value=round(float(CBPF_DATA[CBPF_DURATION_NUMERIC_COLUMN].median()), 2),
-                                                    debounce=True,
-                                                ),
-                                                html.Label("Budget"),
-                                                dcc.Input(
-                                                    id="cbpf-model-budget",
-                                                    type="number",
-                                                    min=0,
-                                                    step=1000,
-                                                    value=round(float(CBPF_DATA[CBPF_BUDGET_NUMERIC_COLUMN].median()), 2),
-                                                    debounce=True,
-                                                ),
-                                                html.Label("Total people"),
-                                                dcc.Input(
-                                                    id="cbpf-model-people",
-                                                    type="number",
-                                                    min=0,
-                                                    step=100,
-                                                    value=round(float(CBPF_DATA[CBPF_TOTAL_PEOPLE_NUMERIC_COLUMN].median()), 2),
-                                                    debounce=True,
-                                                ),
-                                                html.Label("CIRV - Prev"),
-                                                dcc.Input(
-                                                    id="cbpf-model-prev",
-                                                    type="number",
-                                                    step=0.1,
-                                                    value=round(float(CBPF_DATA[CIRV_PREV_NUMERIC_COLUMN].median()), 2),
-                                                    debounce=True,
-                                                ),
-                                                html.Label("Project sectors"),
-                                                dcc.Dropdown(
-                                                    id="cbpf-model-sectors",
-                                                    options=CBPF_SECTOR_OPTIONS,
-                                                    value=[most_common(CBPF_DATA.explode(CBPF_PROJECT_SECTOR_LIST_COLUMN), CBPF_PROJECT_SECTOR_LIST_COLUMN)],
-                                                    multi=True,
-                                                    placeholder="Select one or more sectors",
-                                                ),
-                                                html.Button("Estimate CBPF", id="cbpf-estimate-button", n_clicks=0),
-                                            ],
-                                            className="model-form",
-                                        ),
-                                        html.Div(id="cbpf-prediction-output"),
-                                        model_diagnostics(
-                                            CBPF_MODEL,
-                                            "Bayesian Ridge using scaled numeric fields, dropped-reference one-hot categories, and multi-hot project sectors.",
-                                        ),
-                                    ],
-                                    className="model-card",
-                                ),
-                            ],
-                            className="model-columns",
+                        dcc.Upload(
+                            id="csv-upload",
+                            children=html.Div(["Drag and drop or ", html.A("select a CSV file")]),
+                            className="upload-box",
+                            multiple=False,
                         ),
+                        html.Div(id="upload-status"),
+                        html.Div(id="dataset-summary", className="metrics-grid"),
                     ],
                     className="panel",
                 ),
@@ -810,91 +415,67 @@ app.layout = html.Div(
                     [
                         html.Div(
                             [
-                                html.Span("CBPF EDA", className="section-kicker"),
-                                html.H2("Explore CBPF projects"),
-                                html.P(
-                                    "Filter CBPF project records and check the budget parsing used by the model.",
-                                    className="muted",
-                                ),
+                                html.Span("Setup", className="section-kicker"),
+                                html.H2("2) Choose target, treatments, and encodings"),
                             ],
                             className="section-heading",
                         ),
                         html.Div(
                             [
-                                html.Label("Years"),
-                                dcc.Dropdown(
-                                    id="cbpf-year-filter",
-                                    options=CBPF_YEAR_OPTIONS,
-                                    value=[],
-                                    multi=True,
-                                    placeholder="All years",
+                                html.Div([html.Label("Target column"), dcc.Dropdown(id="target-column")]),
+                                html.Div([html.Label("Treatment variables"), dcc.Dropdown(id="treatment-columns", multi=True)]),
+                                html.Div(
+                                    [
+                                        html.Label("Correlation method"),
+                                        dcc.Dropdown(
+                                            id="corr-method",
+                                            options=CORRELATION_METHOD_OPTIONS,
+                                            value="spearman",
+                                            clearable=False,
+                                        ),
+                                    ]
                                 ),
-                                html.Label("Countries"),
-                                dcc.Dropdown(
-                                    id="cbpf-country-filter",
-                                    options=CBPF_COUNTRY_OPTIONS,
-                                    value=[],
-                                    multi=True,
-                                    placeholder="All countries",
-                                ),
-                                html.Label("Allocation sources"),
-                                dcc.Dropdown(
-                                    id="cbpf-allocation-filter",
-                                    options=CBPF_ALLOCATION_OPTIONS,
-                                    value=[],
-                                    multi=True,
-                                    placeholder="All sources",
-                                ),
-                                html.Label("Organization types"),
-                                dcc.Dropdown(
-                                    id="cbpf-org-filter",
-                                    options=CBPF_ORG_OPTIONS,
-                                    value=[],
-                                    multi=True,
-                                    placeholder="All organization types",
-                                ),
-                                html.Label("Project sectors"),
-                                dcc.Dropdown(
-                                    id="cbpf-sector-filter",
-                                    options=CBPF_SECTOR_OPTIONS,
-                                    value=[],
-                                    multi=True,
-                                    placeholder="All sectors",
-                                ),
-                                html.Label("Correlation method"),
-                                dcc.Dropdown(
-                                    id="cbpf-corr-method",
-                                    options=CORRELATION_METHOD_OPTIONS,
-                                    value="spearman",
-                                    clearable=False,
-                                ),
-                                html.Label("Top features (correlation)"),
-                                dcc.Dropdown(
-                                    id="cbpf-corr-top-n",
-                                    options=CORRELATION_TOP_N_OPTIONS,
-                                    value=5,
-                                    clearable=False,
+                                html.Div(
+                                    [
+                                        html.Label("Top features"),
+                                        dcc.Dropdown(
+                                            id="corr-top-n",
+                                            options=CORRELATION_TOP_N_OPTIONS,
+                                            value=5,
+                                            clearable=False,
+                                        ),
+                                    ]
                                 ),
                             ],
                             className="filter-grid",
                         ),
-                        html.Div(id="cbpf-summary-cards", className="metrics-grid"),
+                        html.Div(id="encoding-config"),
+                        html.Button("Train model", id="train-button", n_clicks=0),
+                        html.Div(id="train-status"),
+                    ],
+                    className="panel",
+                ),
+                html.Section(
+                    [
                         html.Div(
                             [
-                                budget_sensecheck_component(),
-                                dcc.Graph(id="cbpf-target-distribution", config={"displayModeBar": False}),
+                                html.Span("Diagnostics", className="section-kicker"),
+                                html.H2("3) Evaluate model"),
+                            ],
+                            className="section-heading",
+                        ),
+                        html.Div(id="model-metrics", className="metrics-grid"),
+                        html.Div(
+                            [
+                                dcc.Graph(id="target-distribution", config={"displayModeBar": False}),
+                                dcc.Graph(id="feature-target-corr", config={"displayModeBar": False}),
                                 dcc.Graph(
-                                    id="cbpf-feature-target-corr",
+                                    id="feature-corr-heatmap",
                                     config={"displayModeBar": False},
                                     className="chart-span-full",
                                 ),
-                                dcc.Graph(
-                                    id="cbpf-feature-corr-heatmap",
-                                    config={"displayModeBar": False},
-                                    className="chart-span-full",
-                                ),
-                                dcc.Graph(id="cbpf-holdout-prediction", config={"displayModeBar": False}),
-                                dcc.Graph(id="cbpf-holdout-residual", config={"displayModeBar": False}),
+                                dcc.Graph(id="holdout-prediction", config={"displayModeBar": False}),
+                                dcc.Graph(id="holdout-residual", config={"displayModeBar": False}),
                             ],
                             className="chart-grid",
                         ),
@@ -905,85 +486,14 @@ app.layout = html.Div(
                     [
                         html.Div(
                             [
-                                html.Span("CERF EDA", className="section-kicker"),
-                                html.H2("Explore CERF UFE allocations"),
-                                html.P(
-                                    "Filter CERF records and compare CIRV - Inc across amounts, countries, emergency types, and project sectors.",
-                                    className="muted",
-                                ),
+                                html.Span("Inference", className="section-kicker"),
+                                html.H2("4) Estimate target"),
                             ],
                             className="section-heading",
                         ),
-                        html.Div(
-                            [
-                                html.Label("Years"),
-                                dcc.Dropdown(
-                                    id="cerf-year-filter",
-                                    options=CERF_YEAR_OPTIONS,
-                                    value=[],
-                                    multi=True,
-                                    placeholder="All years",
-                                ),
-                                html.Label("Countries"),
-                                dcc.Dropdown(
-                                    id="cerf-country-filter",
-                                    options=CERF_COUNTRY_OPTIONS,
-                                    value=[],
-                                    multi=True,
-                                    placeholder="All countries",
-                                ),
-                                html.Label("Emergency types"),
-                                dcc.Dropdown(
-                                    id="cerf-emergency-filter",
-                                    options=CERF_EMERGENCY_OPTIONS,
-                                    value=[],
-                                    multi=True,
-                                    placeholder="All emergency types",
-                                ),
-                                html.Label("Project sectors"),
-                                dcc.Dropdown(
-                                    id="cerf-sector-filter",
-                                    options=CERF_SECTOR_OPTIONS,
-                                    value=[],
-                                    multi=True,
-                                    placeholder="All project sectors",
-                                ),
-                                html.Label("Correlation method"),
-                                dcc.Dropdown(
-                                    id="cerf-corr-method",
-                                    options=CORRELATION_METHOD_OPTIONS,
-                                    value="spearman",
-                                    clearable=False,
-                                ),
-                                html.Label("Top features (correlation)"),
-                                dcc.Dropdown(
-                                    id="cerf-corr-top-n",
-                                    options=CORRELATION_TOP_N_OPTIONS,
-                                    value=5,
-                                    clearable=False,
-                                ),
-                            ],
-                            className="filter-grid",
-                        ),
-                        html.Div(id="cerf-summary-cards", className="metrics-grid"),
-                        html.Div(
-                            [
-                                dcc.Graph(id="cerf-target-distribution", config={"displayModeBar": False}),
-                                dcc.Graph(
-                                    id="cerf-feature-target-corr",
-                                    config={"displayModeBar": False},
-                                    className="chart-span-full",
-                                ),
-                                dcc.Graph(
-                                    id="cerf-feature-corr-heatmap",
-                                    config={"displayModeBar": False},
-                                    className="chart-span-full",
-                                ),
-                                dcc.Graph(id="cerf-holdout-prediction", config={"displayModeBar": False}),
-                                dcc.Graph(id="cerf-holdout-residual", config={"displayModeBar": False}),
-                            ],
-                            className="chart-grid",
-                        ),
+                        html.Div(id="inference-form", className="model-form"),
+                        html.Button("Estimate", id="estimate-button", n_clicks=0),
+                        html.Div(id="prediction-output"),
                     ],
                     className="panel",
                 ),
@@ -995,208 +505,310 @@ app.layout = html.Div(
 
 
 @app.callback(
-    Output("cerf-prediction-output", "children"),
-    Input("cerf-estimate-button", "n_clicks"),
-    State("cerf-model-amount", "value"),
-    State("cerf-model-emergency", "value"),
-    State("cerf-model-country", "value"),
-    State("cerf-model-sector", "value"),
+    Output("dataset-key", "data"),
+    Output("target-column", "options"),
+    Output("target-column", "value"),
+    Output("treatment-columns", "options"),
+    Output("upload-status", "children"),
+    Output("dataset-summary", "children"),
+    Input("csv-upload", "contents"),
+    State("csv-upload", "filename"),
+    prevent_initial_call=True,
 )
-def update_cerf_prediction(_n_clicks, amount, emergency_type, country, sector):
-    missing = []
-    if amount is None:
-        missing.append("total amount approved")
-    if emergency_type is None:
-        missing.append("emergency type")
-    if country is None:
-        missing.append("country")
-    if sector is None:
-        missing.append("project sector")
-    if missing:
-        return warning_box("Input needed", f"Add {', '.join(missing)} to estimate CIRV - Inc.")
-    if float(amount) < 0:
-        return warning_box("Check amount", "Total amount approved must be zero or greater.")
+def handle_upload(contents, filename):
+    try:
+        df = _decode_upload(contents)
+    except Exception as exc:
+        message = warning_box("Upload failed", f"Could not parse CSV: {exc}")
+        return None, [], None, [], message, []
 
-    frame = make_cerf_prediction_frame(float(amount), str(emergency_type), str(country), str(sector))
-    return prediction_box(predict_with_uncertainty(CERF_MODEL, frame))
+    if df.empty:
+        return None, [], None, [], warning_box("Upload failed", "The uploaded CSV has no rows."), []
 
+    dataset_key = _cache_put(DATASET_CACHE, df)
+    options = [{"label": column, "value": column} for column in df.columns]
+    target_default = None
+    roles = infer_column_roles(df)
+    for column, role in roles.items():
+        if role == "numeric":
+            target_default = column
+            break
+    if target_default is None:
+        target_default = df.columns[0]
 
-@app.callback(
-    Output("cbpf-prediction-output", "children"),
-    Input("cbpf-estimate-button", "n_clicks"),
-    State("cbpf-model-allocation", "value"),
-    State("cbpf-model-org", "value"),
-    State("cbpf-model-duration", "value"),
-    State("cbpf-model-budget", "value"),
-    State("cbpf-model-people", "value"),
-    State("cbpf-model-prev", "value"),
-    State("cbpf-model-sectors", "value"),
-)
-def update_cbpf_prediction(
-    _n_clicks,
-    allocation_source,
-    organization_type,
-    duration,
-    budget,
-    people,
-    cirv_prev,
-    sectors,
-):
-    missing = []
-    for value, label in [
-        (allocation_source, "allocation source"),
-        (organization_type, "organization type"),
-        (duration, "project duration"),
-        (budget, "budget"),
-        (people, "total people"),
-        (cirv_prev, "CIRV - Prev"),
-    ]:
-        if value is None:
-            missing.append(label)
-    if not sectors:
-        missing.append("project sectors")
-    if missing:
-        return warning_box("Input needed", f"Add {', '.join(missing)} to estimate CIRV - Inc.")
-
-    for value, label in [(duration, "Project duration"), (budget, "Budget"), (people, "Total people")]:
-        if float(value) < 0:
-            return warning_box("Check input", f"{label} must be zero or greater.")
-
-    frame = make_cbpf_prediction_frame(
-        CBPF_SECTOR_COLUMNS,
-        allocation_source=str(allocation_source),
-        organization_type=str(organization_type),
-        project_duration_months=float(duration),
-        budget=float(budget),
-        total_people=float(people),
-        cirv_prev=float(cirv_prev),
-        project_sectors=[str(sector) for sector in sectors],
+    summary = [
+        metric_card("File", str(filename or "uploaded.csv")),
+        metric_card("Rows", format_number(len(df))),
+        metric_card("Columns", format_number(len(df.columns))),
+        metric_card(
+            "Missing cells",
+            format_number(int(df.isna().sum().sum())),
+            f"{(float(df.isna().sum().sum()) / max(1, df.size)):.1%} of all cells",
+        ),
+    ]
+    status = html.Div(
+        [
+            html.Span("Upload complete", className="section-kicker"),
+            html.P("Select target and treatment variables, then configure encoding per variable.", className="muted"),
+        ],
+        className="diagnostics",
     )
-    return prediction_box(predict_with_uncertainty(CBPF_MODEL, frame))
+    return dataset_key, options, target_default, options, status, summary
 
 
 @app.callback(
-    Output("cbpf-summary-cards", "children"),
-    Output("cbpf-target-distribution", "figure"),
-    Output("cbpf-feature-target-corr", "figure"),
-    Output("cbpf-feature-corr-heatmap", "figure"),
-    Output("cbpf-holdout-prediction", "figure"),
-    Output("cbpf-holdout-residual", "figure"),
-    Input("cbpf-year-filter", "value"),
-    Input("cbpf-country-filter", "value"),
-    Input("cbpf-allocation-filter", "value"),
-    Input("cbpf-org-filter", "value"),
-    Input("cbpf-sector-filter", "value"),
-    Input("cbpf-corr-method", "value"),
-    Input("cbpf-corr-top-n", "value"),
+    Output("encoding-config", "children"),
+    Input("dataset-key", "data"),
+    Input("treatment-columns", "value"),
 )
-def update_cbpf_eda(years, countries, allocation_sources, org_types, sectors, corr_method, corr_top_n):
-    filtered = filter_cbpf_data(years, countries, allocation_sources, org_types, sectors)
+def render_encoding_config(dataset_key, treatments):
+    df = _cache_get(DATASET_CACHE, dataset_key)
+    if df is None or not treatments:
+        return html.P("Choose one or more treatment variables to configure encodings.", className="muted")
+
+    roles = infer_column_roles(df)
+    rows = []
+    for column in treatments:
+        if column not in df.columns:
+            continue
+        default_spec = default_encoding_for_series(df[column])
+        role = roles.get(column, "categorical")
+        delimiter_default = default_spec.delimiter or ";"
+        rows.append(
+            html.Div(
+                [
+                    html.Div([html.Strong(column), html.Small(f"Detected type: {role}", className="muted")]),
+                    dcc.Dropdown(
+                        id={"type": "encoding-select", "column": column},
+                        options=ENCODING_OPTIONS,
+                        value=default_spec.encoding,
+                        clearable=False,
+                    ),
+                    dcc.Input(
+                        id={"type": "encoding-delimiter", "column": column},
+                        type="text",
+                        value=delimiter_default,
+                        placeholder="Delimiter for multi-hot",
+                        maxLength=3,
+                    ),
+                ],
+                className="encoding-row",
+            )
+        )
+    return html.Div(rows, className="encoding-grid")
+
+
+def _build_feature_specs(treatments, encodings, delimiters) -> list[FeatureEncodingSpec]:
+    specs: list[FeatureEncodingSpec] = []
+    if not treatments:
+        return specs
+    for idx, column in enumerate(treatments):
+        encoding = encodings[idx] if idx < len(encodings) and encodings[idx] else "one_hot"
+        delimiter = delimiters[idx] if idx < len(delimiters) and delimiters[idx] else None
+        if encoding != "multi_hot_delimited":
+            delimiter = None
+        specs.append(FeatureEncodingSpec(column=column, encoding=encoding, delimiter=delimiter))
+    return specs
+
+
+@app.callback(
+    Output("model-key", "data"),
+    Output("train-status", "children"),
+    Output("model-metrics", "children"),
+    Output("target-distribution", "figure"),
+    Output("feature-target-corr", "figure"),
+    Output("feature-corr-heatmap", "figure"),
+    Output("holdout-prediction", "figure"),
+    Output("holdout-residual", "figure"),
+    Input("train-button", "n_clicks"),
+    State("dataset-key", "data"),
+    State("target-column", "value"),
+    State("treatment-columns", "value"),
+    State({"type": "encoding-select", "column": ALL}, "value"),
+    State({"type": "encoding-delimiter", "column": ALL}, "value"),
+    State("corr-method", "value"),
+    State("corr-top-n", "value"),
+    prevent_initial_call=True,
+)
+def train_model(
+    _n_clicks,
+    dataset_key,
+    target_column,
+    treatments,
+    encoding_values,
+    delimiter_values,
+    corr_method,
+    corr_top_n,
+):
+    df = _cache_get(DATASET_CACHE, dataset_key)
+    if df is None:
+        return (
+            None,
+            warning_box("Training blocked", "Upload a CSV first."),
+            [],
+            empty_figure("Upload data before training"),
+            empty_figure("Upload data before training"),
+            empty_figure("Upload data before training"),
+            empty_figure("Upload data before training"),
+            empty_figure("Upload data before training"),
+        )
+
+    errors = validate_training_setup(df, target_column, treatments)
+    if errors:
+        return (
+            None,
+            warning_box("Training blocked", " ".join(errors)),
+            [],
+            empty_figure("Fix setup errors before training"),
+            empty_figure("Fix setup errors before training"),
+            empty_figure("Fix setup errors before training"),
+            empty_figure("Fix setup errors before training"),
+            empty_figure("Fix setup errors before training"),
+        )
+
+    specs = _build_feature_specs(treatments or [], encoding_values or [], delimiter_values or [])
+    try:
+        bundle = train_dynamic_model(df, str(target_column), specs)
+    except Exception as exc:
+        return (
+            None,
+            warning_box("Training failed", str(exc)),
+            [],
+            empty_figure("Training failed"),
+            empty_figure("Training failed"),
+            empty_figure("Training failed"),
+            empty_figure("Training failed"),
+            empty_figure("Training failed"),
+        )
+
+    model_key = _cache_put(MODEL_CACHE, bundle)
     method = str(corr_method or "spearman")
     top_n = int(corr_top_n or 5)
+    corr_df = _feature_target_correlation(bundle.training_encoded, bundle.training_target, method, top_n)
 
-    cbpf_features = _prepare_feature_matrix(
-        filtered,
-        numeric_columns=[
-            CBPF_YEAR_COLUMN,
-            CBPF_DURATION_NUMERIC_COLUMN,
-            CBPF_BUDGET_NUMERIC_COLUMN,
-            CBPF_TOTAL_PEOPLE_NUMERIC_COLUMN,
-            CIRV_PREV_NUMERIC_COLUMN,
+    metrics = bundle.metrics
+    cards = [
+        metric_card("Test R2", f"{metrics['test_r2']:.3f}"),
+        metric_card("Test MAE", f"{metrics['test_mae']:.3f}"),
+        metric_card("Mean test std", f"{metrics['test_mean_std']:.3f}"),
+        metric_card("Rows", format_number(metrics["train_rows"] + metrics["test_rows"])),
+    ]
+
+    status = html.Div(
+        [
+            html.Span("Model ready", className="section-kicker"),
+            html.P("Training complete. You can inspect diagnostics and run inference below.", className="muted"),
         ],
-        categorical_columns=[CBPF_ALLOCATION_SOURCE_COLUMN, CBPF_ORGANIZATION_TYPE_COLUMN],
-        passthrough_columns=CBPF_SECTOR_COLUMNS,
+        className="diagnostics",
     )
-    cbpf_corr = _feature_target_correlation(
-        cbpf_features,
-        filtered[TARGET_NUMERIC_COLUMN],
-        method=method,
-        top_n=top_n,
-    )
-    cbpf_holdout = _filter_holdout(CBPF_MODEL, filtered)
 
     return (
-        cbpf_summary_cards(filtered),
-        target_distribution(filtered, "CBPF CIRV - Inc distribution"),
-        feature_target_correlation_bar(
-            cbpf_corr,
-            f"CBPF top {top_n} feature to CIRV correlation ({method.capitalize()})",
-        ),
+        model_key,
+        status,
+        cards,
+        target_distribution(bundle.training_target, "Target distribution (training rows)"),
+        feature_target_correlation_bar(corr_df, f"Top {top_n} feature correlations ({method.capitalize()})"),
         correlation_heatmap(
-            cbpf_features,
-            cbpf_corr,
+            bundle.training_encoded,
+            corr_df,
             method,
-            f"CBPF pairwise feature correlation ({method.capitalize()}, top {len(cbpf_corr)})",
+            f"Pairwise feature correlation ({method.capitalize()}, top {len(corr_df)})",
         ),
-        predicted_vs_actual_ribbon(
-            cbpf_holdout,
-            "CBPF holdout predicted vs actual with 90% model ribbon",
-            interval_z=CBPF_MODEL.interval_z,
-        ),
-        residual_ribbon(
-            cbpf_holdout,
-            "CBPF holdout residuals with 90% model ribbon",
-            interval_z=CBPF_MODEL.interval_z,
-        ),
+        predicted_vs_actual_ribbon(bundle.holdout_diagnostics, "Holdout predicted vs actual", bundle.interval_z),
+        residual_ribbon(bundle.holdout_diagnostics, "Holdout residuals", bundle.interval_z),
     )
 
 
 @app.callback(
-    Output("cerf-summary-cards", "children"),
-    Output("cerf-target-distribution", "figure"),
-    Output("cerf-feature-target-corr", "figure"),
-    Output("cerf-feature-corr-heatmap", "figure"),
-    Output("cerf-holdout-prediction", "figure"),
-    Output("cerf-holdout-residual", "figure"),
-    Input("cerf-year-filter", "value"),
-    Input("cerf-country-filter", "value"),
-    Input("cerf-emergency-filter", "value"),
-    Input("cerf-sector-filter", "value"),
-    Input("cerf-corr-method", "value"),
-    Input("cerf-corr-top-n", "value"),
+    Output("inference-form", "children"),
+    Input("model-key", "data"),
 )
-def update_cerf_eda(years, countries, emergency_types, sectors, corr_method, corr_top_n):
-    filtered = filter_cerf_data(years, countries, emergency_types, sectors)
-    method = str(corr_method or "spearman")
-    corr_limit = int(corr_top_n or 5)
+def render_inference_form(model_key):
+    bundle = _cache_get(MODEL_CACHE, model_key)
+    if bundle is None:
+        return html.P("Train a model to unlock inference inputs.", className="muted")
 
-    cerf_features = _prepare_feature_matrix(
-        filtered,
-        numeric_columns=["year", AMOUNT_NUMERIC_COLUMN, CIRV_PREV_NUMERIC_COLUMN],
-        categorical_columns=["emergencyTypeName", "countryName", "projectsectors"],
-    )
-    cerf_corr = _feature_target_correlation(
-        cerf_features,
-        filtered[TARGET_NUMERIC_COLUMN],
-        method=method,
-        top_n=corr_limit,
-    )
-    cerf_holdout = _filter_holdout(CERF_MODEL, filtered)
+    components = []
+    for spec in bundle.feature_specs:
+        field_id = {"type": "infer-input", "column": spec.column}
+        if spec.encoding in {"numeric_scaled", "numeric_raw"}:
+            components.append(
+                html.Div(
+                    [
+                        html.Label(spec.column),
+                        dcc.Input(
+                            id=field_id,
+                            type="number",
+                            value=spec.default_value if spec.default_value is not None else 0,
+                            debounce=True,
+                        ),
+                    ]
+                )
+            )
+        elif spec.encoding in {"one_hot", "ordinal"}:
+            categories = spec.categories or ["Unknown"]
+            default_value = spec.default_value if spec.default_value is not None else categories[0]
+            components.append(
+                html.Div(
+                    [
+                        html.Label(spec.column),
+                        dcc.Dropdown(
+                            id=field_id,
+                            options=[{"label": value, "value": value} for value in categories],
+                            value=default_value,
+                            clearable=False,
+                        ),
+                    ]
+                )
+            )
+        else:
+            vocabulary = spec.token_vocabulary or []
+            components.append(
+                html.Div(
+                    [
+                        html.Label(spec.column),
+                        dcc.Dropdown(
+                            id=field_id,
+                            options=[{"label": token, "value": token} for token in vocabulary],
+                            value=[],
+                            multi=True,
+                            placeholder="Select one or more values",
+                        ),
+                    ]
+                )
+            )
+    return components
 
-    return (
-        cerf_summary_cards(filtered),
-        target_distribution(filtered, "CERF CIRV - Inc distribution"),
-        feature_target_correlation_bar(
-            cerf_corr,
-            f"CERF top {corr_limit} feature to CIRV correlation ({method.capitalize()})",
-        ),
-        correlation_heatmap(
-            cerf_features,
-            cerf_corr,
-            method,
-            f"CERF pairwise feature correlation ({method.capitalize()}, top {len(cerf_corr)})",
-        ),
-        predicted_vs_actual_ribbon(
-            cerf_holdout,
-            "CERF holdout predicted vs actual with 90% model ribbon",
-            interval_z=CERF_MODEL.interval_z,
-        ),
-        residual_ribbon(
-            cerf_holdout,
-            "CERF holdout residuals with 90% model ribbon",
-            interval_z=CERF_MODEL.interval_z,
-        ),
-    )
+
+@app.callback(
+    Output("prediction-output", "children"),
+    Input("estimate-button", "n_clicks"),
+    State("model-key", "data"),
+    State({"type": "infer-input", "column": ALL}, "value"),
+    prevent_initial_call=True,
+)
+def run_prediction(_n_clicks, model_key, input_values):
+    bundle = _cache_get(MODEL_CACHE, model_key)
+    if bundle is None:
+        return warning_box("Inference blocked", "Train a model first.")
+
+    row: dict[str, object] = {}
+    specs = bundle.feature_specs
+    values = input_values or []
+    for idx, spec in enumerate(specs):
+        value = values[idx] if idx < len(values) else None
+        if spec.encoding in {"multi_hot_literal", "multi_hot_delimited"}:
+            value = value or []
+            row[spec.column] = list(value) if isinstance(value, list) else [value]
+        else:
+            row[spec.column] = value
+
+    frame = make_dynamic_prediction_frame(row)
+    try:
+        prediction = predict_dynamic(bundle, frame)
+    except Exception as exc:
+        return warning_box("Inference failed", str(exc))
+    return prediction_box(prediction)
 
 
 if __name__ == "__main__":

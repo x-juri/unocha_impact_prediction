@@ -240,6 +240,32 @@ button:hover {
   gap: 12px;
 }
 
+.upload-box {
+  padding: 20px;
+  border: 2px dashed var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.encoding-grid {
+  display: grid;
+  gap: 10px;
+  margin: 12px 0 18px;
+}
+
+.encoding-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.3fr) minmax(180px, 1fr) minmax(120px, 0.7fr);
+  gap: 10px;
+  align-items: end;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
 .model-results {
   display: grid;
   gap: 16px;
@@ -309,5 +335,9 @@ button:hover {
 
   .panel {
     padding: 18px;
+  }
+
+  .encoding-row {
+    grid-template-columns: 1fr;
   }
 }

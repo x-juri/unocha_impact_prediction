@@ -119,6 +119,15 @@ def _parse_general_number(series: pd.Series) -> pd.Series:
     return pd.to_numeric(cleaned, errors="coerce")
 
 
+def _coerce_numeric(series: pd.Series) -> pd.Series:
+    direct = pd.to_numeric(series, errors="coerce")
+    general = _parse_general_number(series)
+    decimal_comma = _parse_decimal_comma(series)
+    candidates = [direct, general, decimal_comma]
+    best = max(candidates, key=lambda values: int(values.notna().sum()))
+    return best
+
+
 def _normalise_category(series: pd.Series) -> pd.Series:
     values = series.astype("string").str.strip()
     return values.replace("", pd.NA).fillna("Unknown").astype(str)
@@ -561,3 +570,427 @@ def budget_sensecheck(df: pd.DataFrame) -> dict[str, object]:
         "max": float(parsed.max()),
         "examples": raw.dropna().head(8).tolist(),
     }
+
+
+@dataclass(frozen=True)
+class FeatureEncodingSpec:
+    column: str
+    encoding: str
+    delimiter: str | None = None
+
+
+@dataclass(frozen=True)
+class FittedFeatureSpec:
+    column: str
+    encoding: str
+    feature_names: list[str]
+    fill_value: float | None = None
+    mean: float | None = None
+    std: float | None = None
+    categories: list[str] | None = None
+    token_vocabulary: list[str] | None = None
+    delimiter: str | None = None
+    default_value: object | None = None
+
+
+@dataclass(frozen=True)
+class DynamicModelBundle:
+    regressor: BayesianRidge
+    target_column: str
+    feature_specs: list[FittedFeatureSpec]
+    encoded_feature_names: list[str]
+    metrics: dict[str, float]
+    holdout_diagnostics: pd.DataFrame
+    training_encoded: pd.DataFrame
+    training_target: pd.Series
+    interval_z: float = 1.64
+
+
+def detect_column_role(series: pd.Series) -> str:
+    non_null = series.dropna()
+    if non_null.empty:
+        return "categorical"
+
+    numeric_ratio = pd.to_numeric(non_null, errors="coerce").notna().mean()
+    if numeric_ratio >= 0.9:
+        return "numeric"
+
+    string_values = non_null.astype("string").str.strip()
+    if string_values.empty:
+        return "categorical"
+
+    literal_hits = 0
+    inspected = 0
+    semicolon_hits = 0
+    comma_hits = 0
+    for raw in string_values.head(500):
+        if not raw:
+            continue
+        inspected += 1
+        if ";" in raw:
+            semicolon_hits += 1
+        if "," in raw:
+            comma_hits += 1
+        try:
+            parsed = ast.literal_eval(raw)
+        except (ValueError, SyntaxError):
+            continue
+        if isinstance(parsed, (list, tuple, set)):
+            literal_hits += 1
+
+    if inspected == 0:
+        return "categorical"
+    if literal_hits / inspected >= 0.5:
+        return "multi_hot_literal"
+    if max(semicolon_hits, comma_hits) / inspected >= 0.5:
+        return "multi_hot_delimited"
+    return "categorical"
+
+
+def default_encoding_for_series(series: pd.Series) -> FeatureEncodingSpec:
+    role = detect_column_role(series)
+    if role == "numeric":
+        return FeatureEncodingSpec(column=str(series.name), encoding="numeric_scaled")
+    if role == "multi_hot_literal":
+        return FeatureEncodingSpec(column=str(series.name), encoding="multi_hot_literal")
+    if role == "multi_hot_delimited":
+        delimiter = ";"
+        sample = series.dropna().astype("string").head(200)
+        semicolon_hits = sample.str.contains(";", regex=False).sum()
+        comma_hits = sample.str.contains(",", regex=False).sum()
+        if comma_hits > semicolon_hits:
+            delimiter = ","
+        return FeatureEncodingSpec(column=str(series.name), encoding="multi_hot_delimited", delimiter=delimiter)
+    return FeatureEncodingSpec(column=str(series.name), encoding="one_hot")
+
+
+def infer_column_roles(df: pd.DataFrame) -> dict[str, str]:
+    return {column: detect_column_role(df[column]) for column in df.columns}
+
+
+def validate_training_setup(
+    df: pd.DataFrame,
+    target_column: str | None,
+    treatment_columns: list[str] | None,
+) -> list[str]:
+    errors: list[str] = []
+    if target_column is None or not target_column:
+        errors.append("Select a target column.")
+    elif target_column not in df.columns:
+        errors.append(f"Target column '{target_column}' is not present in the dataset.")
+
+    treatments = treatment_columns or []
+    if not treatments:
+        errors.append("Select at least one treatment variable.")
+    for column in treatments:
+        if column not in df.columns:
+            errors.append(f"Treatment column '{column}' is not present in the dataset.")
+    if target_column and target_column in treatments:
+        errors.append("Target column cannot also be a treatment variable.")
+    return errors
+
+
+def _normalise_string(series: pd.Series) -> pd.Series:
+    values = series.astype("string").str.strip()
+    return values.replace("", pd.NA).fillna("Unknown").astype(str)
+
+
+def _parse_multi_hot_literal(value: object) -> list[str]:
+    if isinstance(value, (list, tuple, set)):
+        parsed = list(value)
+    elif pd.isna(value):
+        return []
+    else:
+        raw = str(value).strip()
+        if not raw:
+            return []
+        try:
+            parsed = ast.literal_eval(raw)
+        except (ValueError, SyntaxError):
+            return [raw]
+    if not isinstance(parsed, list):
+        parsed = [parsed]
+    tokens: list[str] = []
+    for item in parsed:
+        token = str(item).strip()
+        if token:
+            tokens.append(token)
+    return tokens
+
+
+def _parse_multi_hot_delimited(value: object, delimiter: str | None) -> list[str]:
+    if isinstance(value, (list, tuple, set)):
+        return [str(token).strip() for token in value if str(token).strip()]
+    if pd.isna(value):
+        return []
+    raw = str(value).strip()
+    if not raw:
+        return []
+    delimiter = delimiter or ";"
+    return [token.strip() for token in raw.split(delimiter) if token.strip()]
+
+
+def _fit_feature_spec(series: pd.Series, spec: FeatureEncodingSpec) -> tuple[FittedFeatureSpec, pd.DataFrame]:
+    column = spec.column
+    encoding = spec.encoding
+    index = series.index
+
+    if encoding in {"numeric_scaled", "numeric_raw"}:
+        numeric = _coerce_numeric(series)
+        if numeric.notna().any():
+            fill = float(numeric.median())
+        else:
+            fill = 0.0
+        filled = numeric.fillna(fill).astype(float)
+        mean = float(filled.mean())
+        std = float(filled.std(ddof=0))
+        if std <= 0:
+            std = 1.0
+        transformed = (filled - mean) / std if encoding == "numeric_scaled" else filled
+        frame = pd.DataFrame({column: transformed}, index=index)
+        fitted = FittedFeatureSpec(
+            column=column,
+            encoding=encoding,
+            feature_names=[column],
+            fill_value=fill,
+            mean=mean,
+            std=std,
+            default_value=fill,
+        )
+        return fitted, frame
+
+    if encoding == "one_hot":
+        values = _normalise_string(series)
+        categories = sorted(values.unique().tolist())
+        reference = categories[0] if categories else "Unknown"
+        active_categories = categories[1:] if len(categories) > 1 else []
+        encoded_map = {f"{column}={category}": (values == category).astype(float) for category in active_categories}
+        frame = pd.DataFrame(encoded_map, index=index)
+        fitted = FittedFeatureSpec(
+            column=column,
+            encoding=encoding,
+            feature_names=list(frame.columns),
+            categories=categories,
+            default_value=reference,
+        )
+        return fitted, frame
+
+    if encoding == "ordinal":
+        values = _normalise_string(series)
+        categories = sorted(values.unique().tolist())
+        mapping = {category: float(idx) for idx, category in enumerate(categories)}
+        encoded = values.map(mapping).fillna(-1.0).astype(float)
+        frame = pd.DataFrame({column: encoded}, index=index)
+        default_value = categories[0] if categories else "Unknown"
+        fitted = FittedFeatureSpec(
+            column=column,
+            encoding=encoding,
+            feature_names=[column],
+            categories=categories,
+            default_value=default_value,
+        )
+        return fitted, frame
+
+    if encoding in {"multi_hot_literal", "multi_hot_delimited"}:
+        parser = _parse_multi_hot_literal
+        if encoding == "multi_hot_delimited":
+            parser = lambda value: _parse_multi_hot_delimited(value, spec.delimiter)
+        tokens_per_row = series.apply(parser)
+        vocabulary = sorted({token for row_tokens in tokens_per_row for token in row_tokens})
+        encoded_map = {
+            f"{column} contains {token}": tokens_per_row.apply(lambda values, token=token: float(token in values))
+            for token in vocabulary
+        }
+        frame = pd.DataFrame(encoded_map, index=index)
+        fitted = FittedFeatureSpec(
+            column=column,
+            encoding=encoding,
+            feature_names=list(frame.columns),
+            token_vocabulary=vocabulary,
+            delimiter=spec.delimiter,
+            default_value=[],
+        )
+        return fitted, frame
+
+    raise ValueError(f"Unsupported encoding '{encoding}' for column '{column}'.")
+
+
+def _transform_with_fitted_specs(df: pd.DataFrame, specs: list[FittedFeatureSpec]) -> pd.DataFrame:
+    encoded_parts: list[pd.DataFrame] = []
+    for spec in specs:
+        column = spec.column
+        if column not in df.columns:
+            source = pd.Series([spec.default_value] * len(df), index=df.index)
+        else:
+            source = df[column]
+
+        if spec.encoding in {"numeric_scaled", "numeric_raw"}:
+            numeric = _coerce_numeric(source)
+            fill = float(spec.fill_value if spec.fill_value is not None else 0.0)
+            filled = numeric.fillna(fill).astype(float)
+            if spec.encoding == "numeric_scaled":
+                mean = float(spec.mean if spec.mean is not None else 0.0)
+                std = float(spec.std if spec.std is not None else 1.0)
+                if std <= 0:
+                    std = 1.0
+                filled = (filled - mean) / std
+            encoded_parts.append(pd.DataFrame({spec.feature_names[0]: filled}, index=df.index))
+            continue
+
+        if spec.encoding == "one_hot":
+            values = _normalise_string(source)
+            encoded_map = {
+                feature_name: (values == feature_name.split("=", 1)[1]).astype(float)
+                for feature_name in spec.feature_names
+            }
+            part = pd.DataFrame(encoded_map, index=df.index)
+            encoded_parts.append(part)
+            continue
+
+        if spec.encoding == "ordinal":
+            values = _normalise_string(source)
+            categories = spec.categories or []
+            mapping = {category: float(idx) for idx, category in enumerate(categories)}
+            encoded = values.map(mapping).fillna(-1.0).astype(float)
+            encoded_parts.append(pd.DataFrame({spec.feature_names[0]: encoded}, index=df.index))
+            continue
+
+        parser = _parse_multi_hot_literal
+        if spec.encoding == "multi_hot_delimited":
+            parser = lambda value: _parse_multi_hot_delimited(value, spec.delimiter)
+        tokens_per_row = source.apply(parser)
+        encoded_map = {
+            feature_name: tokens_per_row.apply(
+                lambda values, token=feature_name.split(" contains ", 1)[1]: float(token in values)
+            )
+            for feature_name in spec.feature_names
+        }
+        part = pd.DataFrame(encoded_map, index=df.index)
+        encoded_parts.append(part)
+
+    if not encoded_parts:
+        return pd.DataFrame(index=df.index)
+    return pd.concat(encoded_parts, axis=1).astype(float)
+
+
+def train_dynamic_model(
+    df: pd.DataFrame,
+    target_column: str,
+    feature_specs: list[FeatureEncodingSpec],
+    random_state: int = 42,
+    test_size: float = 0.25,
+    interval_z: float = 1.64,
+) -> DynamicModelBundle:
+    if not feature_specs:
+        raise ValueError("At least one feature specification is required for training.")
+
+    missing = [spec.column for spec in feature_specs if spec.column not in df.columns]
+    if missing:
+        raise ValueError(f"The following treatment columns are missing: {sorted(set(missing))}")
+    if target_column not in df.columns:
+        raise ValueError(f"Target column '{target_column}' is missing from the dataset.")
+
+    fitted_specs: list[FittedFeatureSpec] = []
+    encoded_parts: list[pd.DataFrame] = []
+    for spec in feature_specs:
+        fitted, part = _fit_feature_spec(df[spec.column], spec)
+        fitted_specs.append(fitted)
+        if not part.empty:
+            encoded_parts.append(part)
+
+    if not encoded_parts:
+        raise ValueError("Selected encodings produced zero usable model features.")
+    encoded = pd.concat(encoded_parts, axis=1).astype(float)
+    encoded = encoded.loc[:, encoded.var(axis=0, numeric_only=True) > 0]
+    if encoded.empty:
+        raise ValueError("All encoded features are constant; choose different treatments or encodings.")
+
+    target = _coerce_numeric(df[target_column])
+    valid_mask = target.notna()
+    encoded_valid = encoded.loc[valid_mask].copy()
+    target_valid = target.loc[valid_mask].copy()
+    if len(encoded_valid) < 8:
+        raise ValueError("Need at least 8 rows with numeric target values for training.")
+
+    holdout_diagnostics = pd.DataFrame(
+        columns=["source_index", "actual", "prediction", "std", "lower", "upper", "residual"]
+    )
+
+    if len(encoded_valid) >= 12:
+        x_train, x_test, y_train, y_test = train_test_split(
+            encoded_valid,
+            target_valid,
+            test_size=test_size,
+            random_state=random_state,
+        )
+        eval_model = BayesianRidge()
+        eval_model.fit(x_train, y_train)
+        train_pred, train_std = eval_model.predict(x_train, return_std=True)
+        test_pred, test_std = eval_model.predict(x_test, return_std=True)
+        holdout_diagnostics = pd.DataFrame(
+            {
+                "source_index": x_test.index,
+                "actual": y_test.to_numpy(),
+                "prediction": test_pred,
+                "std": test_std,
+            }
+        )
+        holdout_diagnostics["lower"] = holdout_diagnostics["prediction"] - interval_z * holdout_diagnostics["std"]
+        holdout_diagnostics["upper"] = holdout_diagnostics["prediction"] + interval_z * holdout_diagnostics["std"]
+        holdout_diagnostics["residual"] = holdout_diagnostics["actual"] - holdout_diagnostics["prediction"]
+        metrics = {
+            "train_r2": float(r2_score(y_train, train_pred)),
+            "test_r2": float(r2_score(y_test, test_pred)),
+            "train_mae": float(mean_absolute_error(y_train, train_pred)),
+            "test_mae": float(mean_absolute_error(y_test, test_pred)),
+            "train_mean_std": float(train_std.mean()),
+            "test_mean_std": float(test_std.mean()),
+            "train_rows": float(len(x_train)),
+            "test_rows": float(len(x_test)),
+        }
+    else:
+        metrics = {
+            "train_r2": float("nan"),
+            "test_r2": float("nan"),
+            "train_mae": float("nan"),
+            "test_mae": float("nan"),
+            "train_mean_std": float("nan"),
+            "test_mean_std": float("nan"),
+            "train_rows": float(len(encoded_valid)),
+            "test_rows": 0.0,
+        }
+
+    final_model = BayesianRidge()
+    final_model.fit(encoded_valid, target_valid)
+    return DynamicModelBundle(
+        regressor=final_model,
+        target_column=target_column,
+        feature_specs=fitted_specs,
+        encoded_feature_names=list(encoded_valid.columns),
+        metrics=metrics,
+        holdout_diagnostics=holdout_diagnostics,
+        training_encoded=encoded_valid,
+        training_target=target_valid,
+        interval_z=interval_z,
+    )
+
+
+def make_dynamic_prediction_frame(raw_values: dict[str, object]) -> pd.DataFrame:
+    return pd.DataFrame([raw_values])
+
+
+def predict_dynamic(bundle: DynamicModelBundle, frame: pd.DataFrame) -> PredictionResult:
+    transformed = _transform_with_fitted_specs(frame, bundle.feature_specs)
+    for column in bundle.encoded_feature_names:
+        if column not in transformed.columns:
+            transformed[column] = 0.0
+    transformed = transformed[bundle.encoded_feature_names]
+    prediction, std = bundle.regressor.predict(transformed, return_std=True)
+    value = float(prediction[0])
+    uncertainty = float(std[0])
+    return PredictionResult(
+        prediction=value,
+        lower=value - bundle.interval_z * uncertainty,
+        upper=value + bundle.interval_z * uncertainty,
+        std=uncertainty,
+    )
