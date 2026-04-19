@@ -10,7 +10,7 @@ from typing import Any
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from dash import ALL, Dash, Input, Output, State, dcc, html
+from dash import ALL, Dash, Input, Output, State, dcc, html, dash_table
 
 try:
     from .data_model import (
@@ -85,7 +85,31 @@ def _decode_upload(contents: str) -> pd.DataFrame:
     return pd.read_csv(buffer)
 
 
-def format_cirv(value: float | int | None) -> str:
+def _pick_default_target(df: pd.DataFrame, roles: dict[str, str]) -> str:
+    numeric_columns = [column for column, role in roles.items() if role == "numeric"]
+    if not numeric_columns:
+        return str(df.columns[0])
+
+    def score(column: str) -> int:
+        label = column.lower()
+        value = 0
+        if "target" in label or "label" in label or "outcome" in label:
+            value += 6
+        if "cirv" in label or "civr" in label:
+            value += 5
+        if "inc" in label:
+            value += 3
+        if "prev" in label:
+            value -= 2
+        return value
+
+    ranked = sorted(numeric_columns, key=lambda column: (score(column), column), reverse=True)
+    if score(ranked[0]) > 0:
+        return ranked[0]
+    return numeric_columns[0]
+
+
+def format_target_value(value: float | int | None) -> str:
     if value is None:
         return "n/a"
     try:
@@ -94,7 +118,14 @@ def format_cirv(value: float | int | None) -> str:
         return "n/a"
     if not math.isfinite(numeric):
         return "n/a"
-    return f"{numeric:+.3f}"
+    abs_value = abs(numeric)
+    if abs_value >= 1_000_000:
+        return f"{numeric:,.0f}"
+    if abs_value >= 1_000:
+        return f"{numeric:,.2f}"
+    if abs_value >= 1:
+        return f"{numeric:,.3f}"
+    return f"{numeric:,.4f}"
 
 
 def format_number(value: float | int | None) -> str:
@@ -123,13 +154,16 @@ def warning_box(title: str, message: str) -> html.Div:
     )
 
 
-def prediction_box(prediction) -> html.Div:
+def prediction_box(prediction, target_label: str = "Target") -> html.Div:
     return html.Div(
         [
-            html.Span("Estimated target", className="prediction-label"),
-            html.Strong(format_cirv(prediction.prediction)),
-            html.P(f"90% model interval: {format_cirv(prediction.lower)} to {format_cirv(prediction.upper)}"),
-            html.Small(f"Predictive standard deviation: {prediction.std:.3f}"),
+            html.Span(f"Estimated {target_label}", className="prediction-label"),
+            html.Strong(format_target_value(prediction.prediction)),
+            html.P(
+                f"90% model interval: {format_target_value(prediction.lower)}"
+                f" to {format_target_value(prediction.upper)}"
+            ),
+            html.Small(f"Predictive standard deviation: {format_target_value(prediction.std)}"),
         ],
         className="prediction-box",
     )
@@ -256,7 +290,12 @@ def _binned_line(frame: pd.DataFrame, x_column: str, interval_z: float = 1.64, b
     return grouped
 
 
-def predicted_vs_actual_ribbon(holdout: pd.DataFrame, title: str, interval_z: float):
+def predicted_vs_actual_ribbon(
+    holdout: pd.DataFrame,
+    title: str,
+    interval_z: float,
+    target_label: str,
+):
     if holdout.empty:
         return empty_figure("No holdout rows are available for diagnostics")
     fig = go.Figure()
@@ -303,11 +342,20 @@ def predicted_vs_actual_ribbon(holdout: pd.DataFrame, title: str, interval_z: fl
             name="Perfect calibration",
         )
     )
-    fig.update_layout(title=title, xaxis_title="Actual target", yaxis_title="Predicted target")
+    fig.update_layout(
+        title=title,
+        xaxis_title=f"Actual {target_label}",
+        yaxis_title=f"Predicted {target_label}",
+    )
     return apply_chart_style(fig)
 
 
-def residual_ribbon(holdout: pd.DataFrame, title: str, interval_z: float):
+def residual_ribbon(
+    holdout: pd.DataFrame,
+    title: str,
+    interval_z: float,
+    target_label: str,
+):
     if holdout.empty:
         return empty_figure("No holdout rows are available for diagnostics")
     fig = go.Figure()
@@ -346,19 +394,23 @@ def residual_ribbon(holdout: pd.DataFrame, title: str, interval_z: float):
             )
         )
     fig.add_hline(y=0, line_dash="dash", line_color="#9aa5b1")
-    fig.update_layout(title=title, xaxis_title="Predicted target", yaxis_title="Residual (actual - predicted)")
+    fig.update_layout(
+        title=title,
+        xaxis_title=f"Predicted {target_label}",
+        yaxis_title=f"Residual ({target_label} actual - predicted)",
+    )
     return apply_chart_style(fig)
 
 
-def target_distribution(series: pd.Series, title: str):
-    numeric = pd.to_numeric(series, errors="coerce").dropna()
+def target_distribution(series: pd.Series, title: str, target_label: str):
+    numeric = series.dropna()
     if numeric.empty:
         return empty_figure("Target could not be parsed as numeric values")
     fig = px.histogram(
         x=numeric,
         nbins=30,
         title=title,
-        labels={"x": "Target"},
+        labels={"x": target_label},
         color_discrete_sequence=["#1f7a8c"],
     )
     return apply_chart_style(fig)
@@ -408,6 +460,7 @@ app.layout = html.Div(
                         ),
                         html.Div(id="upload-status"),
                         html.Div(id="dataset-summary", className="metrics-grid"),
+                        html.Div(id="dataset-head-block"),
                     ],
                     className="panel",
                 ),
@@ -511,6 +564,7 @@ app.layout = html.Div(
     Output("treatment-columns", "options"),
     Output("upload-status", "children"),
     Output("dataset-summary", "children"),
+    Output("dataset-head-block", "children"),
     Input("csv-upload", "contents"),
     State("csv-upload", "filename"),
     prevent_initial_call=True,
@@ -520,21 +574,15 @@ def handle_upload(contents, filename):
         df = _decode_upload(contents)
     except Exception as exc:
         message = warning_box("Upload failed", f"Could not parse CSV: {exc}")
-        return None, [], None, [], message, []
+        return None, [], None, [], message, [], []
 
     if df.empty:
-        return None, [], None, [], warning_box("Upload failed", "The uploaded CSV has no rows."), []
+        return None, [], None, [], warning_box("Upload failed", "The uploaded CSV has no rows."), [], []
 
     dataset_key = _cache_put(DATASET_CACHE, df)
     options = [{"label": column, "value": column} for column in df.columns]
-    target_default = None
     roles = infer_column_roles(df)
-    for column, role in roles.items():
-        if role == "numeric":
-            target_default = column
-            break
-    if target_default is None:
-        target_default = df.columns[0]
+    target_default = _pick_default_target(df, roles)
 
     summary = [
         metric_card("File", str(filename or "uploaded.csv")),
@@ -553,7 +601,45 @@ def handle_upload(contents, filename):
         ],
         className="diagnostics",
     )
-    return dataset_key, options, target_default, options, status, summary
+
+    preview = df.head(5).copy()
+    max_columns = 20
+    truncated = len(preview.columns) > max_columns
+    preview = preview.iloc[:, :max_columns]
+    preview = preview.astype("string").replace("<NA>", "")
+    preview_columns = [{"name": column, "id": column} for column in preview.columns]
+    preview_block = html.Div(
+        [
+            html.Span("Data preview", className="section-kicker"),
+            html.P("First 5 rows from the uploaded file.", className="muted"),
+            html.Small(
+                f"Showing first {max_columns} columns for readability."
+                if truncated
+                else "",
+                className="muted",
+            ),
+            html.Div(
+                dash_table.DataTable(
+                    columns=preview_columns,
+                    data=preview.to_dict("records"),
+                    page_action="none",
+                    style_table={"overflowX": "auto"},
+                    style_cell={
+                        "textAlign": "left",
+                        "minWidth": "120px",
+                        "maxWidth": "280px",
+                        "whiteSpace": "normal",
+                        "fontFamily": "Arial, sans-serif",
+                        "fontSize": "12px",
+                    },
+                    style_header={"fontWeight": "700", "backgroundColor": "#f5f8fa"},
+                ),
+                className="dataset-head-table-wrap",
+            ),
+        ],
+        className="diagnostics dataset-head-block",
+    )
+    return dataset_key, options, target_default, options, status, summary, preview_block
 
 
 @app.callback(
@@ -689,8 +775,8 @@ def train_model(
     metrics = bundle.metrics
     cards = [
         metric_card("Test R2", f"{metrics['test_r2']:.3f}"),
-        metric_card("Test MAE", f"{metrics['test_mae']:.3f}"),
-        metric_card("Mean test std", f"{metrics['test_mean_std']:.3f}"),
+        metric_card("Test MAE", format_target_value(metrics["test_mae"])),
+        metric_card("Mean test std", format_target_value(metrics["test_mean_std"])),
         metric_card("Rows", format_number(metrics["train_rows"] + metrics["test_rows"])),
     ]
 
@@ -706,7 +792,11 @@ def train_model(
         model_key,
         status,
         cards,
-        target_distribution(bundle.training_target, "Target distribution (training rows)"),
+        target_distribution(
+            bundle.training_target,
+            f"{bundle.target_column} distribution (training rows)",
+            bundle.target_column,
+        ),
         feature_target_correlation_bar(corr_df, f"Top {top_n} feature correlations ({method.capitalize()})"),
         correlation_heatmap(
             bundle.training_encoded,
@@ -714,8 +804,18 @@ def train_model(
             method,
             f"Pairwise feature correlation ({method.capitalize()}, top {len(corr_df)})",
         ),
-        predicted_vs_actual_ribbon(bundle.holdout_diagnostics, "Holdout predicted vs actual", bundle.interval_z),
-        residual_ribbon(bundle.holdout_diagnostics, "Holdout residuals", bundle.interval_z),
+        predicted_vs_actual_ribbon(
+            bundle.holdout_diagnostics,
+            f"Holdout predicted vs actual ({bundle.target_column})",
+            bundle.interval_z,
+            bundle.target_column,
+        ),
+        residual_ribbon(
+            bundle.holdout_diagnostics,
+            f"Holdout residuals ({bundle.target_column})",
+            bundle.interval_z,
+            bundle.target_column,
+        ),
     )
 
 
@@ -808,7 +908,7 @@ def run_prediction(_n_clicks, model_key, input_values):
         prediction = predict_dynamic(bundle, frame)
     except Exception as exc:
         return warning_box("Inference failed", str(exc))
-    return prediction_box(prediction)
+    return prediction_box(prediction, target_label=bundle.target_column)
 
 
 if __name__ == "__main__":

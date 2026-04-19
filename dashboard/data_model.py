@@ -120,12 +120,31 @@ def _parse_general_number(series: pd.Series) -> pd.Series:
 
 
 def _coerce_numeric(series: pd.Series) -> pd.Series:
+    text = series.astype("string").str.strip()
     direct = pd.to_numeric(series, errors="coerce")
     general = _parse_general_number(series)
     decimal_comma = _parse_decimal_comma(series)
-    candidates = [direct, general, decimal_comma]
-    best = max(candidates, key=lambda values: int(values.notna().sum()))
-    return best
+    candidates = {
+        "direct": direct,
+        "general": general,
+        "decimal_comma": decimal_comma,
+    }
+    scores = {name: int(values.notna().sum()) for name, values in candidates.items()}
+    best_name = max(scores, key=scores.get)
+
+    comma_mask = text.str.contains(",", regex=False, na=False)
+    dot_mask = text.str.contains(".", regex=False, na=False)
+    comma_no_dot = comma_mask & ~dot_mask
+    if comma_no_dot.any():
+        right_lengths = text[comma_no_dot].str.rsplit(",", n=1).str[-1].str.len()
+        decimal_like = int((right_lengths <= 2).sum())
+        thousands_like = int((right_lengths == 3).sum())
+        if decimal_like > thousands_like and scores["decimal_comma"] >= max(scores["general"] - 2, 0):
+            best_name = "decimal_comma"
+        elif thousands_like > decimal_like and scores["general"] >= max(scores["decimal_comma"] - 2, 0):
+            best_name = "general"
+
+    return candidates[best_name]
 
 
 def _normalise_category(series: pd.Series) -> pd.Series:
@@ -611,7 +630,7 @@ def detect_column_role(series: pd.Series) -> str:
     if non_null.empty:
         return "categorical"
 
-    numeric_ratio = pd.to_numeric(non_null, errors="coerce").notna().mean()
+    numeric_ratio = _coerce_numeric(non_null).notna().mean()
     if numeric_ratio >= 0.9:
         return "numeric"
 
