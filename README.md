@@ -1,4 +1,4 @@
-# Analytics Datathon 2026
+# Unocha Quick Data Evaluation
 
 Funny but true: the dashboard lives in `dashboard/`, but it is definitely not a
 dashboard. It is a local CSV modeling workbench wearing a dashboard costume so
